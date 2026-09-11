@@ -1,0 +1,23 @@
+name: Build PDF
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: xu-cheng/latex-action@v3
+        with:
+          root_file: main.tex
+          latexmk_use_xelatex: true
+      - name: Rename output
+        run: mv main.pdf chapter-01-cn.pdf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chapter-01-cn
+          path: chapter-01-cn.pdf
+

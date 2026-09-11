@@ -1,0 +1,841 @@
+\chapter{从样本到经验分布}
+
+数理统计以概率规律以及随机样本如何代表这些规律为起点。本章先复习描述分布、密度、条件期望和积分所需的测度论语言，再引入经验分布函数和经验测度，最后利用大数定律、中心极限定理、连续映射定理、Slutsky 定理和 Delta 方法建立基本渐近工具。
+
+本章的主线可以概括为
+\[
+  \text{总体分布 }P
+  \longrightarrow
+  \text{随机样本 }X_1,\ldots,X_n
+  \longrightarrow
+  \text{经验分布 }P_n,F_n
+  \longrightarrow
+  \text{大样本极限理论}.
+\]
+
+\section{概率论回顾}
+
+\subsection{测度论的基本语言}
+
+\begin{definitionbox}{定义 1.1.1：$\sigma$-域}
+设 $\mathcal F$ 是样本空间 $\Omega$ 的若干子集组成的非空集合族。若
+\[
+ A\in\mathcal F\Rightarrow A^c\in\mathcal F,
+ \qquad
+ A_i\in\mathcal F\Rightarrow \bigcup_{i=1}^{\infty}A_i\in\mathcal F,
+\]
+则称 $\mathcal F$ 为一个 $\sigma$-域。由 De Morgan 律，它也对可列交封闭。实数轴上的 Borel $\sigma$-域 $\mathcal B(\R)$ 是包含所有开集的最小 $\sigma$-域。
+\end{definitionbox}
+
+概率模型写作三元组
+\[
+  (\Omega,\mathcal F,P),
+\]
+其中 $\Omega$ 给出全部基本结果，$\mathcal F$ 规定哪些集合是可测事件，$P$ 则为事件分配概率。
+
+\begin{definitionbox}{定义 1.1.2：测度与概率}
+测度 $\mu$ 是定义在 $(\Omega,\mathcal F)$ 上的非负、可列可加集合函数。若 $A_i$ 两两不交，则
+\[
+ \mu\!\left(\bigcup_{i=1}^{\infty}A_i\right)
+ =\sum_{i=1}^{\infty}\mu(A_i).
+\]
+若再有 $\mu(\Omega)=1$，则 $\mu$ 是概率测度。只在一个 $P$-零测集上可能失败的命题称为几乎必然成立，记为 a.s.。
+\end{definitionbox}
+
+连续空间中最常见的参考测度是 Lebesgue 测度 $\lambda$，满足
+\[
+ \lambda((a,b))=b-a.
+\]
+可数空间中最常见的是计数测度
+\[
+ \#(A)=|A|.
+\]
+
+若存在 $A_1,A_2,\ldots\in\mathcal F$，使得
+\[
+ \Omega=\bigcup_{n=1}^{\infty}A_n,
+ \qquad \mu(A_n)<\infty,
+\]
+则称 $\mu$ 为 $\sigma$-有限测度。Lebesgue 测度在 $\R$ 上是 $\sigma$-有限的，因为 $\R=\bigcup_n[-n,n]$；而 $\R$ 上的计数测度不是 $\sigma$-有限的。
+
+\begin{definitionbox}{定义 1.1.3：离散概率测度}
+若概率测度 $P$ 集中在有限或可数集合 $\{x_1,x_2,\ldots\}$ 上，且
+\[
+ P(E)=\sum_i p_i\ind_{\{x_i\in E\}},
+ \qquad p_i\geq0,
+ \qquad \sum_i p_i=1,
+\]
+则称 $P$ 为离散概率测度。
+\end{definitionbox}
+
+\begin{definitionbox}{定义 1.1.4：绝对连续}
+若对每个 $E\in\mathcal F$ 都有
+\[
+ \nu(E)=0\Rightarrow\mu(E)=0,
+\]
+则称 $\mu$ 关于 $\nu$ 绝对连续，记为 $\mu\ll\nu$，也称 $\mu$ 被 $\nu$ 控制。
+\end{definitionbox}
+
+\begin{notebox}[绝对连续的直觉]
+$\nu$ 可以看作参考尺子。$\mu\ll\nu$ 并不表示 $\mu(E)\leq\nu(E)$，它只比较零测集：$\nu$ 完全看不见的集合，$\mu$ 不能在上面放置正质量。
+
+例如，若 $P(X=0)=0.4$、$P(X=1)=0.6$，则
+\[
+ \lambda(\{0\})=0,\qquad P_X(\{0\})=0.4,
+\]
+所以 $P_X\not\ll\lambda$。但在其可数支撑上，$P_X\ll\#$。
+\end{notebox}
+
+\begin{definitionbox}{定义 1.1.5：随机变量与概率律}
+随机变量是可测映射 $X:\Omega\to\R$，即对所有 $a\in\R$，
+\[
+ X^{-1}(( -\infty,a])=\{\omega:X(\omega)\leq a\}\in\mathcal F.
+\]
+它的概率律是 $\mathcal B(\R)$ 上的概率测度
+\[
+ \boxed{P_X(B)=P\bigl(X^{-1}(B)\bigr)=P(X\in B)}.
+\]
+\end{definitionbox}
+
+这里 $P$ 只能直接测量 $\Omega$ 中的事件，而 $B$ 位于数值空间 $\R$。原像
+\[
+ X^{-1}(B)=\{\omega:X(\omega)\in B\}
+\]
+把 $B$ 拉回到原样本空间，再由 $P$ 计算概率。注意 $P_X$ 是概率测度，$P_X(B)$ 才是一个具体概率值。
+
+\subsection{Radon--Nikodym 导数与概率密度}
+
+\begin{definitionbox}{定理 1.1.1：Radon--Nikodym 定理}
+设 $\mu,\nu$ 是 $(\Omega,\mathcal F)$ 上的 $\sigma$-有限测度。若 $\mu\ll\nu$，则存在非负可测函数 $f$，使得
+\[
+ \mu(E)=\int_E f\,\mathrm d\nu,
+ \qquad E\in\mathcal F.
+\]
+函数 $f$ 称为 $\mu$ 关于 $\nu$ 的 Radon--Nikodym 导数，记为
+\[
+ f=\frac{\mathrm d\mu}{\mathrm d\nu}.
+\]
+它在 $\nu$-几乎处处意义下唯一。
+\end{definitionbox}
+
+RN 导数表示“每单位 $\nu$-测度含有多少 $\mu$-质量”。核心恒等式是
+\[
+ \boxed{
+ \mu(E)=\int_E\frac{\mathrm d\mu}{\mathrm d\nu}\,\mathrm d\nu.}
+\]
+
+在离散空间中，以计数测度为参考，
+\[
+ \frac{\mathrm dP}{\mathrm d\#}(x)=P(\{x\}),
+\]
+就是 PMF。在连续空间中，若 $P_X\ll\lambda$，则
+\[
+ f_X=\frac{\mathrm dP_X}{\mathrm d\lambda}
+\]
+就是通常的 PDF，并且
+\[
+ P(X\in A)=\int_A f_X(x)\,\mathrm dx,
+ \qquad
+ F_X(x)=\int_{-\infty}^{x}f_X(y)\,\mathrm dy.
+\]
+
+\begin{notebox}[密度依赖参考测度]
+固定 $\psi$ 时，密度不能脱离参考测度单独存在。同一个概率分布相对于计数测度、Lebesgue 测度或其他控制测度，会有不同的 RN 导数。密度值也可以超过 $1$；只有对集合积分以后才得到概率。
+\end{notebox}
+
+若 $\mathcal P$ 是概率测度族，并存在同一个 $\sigma$-有限测度 $\nu$ 使每个 $P\in\mathcal P$ 都满足 $P\ll\nu$，则称 $\mathcal P$ 被 $\nu$ 控制，并可由密度族
+\[
+ \left\{\frac{\mathrm dP}{\mathrm d\nu}:P\in\mathcal P\right\}
+\]
+表示。
+
+RN 导数具有换测度、可加性和链式法则：
+\[
+ \int g\,\mathrm d\mu
+ =\int g\frac{\mathrm d\mu}{\mathrm d\nu}\,\mathrm d\nu,
+\]
+\[
+ \frac{\mathrm d(\mu_1+\mu_2)}{\mathrm d\nu}
+ =\frac{\mathrm d\mu_1}{\mathrm d\nu}
+ +\frac{\mathrm d\mu_2}{\mathrm d\nu},
+\]
+以及当 $\tau\ll\mu\ll\nu$ 时，
+\[
+ \frac{\mathrm d\tau}{\mathrm d\nu}
+ =\frac{\mathrm d\tau}{\mathrm d\mu}
+  \frac{\mathrm d\mu}{\mathrm d\nu}.
+\]
+
+\begin{notebox}[连续 CDF 不一定有密度]
+Cantor 分布集中在不可数但 Lebesgue 测度为零的 Cantor 集 $C$ 上：
+\[
+ P_X(C)=1,\qquad \lambda(C)=0.
+\]
+同时它没有单点质量，因此 CDF 处处连续。这说明 CDF 连续只能排除点质量，却不能排除概率集中在零长度的不可数集合上：
+\[
+ \text{CDF 连续}\not\Rightarrow P_X\ll\lambda.
+\]
+\end{notebox}
+
+\subsection{变量变换、条件期望与积分}
+
+设 $f:(\Omega,\mathcal F,\nu)\to(\Lambda,\mathcal G)$ 可测。它诱导推前测度
+\[
+ (\nu\circ f^{-1})(B)=\nu(f^{-1}(B)).
+\]
+
+\begin{definitionbox}{定理 1.1.2：变量变换}
+对任意非负可测函数或可积函数 $g$，
+\[
+ \int_\Omega g\circ f\,\mathrm d\nu
+ =\int_\Lambda g\,\mathrm d(\nu\circ f^{-1}).
+\]
+\end{definitionbox}
+
+当 $\nu=P$、$f=X$ 时，推前测度就是 $P_X=P\circ X^{-1}$，从而
+\[
+ \E\{h(X)\}
+ =\int_\Omega h(X(\omega))\,\mathrm dP(\omega)
+ =\int_\R h(x)\,\mathrm dP_X(x).
+\]
+
+\begin{definitionbox}{定义 1.1.7：条件期望}
+设 $X$ 可积，$\mathcal G\subseteq\mathcal F$。条件期望 $Z=\E(X\mid\mathcal G)$ 是满足以下条件且 a.s. 唯一的随机变量：
+\begin{enumerate}
+ \item $Z$ 是 $\mathcal G$-可测的；
+ \item 对每个 $A\in\mathcal G$，
+ \[
+  \int_A Z\,\mathrm dP=\int_A X\,\mathrm dP.
+ \]
+\end{enumerate}
+\end{definitionbox}
+
+第二个条件等价于
+\[
+ \E\{(X-Z)\ind_A\}=0,
+ \qquad A\in\mathcal G,
+\]
+即残差在每个已知信息事件上的平均值都为零。给定随机变量 $Y$ 的条件期望定义为
+\[
+ \E(X\mid Y)=\E\{X\mid\sigma(Y)\}.
+\]
+塔式性质与全期望公式分别为
+\[
+ \mathcal H\subseteq\mathcal G
+ \Rightarrow
+ \E(X\mid\mathcal H)
+ =\E\{\E(X\mid\mathcal G)\mid\mathcal H\},
+\]
+\[
+ \E\{\E(X\mid\mathcal G)\}=\E X.
+\]
+完全信息下 $\E(X\mid\mathcal F)=X$ a.s.；平凡信息下 $\E(X\mid\mathcal G)=\E X$。
+
+若 $(X,Y)$ 具有联合密度，则当 $f_Y(y)>0$ 时，
+\[
+ f_{X\mid Y}(x\mid y)
+ =\frac{f_{X,Y}(x,y)}{f_Y(y)}
+ =\frac{f_{X,Y}(x,y)}{\int f_{X,Y}(u,y)\,\mathrm du}.
+\]
+
+\begin{definitionbox}{定理 1.1.3：Fubini--Tonelli 定理}
+若 $f\geq0$，或 $\int|f|\,\mathrm d(\nu_1\times\nu_2)<\infty$，则可以交换积分次序：
+\[
+\begin{aligned}
+ \int f\,\mathrm d(\nu_1\times\nu_2)
+ &=\int_{\Omega_2}\!\left[\int_{\Omega_1}f(\omega_1,\omega_2)\,\mathrm d\nu_1\right]\mathrm d\nu_2\\
+ &=\int_{\Omega_1}\!\left[\int_{\Omega_2}f(\omega_1,\omega_2)\,\mathrm d\nu_2\right]\mathrm d\nu_1.
+\end{aligned}
+\]
+\end{definitionbox}
+
+基本收敛定理包括：对 $X_n\geq0$，Fatou 引理给出
+\[
+ \E(\liminf_nX_n)\leq\liminf_n\E X_n;
+\]
+若 $X_n\asto X$ 且 $|X_n|\leq Y$、$\E Y<\infty$，控制收敛定理给出
+\[
+ \E X_n\to\E X;
+\]
+若 $0\leq X_n\uparrow X$ a.s.，单调收敛定理同样给出 $\E X_n\to\E X$，两端允许为无穷大。
+
+\section{总体分布、样本与经验分布函数}
+
+给定概率测度 $P$，通常写 $X\sim P$。对期望存在的可测函数 $f$，记
+\[
+ \boxed{Pf:=\int f\,\mathrm dP=\E\{f(X)\}.}
+ \tag{1.1}
+\]
+总体是一个一般观测 $X$ 的概率分布 $P$；统计模型是可能总体分布的集合 $\mathcal P$。参数模型通常写为
+\[
+ \mathcal P=\{P_\theta:\theta\in\Theta\},
+ \qquad \Theta\subseteq\R^d,
+\]
+非参数模型则允许未知参数本身是函数。
+
+\begin{definitionbox}{定义 1.2.1：随机样本}
+若
+\[
+ X_1,\ldots,X_n\overset{\mathrm{i.i.d.}}{\sim}P,
+\]
+则称其为来自 $P$ 的随机样本。其联合分布是乘积测度 $P^n$。观测前 $X_i$ 和统计量 $\bar X$ 是随机的；观测后得到的数据 $x_i$ 和数值 $\bar x$ 是固定的。
+\end{definitionbox}
+
+总体 CDF $F$ 未知。落入 $(-\infty,x]$ 的观测比例定义经验 CDF：
+\[
+ \boxed{F_n(x)=\frac1n\sum_{i=1}^n\ind_{\{X_i\leq x\}}.}
+\]
+每个实现样本对应的 $F_n$ 都是阶梯型 CDF。若 $X_{(1)}\leq\cdots\leq X_{(n)}$ 是次序统计量，则
+\[
+ F_n^{-1}(p)=\inf\{x:F_n(x)\geq p\}
+ =X_{(\lceil np\rceil)},
+ \qquad 0<p\leq1.
+\]
+
+固定 $x$，令 $Y_i(x)=\ind_{\{X_i\leq x\}}$。则
+\[
+ Y_i(x)\sim\operatorname{Bernoulli}(F(x)),
+ \qquad
+ nF_n(x)\sim\operatorname{Binomial}(n,F(x)).
+ \tag{1.2}
+\]
+
+\begin{definitionbox}{定理 1.2.1：经验 CDF 的均值与方差}
+对每个固定 $x\in\R$，
+\[
+ \E F_n(x)=F(x),
+ \qquad
+ \Var(F_n(x))=\frac{F(x)\{1-F(x)\}}n.
+\]
+\end{definitionbox}
+
+该结论是点态的，只控制固定 $x$，并不能直接控制
+\[
+ \sup_x|F_n(x)-F(x)|.
+\]
+后者需要同时控制整个阈值函数类。
+
+对 $x,y\in\R$，令 $x\wedge y=\min\{x,y\}$，则
+\[
+ \boxed{
+ \Cov(F_n(x),F_n(y))
+ =\frac{F(x\wedge y)-F(x)F(y)}n.}
+ \tag{1.3}
+\]
+
+\section{经验测度与代入原理}
+
+对随机样本 $X_1,\ldots,X_n$，定义经验测度
+\[
+ \boxed{P_n=\frac1n\sum_{i=1}^n\delta_{X_i}},
+\]
+其中 $\delta_x$ 是点质量测度：
+\[
+ \delta_x(A)=\ind_A(x),
+ \qquad
+ \int f\,\mathrm d\delta_x=f(x).
+\]
+因此
+\[
+ P_n(A)=\frac1n\sum_{i=1}^n\ind_A(X_i),
+ \qquad
+ P_nf=\frac1n\sum_{i=1}^nf(X_i).
+\]
+经验 CDF 是特殊情形
+\[
+ F_n(t)=P_n((-\infty,t])=P_n\ind_{(-\infty,t]}.
+\]
+
+\begin{definitionbox}{命题 1.3.1：经验积分的均值与方差}
+若 $f$ 可积，则
+\[
+ \E(P_nf)=Pf.
+\]
+若 $f\in L^2(P)$，则
+\[
+ \Var(P_nf)=\frac{\Var(f(X))}{n}.
+\]
+\end{definitionbox}
+
+\subsection{统计泛函与代入原理}
+
+\begin{definitionbox}{定义 1.3.1：统计泛函}
+设 $\mathcal Q$ 包含统计模型 $\mathcal P$ 以及所考虑的经验测度。统计泛函是映射
+\[
+ T:\mathcal Q\to\mathcal D.
+\]
+$T(P)$ 表示总体分布的某个特征。用 $P_n$ 替换未知 $P$，得到代入估计量
+\[
+ \boxed{\widehat\theta_n=T(P_n).}
+\]
+\end{definitionbox}
+
+对固定可积函数 $\psi$，
+\[
+ T_\psi(P)=P\psi=\int\psi\,\mathrm dP
+\]
+是关于分布 $P$ 的线性泛函，因为
+\[
+ T_\psi(aP_1+bP_2)
+ =aT_\psi(P_1)+bT_\psi(P_2).
+\]
+代入 $P_n$ 后，
+\[
+ T_\psi(P_n)=P_n\psi=\frac1n\sum_{i=1}^n\psi(X_i).
+\]
+
+\begin{notebox}[“线性”是对分布而言]
+$\psi(x)$ 本身不必对 $x$ 线性。例如 $\psi(x)=x^2$ 虽是非线性函数，但 $P\mapsto P(x^2)$ 仍对 $P$ 线性。方差
+\[
+ \Var_P(X)=P(x^2)-(Px)^2
+\]
+则不是线性泛函，因为它包含积分结果的平方。
+\end{notebox}
+
+均值与方差的直接代入估计为
+\[
+ \bar X=P_nx,
+ \qquad
+ S_n^2=P_n(x^2)-(P_nx)^2
+ =\frac1n\sum_{i=1}^n(X_i-\bar X)^2.
+\]
+分位数泛函及其代入估计为
+\[
+ T_p(P)=F^{-1}(p),
+ \qquad
+ T_p(P_n)=F_n^{-1}(p).
+\]
+
+\subsection{M-估计与 Z-估计}
+
+设 $m_\theta(x)$ 衡量候选参数 $\theta$ 在观测 $x$ 上的表现。总体准则与经验准则分别是
+\[
+ M(\theta)=Pm_\theta,
+ \qquad
+ M_n(\theta)=P_nm_\theta.
+\]
+M-估计定义为
+\[
+ \boxed{
+ \widehat\theta_n\in\argmax_{\theta\in\Theta}P_nm_\theta.}
+\]
+若使用损失 $\rho_\theta=-m_\theta$，等价地写为最小化 $P_n\rho_\theta$。
+
+\begin{examplebox}{平方损失给出样本均值}
+取 $\rho_\theta(x)=(x-\theta)^2$。由于
+\[
+ \E(X-\theta)^2=\Var(X)+(\mu-\theta)^2,
+\]
+总体最优点是 $\theta=\mu$。经验问题
+\[
+ \argmin_\theta\frac1n\sum_{i=1}^n(X_i-\theta)^2
+\]
+的一阶条件给出 $\widehat\theta_n=\bar X$。若取绝对值损失 $|x-\theta|$，相应 M-估计量则是样本中位数。
+\end{examplebox}
+
+在控制模型中取
+\[
+ m_\theta(x)=\log p_\theta(x),
+\]
+便得到最大似然估计。因此 MLE 是 M-估计的特殊情形。
+
+Z-估计从总体估计方程出发：设 $\psi_\theta:\mathcal X\to\R^s$，总体参数满足
+\[
+ P\psi_{\theta(P)}=0.
+\]
+用 $P_n$ 替换 $P$，得到
+\[
+ \boxed{P_n\psi_{\widehat\theta_n}=0.}
+\]
+任何解都称为 Z-估计量。
+
+\begin{examplebox}{样本均值也是 Z-估计}
+取 $\psi_\theta(x)=x-\theta$。总体方程
+\[
+ \E(X-\theta)=0
+\]
+的解为 $\theta=\mu$；经验方程
+\[
+ \frac1n\sum_{i=1}^n(X_i-\theta)=0
+\]
+的解为 $\widehat\theta_n=\bar X$。
+\end{examplebox}
+
+若 M-准则光滑且最优点位于参数空间内部，其一阶条件通常给出 Z-方程。最大似然中的得分函数
+\[
+ \dot\ell_\theta(x)=\nabla_\theta\log p_\theta(x)
+\]
+满足
+\[
+ 0=\nabla_\theta\ell_n(\widehat\theta_n)
+ =nP_n\dot\ell_{\widehat\theta_n}.
+\]
+边界最大值和不可微似然不一定满足这个方程，需要单独处理。
+
+\section{收敛方式与随机阶}
+
+\subsection{四种收敛}
+
+设 $\bm Y_n,\bm Y\in\R^k$。主要收敛概念如下：
+\begin{align*}
+ \bm Y_n\asto\bm Y
+ &\iff P(\lim_n\bm Y_n=\bm Y)=1,\\
+ \bm Y_n\xrightarrow{L^r}\bm Y
+ &\iff \E\|\bm Y_n-\bm Y\|_r^r\to0,\\
+ \bm Y_n\pto\bm Y
+ &\iff P(\|\bm Y_n-\bm Y\|>\varepsilon)\to0
+       \quad\forall\varepsilon>0,\\
+ \bm Y_n\dto\bm Y
+ &\iff P_{\bm Y_n}\Rightarrow P_{\bm Y}.
+\end{align*}
+依分布收敛等价于：对每个有界连续函数 $h$，
+\[
+ \E h(\bm Y_n)\to\E h(\bm Y).
+\]
+
+\begin{definitionbox}{定理 1.4.1：依概率收敛的子序列刻画}
+$\bm Y_n\pto\bm Y$ 当且仅当每个子序列 $(\bm Y_{n_j})$ 都存在一个进一步子序列 $(\bm Y_{n_{j_\ell}})$，使
+\[
+ \bm Y_{n_{j_\ell}}\asto\bm Y.
+\]
+\end{definitionbox}
+
+标准蕴含关系为
+\[
+ \boxed{
+ \bm Y_n\asto\bm Y
+ \Rightarrow
+ \bm Y_n\pto\bm Y
+ \Rightarrow
+ \bm Y_n\dto\bm Y.}
+\]
+若有 $L^r$ 收敛，也能由 Markov 不等式推出依概率收敛。
+
+\subsection{矩不等式}
+
+\begin{definitionbox}{定理 1.4.2：Markov 不等式}
+若 $Z\geq0$ 且 $\E Z<\infty$，则对每个 $t>0$，
+\[
+ P(Z\geq t)\leq\frac{\E Z}{t}.
+\]
+\end{definitionbox}
+
+对 $Z=(X-\E X)^2$ 应用 Markov 不等式，得到 Chebyshev 不等式
+\[
+ \boxed{
+ P(|X-\E X|\geq t)
+ \leq\frac{\Var(X)}{t^2}.}
+\]
+更一般地，
+\[
+ P(\|\bm Y_n-\bm Y\|_r>\varepsilon)
+ \leq
+ \frac{\E\|\bm Y_n-\bm Y\|_r^r}{\varepsilon^r}.
+ \tag{1.4}
+\]
+
+\subsection{随机阶}
+
+对正确定数列 $a_n$，定义
+\[
+ Y_n=O_p(a_n)
+ \iff \frac{Y_n}{a_n}\text{ 依概率有界},
+\]
+\[
+ Y_n=o_p(a_n)
+ \iff \frac{Y_n}{a_n}\pto0.
+\]
+更具体地，$Y_n=O_p(a_n)$ 表示对任意 $\varepsilon>0$，存在 $C_\varepsilon<\infty$，使
+\[
+ \sup_{n\geq1}P(|Y_n|>C_\varepsilon a_n)<\varepsilon.
+\]
+
+基本运算规则包括
+\[
+ o_p(a_n)O_p(b_n)=o_p(a_nb_n),
+\]
+\[
+ O_p(a_n)+O_p(b_n)=O_p(a_n+b_n),
+\]
+\[
+ o_p(a_n)+o_p(b_n)=o_p(a_n+b_n).
+\]
+
+\begin{examplebox}{样本均值的随机阶}
+若 $X_i$ i.i.d.，均值为 $\mu$、方差为 $\sigma^2$，则中心极限定理给出
+\[
+ \sqrt n(\bar X_n-\mu)\dto N(0,\sigma^2).
+\]
+因此
+\[
+ \bar X_n-\mu=O_p(n^{-1/2})=o_p(1),
+\]
+但一般不是 $o_p(n^{-1/2})$，因为标准化误差并未收敛到零，而是收敛到非退化正态分布。
+\end{examplebox}
+
+\section{极限定理与变换}
+
+\subsection{大数定律与中心极限定理}
+
+若 $X_i$ i.i.d.，均值为 $\mu$、方差为 $\sigma^2<\infty$，Chebyshev 不等式给出
+\[
+ P(|\bar X_n-\mu|\geq\varepsilon)
+ \leq\frac{\sigma^2}{n\varepsilon^2}\to0.
+ \tag{1.5}
+\]
+
+\begin{definitionbox}{定理 1.5.1：强大数定律}
+若 $X_i\overset{\mathrm{i.i.d.}}{\sim}P$ 且 $P|f|<\infty$，则
+\[
+ \boxed{P_nf\asto Pf.}
+\]
+特别地，对每个固定 $x$，$F_n(x)\asto F(x)$。
+\end{definitionbox}
+
+\begin{definitionbox}{定理 1.5.2：中心极限定理}
+若 $Pf^2<\infty$，$\sigma_f^2=\Var(f(X))\in(0,\infty)$，则
+\[
+ \boxed{
+ \sqrt n(P_n-P)f
+ =\frac1{\sqrt n}\sum_{i=1}^n\{f(X_i)-Pf\}
+ \dto N(0,\sigma_f^2).}
+\]
+\end{definitionbox}
+
+固定 $x$ 并取 $f_x(z)=\ind_{\{z\leq x\}}$，可得
+\[
+ \sqrt n\{F_n(x)-F(x)\}
+ \dto N\!\left(0,F(x)\{1-F(x)\}\right).
+\]
+大数定律说明误差消失，中心极限定理则描述误差在 $n^{-1/2}$ 尺度上的波动。
+
+\subsection{Lindeberg 中心极限定理}
+
+\begin{definitionbox}{定理 1.5.3：Lindeberg 中心极限定理}
+对每个 $n$，设 $X_{n1},\ldots,X_{nk_n}$ 相互独立。令
+\[
+ Y_{nj}=X_{nj}-\E X_{nj},
+ \qquad
+ s_n^2=\sum_{j=1}^{k_n}\Var(X_{nj})\in(0,\infty).
+\]
+若对每个 $\varepsilon>0$，
+\[
+ \frac1{s_n^2}\sum_{j=1}^{k_n}
+ \E\!\left[Y_{nj}^2
+ \ind_{\{|Y_{nj}|>\varepsilon s_n\}}\right]
+ \to0,
+ \tag{1.6}
+\]
+则
+\[
+ \boxed{
+ \frac1{s_n}\sum_{j=1}^{k_n}Y_{nj}\dto N(0,1).}
+ \tag{1.7}
+\]
+\end{definitionbox}
+
+Lindeberg 条件表示：相对于总方差 $s_n^2$，异常大项贡献的方差比例趋于零。它排除了由一个或少数几个变量支配全部波动的情形。
+
+\begin{examplebox}{异质 Bernoulli 顾客例子}
+设第 $n$ 天有 $n$ 位独立顾客，
+\[
+ X_{nj}\sim\operatorname{Bernoulli}\!\left(\frac{j}{2n}\right),
+ \qquad j=1,\ldots,n.
+\]
+总购买人数 $T_n=\sum_jX_{nj}$ 满足
+\[
+ \E T_n=\frac{n+1}{4},
+ \qquad
+ s_n^2=\frac{(n+1)(4n-1)}{24n}\sim\frac n6.
+\]
+由于 $|X_{nj}-\E X_{nj}|\leq1$ 而 $s_n\to\infty$，对固定 $\varepsilon>0$，事件
+\[
+ |Y_{nj}|>\varepsilon s_n
+\]
+最终不可能发生，故 Lindeberg 条件成立。因此
+\[
+ \frac{T_n-(n+1)/4}{\sqrt{(n+1)(4n-1)/(24n)}}
+ \dto N(0,1).
+\]
+各顾客购买概率不同，但总购买人数仍具有正态极限。
+\end{examplebox}
+
+\subsection{连续映射定理与 Slutsky 定理}
+
+\begin{definitionbox}{定理 1.5.4：连续映射定理}
+若 $g$ 在除 $P_{\bm Y}$-零测集外的每一点连续，则
+\[
+ \bm Y_n\asto\bm Y\Rightarrow g(\bm Y_n)\asto g(\bm Y),
+\]
+\[
+ \bm Y_n\pto\bm Y\Rightarrow g(\bm Y_n)\pto g(\bm Y),
+\]
+\[
+ \bm Y_n\dto\bm Y\Rightarrow g(\bm Y_n)\dto g(\bm Y).
+\]
+\end{definitionbox}
+
+例如，若 $\bar X_n\pto\mu$ 且 $g$ 在 $\mu$ 处连续，则
+\[
+ g(\bar X_n)\pto g(\mu).
+\]
+
+\begin{definitionbox}{命题 1.5.1：渐近等价}
+若
+\[
+ \bm U_n\dto\bm U,
+ \qquad
+ \|\bm V_n-\bm U_n\|\pto0,
+\]
+则 $\bm V_n\dto\bm U$。
+\end{definitionbox}
+
+\begin{definitionbox}{定理 1.5.5：Slutsky 定理}
+若 $Y_n\dto Y$、$Z_n\pto c$，其中 $c$ 为常数，则
+\[
+ (Y_n,Z_n)\dto(Y,c).
+\]
+因此
+\[
+ Y_n+Z_n\dto Y+c,
+ \qquad
+ Z_nY_n\dto cY,
+\]
+且当 $c\neq0$ 时，
+\[
+ \frac{Y_n}{Z_n}\dto\frac{Y}{c}.
+\]
+\end{definitionbox}
+
+\begin{examplebox}{学生化样本均值}
+令
+\[
+ S_n^2=\frac1n\sum_{i=1}^n(X_i-\bar X_n)^2.
+\]
+中心极限定理给出
+\[
+ \frac{\sqrt n(\bar X_n-\mu)}\sigma\dto N(0,1),
+\]
+而大数定律与连续映射定理给出 $S_n/\sigma\pto1$。由 Slutsky 定理，
+\[
+ \boxed{
+ \frac{\sqrt n(\bar X_n-\mu)}{S_n}
+ \dto N(0,1).}
+\]
+相合的尺度估计量可以替代未知总体尺度，而不改变一阶极限分布。
+\end{examplebox}
+
+\subsection{Delta 方法}
+
+连续映射定理可以处理相合性，却不能描述非线性变换后的一阶波动。Delta 方法将随机变量的 Taylor 展开与已有渐近分布结合起来。
+
+\begin{definitionbox}{命题 1.5.2：随机 Taylor 展开}
+若 $\bm X_n\pto\bm c$，且当 $\bm h\to0$ 时
+\[
+ g(\bm c+\bm h)
+ =g(\bm c)+\sum_{j=1}^m\frac1{j!}
+ D^jg(\bm c)[\bm h,\ldots,\bm h]+R_m(\bm h),
+\]
+其中 $R_m(\bm h)/\|\bm h\|^m\to0$，则
+\[
+\begin{aligned}
+ g(\bm X_n)=g(\bm c)
+ &+\sum_{j=1}^m\frac1{j!}
+ D^jg(\bm c)[\bm X_n-\bm c,\ldots,\bm X_n-\bm c]\\
+ &+\|\bm X_n-\bm c\|^mQ_n,
+ \qquad Q_n=o_p(1).
+\end{aligned}
+\]
+\end{definitionbox}
+
+\begin{definitionbox}{定理 1.5.6：一阶 Delta 方法}
+若 $a_n\to\infty$，
+\[
+ a_n(\bm X_n-\bm c)\dto\bm Y,
+\]
+且 $g:\R^k\to\R$ 在 $\bm c$ 处可微，则
+\[
+ \boxed{
+ a_n\{g(\bm X_n)-g(\bm c)\}
+ \dto \nabla g(\bm c)^{\mathsf T}\bm Y.}
+\]
+若 $\bm Y\sim N_k(0,\bm\Sigma)$，则极限为
+\[
+ N\!\left(0,
+ \nabla g(\bm c)^{\mathsf T}
+ \bm\Sigma
+ \nabla g(\bm c)\right).
+\]
+\end{definitionbox}
+
+证明的核心是 Taylor 展开
+\[
+ g(\bm X_n)-g(\bm c)
+ =\nabla g(\bm c)^{\mathsf T}(\bm X_n-\bm c)
+ +\|\bm X_n-\bm c\|Q_n,
+\]
+其中 $Q_n=o_p(1)$。乘以 $a_n$ 后，余项是 $O_p(1)o_p(1)=o_p(1)$，再应用 Slutsky 定理。
+
+若前 $m-1$ 阶导数均在 $\bm c$ 处为零，而至少一个 $m$ 阶导数非零，则需要用 $a_n^m$ 缩放，并保留 Taylor 展开的第 $m$ 阶齐次多项式。这就是高阶 Delta 方法。
+
+\begin{examplebox}{样本均值的平方}
+由
+\[
+ \sqrt n(\bar X_n-\mu)\dto N(0,\sigma^2),
+\]
+对 $g(t)=t^2$，当 $\mu\neq0$ 时，$g'(\mu)=2\mu$，故
+\[
+ \sqrt n(\bar X_n^2-\mu^2)
+ \dto N(0,4\mu^2\sigma^2).
+\]
+当 $\mu=0$ 时一阶导数消失，需要二阶 Delta 方法：
+\[
+ n\bar X_n^2\dto\sigma^2Z^2,
+ \qquad Z\sim N(0,1).
+\]
+\end{examplebox}
+
+\begin{examplebox}{样本方差的渐近分布}
+若 $P(x^4)<\infty$，令
+\[
+ S_n^2=P_n(x^2)-(P_nx)^2.
+\]
+对 $\bm W_i=(X_i,X_i^2)^{\mathsf T}$ 使用二维 CLT，再对 $h(a,b)=b-a^2$ 使用 Delta 方法。梯度为
+\[
+ \nabla h(\mu,Px^2)=(-2\mu,1)^{\mathsf T}.
+\]
+中心化线性项化简为
+\[
+ L(X)=(X-\mu)^2-\sigma^2,
+\]
+故渐近方差为
+\[
+ \Var\{L(X)\}=P\{(x-\mu)^4\}-\sigma^4.
+\]
+最终
+\[
+ \boxed{
+ \sqrt n(S_n^2-\sigma^2)
+ \dto N\!\left(0,P\{(x-\mu)^4\}-\sigma^4\right).}
+\]
+使用分母 $n-1$ 的样本方差是 $\frac{n}{n-1}S_n^2$，因该因子趋于 $1$，二者具有相同的一阶极限分布。
+\end{examplebox}
+
+\section*{本章总结}
+\addcontentsline{toc}{section}{本章总结}
+
+概率分布与期望描述总体量，经验测度则给出对应的样本量。Markov 和 Chebyshev 不等式把矩信息转化为概率上界；大数定律说明估计误差消失；中心极限定理描述 $n^{-1/2}$ 尺度上的随机波动；连续映射、Slutsky 定理和 Delta 方法则把这些极限传递到非线性代入估计量。
+
+这些工具将继续支撑后续的集中不等式、一致经验过程以及 M-估计与 Z-估计理论。
+
+\begin{notebox}[复习路线]
+建议按以下顺序复习：
+\[
+ P_nf\to Pf
+ \quad\Longrightarrow\quad
+ \sqrt n(P_n-P)f\dto N(0,\sigma_f^2)
+ \quad\Longrightarrow\quad
+ g(P_nf)\text{ 的 Delta 展开}.
+\]
+首先确认估计量是否相合，再寻找其波动尺度，最后分析非线性变换和学生化。
+\end{notebox}

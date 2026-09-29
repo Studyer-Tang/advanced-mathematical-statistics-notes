@@ -1,0 +1,906 @@
+\chapter{统计模型、指数族、充分性与完备性}
+
+本章依据 Fang Yao 老师《第02章-讲义》整理，原文件共 22 页，对应讲义正文第 27--48 页。定义、定理及例子的编号沿用讲义；“学习注记”和“补充证明”记录个人理解与讨论中的展开，不是讲义逐字译文。Slides 的编号与讲义不同，例如 Slides 引理 2.7 对应讲义引理 2.3.1，Slides 命题 2.9 对应讲义命题 2.4.1。
+
+\begin{notebox}[学习起点：本章到底要做什么？]
+第一章主要问：样本量增大时，经验分布和估计量怎样逼近总体？第二章先固定样本量，问：在指定模型下，原始数据中的哪些部分真正参与对参数的比较？
+
+本章依次研究三个问题：怎样用似然比较候选参数；怎样压缩样本而保持充分性；怎样用完备性得到函数唯一性、用 Basu 定理得到独立性。“已整理”不等于已经能够独立证明，实际追问和待复习内容另见本章学习历程。
+\end{notebox}
+
+\section{统计模型}
+
+\subsection{从具体样本到模型}
+想估计硬币正面概率 $p$，独立抛掷 $n$ 次，把正面记作 $1$。例如
+\[
+ x=(1,0,1,1,0),\qquad y=(0,1,1,0,1)
+\]
+都有三次成功。独立性给出
+\[
+ P_p(\mathbf X=x)=p(1-p)pp(1-p)=p^3(1-p)^2=P_p(\mathbf X=y).
+\]
+一般地，记 $s=\sum_i x_i$，则
+\[
+ P_p(\mathbf X=x)
+ =\prod_{i=1}^n p^{x_i}(1-p)^{1-x_i}
+ =p^s(1-p)^{n-s}.
+\]
+固定 $n$ 后，这个公式只需要成功次数，不需要成功顺序。后面要把“似乎可以丢弃顺序”变成严格的充分性结论。
+
+\begin{notebox}[具体排列与成功次数不是同一个事件]
+某一个排列的概率是 $p^s(1-p)^{n-s}$；成功次数等于 $s$ 的概率要对所有相容排列求和，才有组合数：
+\[
+ P_p(S=s)=\binom ns p^s(1-p)^{n-s}.
+\]
+知道 $S$ 通常不能恢复完整样本，但这不必然意味着损失了关于 $p$ 的信息。
+\end{notebox}
+
+参数模型是一族共同样本空间上的概率分布：
+\[
+ \mathcal P=\{P_\theta:\theta\in\Theta\}.
+\]
+这里 $\Theta$ 是允许的参数集合，$\theta$ 是未知常数，$P_\theta$ 是对应的数据生成规律。i.i.d. 样本的联合模型为
+\[
+ \mathcal P^{(n)}=\{P_\theta^{\otimes n}:\theta\in\Theta\}.
+\]
+$\mathbf X=(X_1,\ldots,X_n)$ 表示随机样本，$\mathbf x=(x_1,\ldots,x_n)$ 表示已观测到的实现值。统计量是计算规则不含未知参数的数据函数；若 $\mu$ 未知，$\bar X-\mu$ 不是直接可计算的统计量。
+
+\begin{definitionbox}{定义 2.1.1：可识别性}
+模型可识别是指
+\[
+ P_\theta=P_{\theta'}\ \Longrightarrow\ \theta=\theta'.
+\]
+等号指两个概率测度对每个事件都给出相同概率，不是某份样本的两个似然值碰巧相同。
+\end{definitionbox}
+
+已知方差的正态位置模型可识别：分布相同则期望相同，故均值参数相同。反之，模型 $N(\alpha\beta,1)$ 中，$(\alpha,\beta)=(1,2)$ 和 $(2,1)$ 产生同一分布，只能识别乘积，不能在整个模型中分别识别两者。增加样本量不能消除这种参数化问题。
+
+\subsection{密度与似然：同一个公式的两个视角}
+\begin{definitionbox}{定义 2.1.2：受支配分布族}
+若存在共同的 $\sigma$-有限测度 $\nu$，使
+\[
+ P\ll\nu\quad\forall P\in\mathcal P,
+\]
+则称模型受 $\nu$ 支配。记 $p_\theta=\mathrm dP_\theta/\mathrm d\nu$。
+\end{definitionbox}
+
+计数测度对应离散 PMF，Lebesgue 测度对应通常的连续 PDF。密度满足
+\[
+ P_\theta(A)=\int_Ap_\theta\,\mathrm d\nu.
+\]
+独立同分布样本的联合密度与似然为
+\[
+ p_\theta^{(n)}(\mathbf x)=\prod_i p_\theta(x_i),
+ \qquad L_{\mathbf x}^{(n)}(\theta)=p_\theta^{(n)}(\mathbf x).
+\]
+固定 $\theta$，它描述数据的概率规律；固定 $\mathbf x$，它比较候选参数。连续模型使用密度值，不是通常为零的单点概率。
+
+\begin{notebox}[似然不是参数的概率分布]
+当 $n=5,s=3$ 时，$L(p)=p^3(1-p)^2$，但
+\[
+ \int_0^1L(p)\,\mathrm dp
+ =\frac14-\frac25+\frac16=\frac1{60}\ne1.
+\]
+比较 $L(0.6)/L(0.2)=6.75$，只是比较同一数据在两个候选参数下的概率，不是两个参数自身的概率比。后验分布还需要先验和归一化。
+\end{notebox}
+
+\subsection{最大似然估计与边界}
+\begin{definitionbox}{定义 2.1.3：最大似然估计}
+若统计量 $\widehat\theta(\mathbf X)$ 的观测值满足
+\[
+ \widehat\theta(\mathbf x)\in\argmax_{\theta\in\Theta}L_{\mathbf x}^{(n)}(\theta),
+\]
+则称为 MLE。$\argmax$ 是最大化参数的集合，不是最大的函数值。
+\end{definitionbox}
+
+对数严格递增，故最大化似然等价于最大化扩展对数似然，约定 $\log0=-\infty$：
+\[
+ \ell_{\mathbf x}^{(n)}(\theta)=\sum_i\log p_\theta(x_i).
+\]
+这与第一章相接：
+\[
+ n^{-1}\ell_{\mathbf X}^{(n)}(\theta)=P_n\log p_\theta.
+\]
+本章先研究有限样本结构，后续一致性理论才讨论这个经验准则的极限。非空紧参数空间上的上半连续似然可以保证最大值取到；严格凹性可以保证已存在的最大化解唯一，但不自动保证存在性。
+
+\begin{examplebox}{例 2.1.2：Bernoulli 的 MLE}
+固定二元样本，令 $s=\sum_i x_i$。在 $0<s<n$ 时，
+\[
+ \ell(p)=s\log p+(n-s)\log(1-p),\qquad
+ \ell'(p)=\frac sp-\frac{n-s}{1-p}.
+\]
+因为 $p(1-p)>0$，
+\[
+ \ell'(p)=0
+ \iff s(1-p)=(n-s)p
+ \iff s=np
+ \iff p=s/n.
+\]
+又
+\[
+ \ell''(p)=-s/p^2-(n-s)/(1-p)^2<0,
+\]
+所以这是唯一内点最大值。若 $s=0$，$L(p)=(1-p)^n$ 递减；若 $s=n$，$L(p)=p^n$ 递增。在 $[0,1]$ 上分别得到边界 MLE $0,1$，在 $(0,1)$ 上却都没有 MLE，因为上确界只能在被排除的边界逼近。
+\end{examplebox}
+
+\subsection{参数无关因子与参数相关支撑}
+若固定样本上 $a(\mathbf x)>0$，且
+\[
+ p_\theta^{(n)}(\mathbf x)=a(\mathbf x)b_\theta(\mathbf x),
+\]
+其中 $a$ 不含参数，则相同因子在参数之间的似然比中消去，也不改变最大化位置。它仍是概率模型的一部分，计算样本事件概率时不能删除。
+
+Poisson 样本满足
+\[
+ p_\lambda^{(n)}(\mathbf x)
+ =e^{-n\lambda}\lambda^{\sum_i x_i}\prod_i\frac1{x_i!}.
+\]
+例如 $(0,2)$ 与 $(1,1)$ 的似然分别为
+\[
+ \tfrac12e^{-2\lambda}\lambda^2,\qquad e^{-2\lambda}\lambda^2.
+\]
+二者不相等，却始终成固定比例，对任意两个参数的相对比较相同。
+
+给定总和为 $2$，三个可能样本为 $(0,2)$、$(1,1)$、$(2,0)$。它们的条件概率依次为 $1/4$、$1/2$、$1/4$，不等概率但都不含参数。
+
+对 $U(0,\theta)$，联合密度则为
+\[
+ p_\theta^{(n)}(\mathbf x)
+ =\theta^{-n}\ind_{\{x_{(n)}<\theta\}}\ind_{\{x_{(1)}>0\}}.
+\]
+示性函数含参数，不能忽略。若最大观测是 $3$，则 $\theta=2$ 与数据不相容；仅保留 $\theta^{-n}$ 会错误地给它正似然。
+
+\begin{notebox}[两种似然比较，以及与后文的联系]
+固定同一个样本，比较 $L_{\mathbf x}(\theta)/L_{\mathbf x}(\theta')$，用于参数推断；比较两组样本的整条似然是否满足
+\[
+ L_{\mathbf x}(\theta)=c(\mathbf x,\mathbf y)L_{\mathbf y}(\theta)
+ \quad\forall\theta,\qquad c(\mathbf x,\mathbf y)>0
+\]
+且 $c$ 不含参数，用于判断哪些样本可以合并。
+
+参数依赖支撑时要同时比较零值区域，不能只在公共正值区域约分。按严格端点密度 $\ind_{\{x<\theta\}}$，均匀模型的 MLE 可能只有未取到的上确界；改用含端点密度会改变逐点最大化。计算时应保持同一密度版本。
+\end{notebox}
+
+\section{指数族}
+
+\subsection{为什么整理成指数形式？}
+前面发现 Bernoulli 和 Poisson 的参数比较都只需要总和。指数族为这种现象提供统一形式：参数和数据通过一个有限维内积相结合，独立样本相乘后变成自然统计量的求和。
+
+\begin{definitionbox}{定义 2.2.1：自然指数族}
+相对于共同 $\sigma$-有限测度 $\nu$，密度为
+\[
+ p_\eta(x)=\exp\{\eta^\top T(x)-\zeta(\eta)\}h(x),
+ \qquad \eta\in\Xi\subseteq\R^k.
+\]
+这里 $T$ 是自然统计量，$\eta$ 是自然参数，$h\ge0$ 不含参数，而
+\[
+ \zeta(\eta)=\log\int e^{\eta^\top T(x)}h(x)\,\nu(\mathrm dx)
+\]
+负责归一化。最大自然参数空间由该积分有限且为正的参数组成；实际子模型可只使用其中一部分。
+\end{definitionbox}
+
+积分核对：
+\[
+ \int p_\eta\,\mathrm d\nu
+ =e^{-\zeta(\eta)}\int e^{\eta^\top T(x)}h(x)\,\mathrm d\nu=1.
+\]
+若用可逆矩阵 $A$ 替换为 $\widetilde T=AT$、$\widetilde\eta=A^{-\top}\eta$，内积不变。这说明表示不唯一，统计意义取决于所生成的信息，而不取决于选用的坐标名称。
+
+\begin{examplebox}{例 2.2.1--2.2.3：从密度中识别自然参数}
+Bernoulli 模型中，对 $x\in\{0,1\}$，
+\[
+ p^x(1-p)^{1-x}
+ =\exp\left\{x\log\frac p{1-p}+\log(1-p)\right\}.
+\]
+取 $\eta=\log[p/(1-p)]$，反解得 $p=e^\eta/(1+e^\eta)$，所以
+\[
+ T(x)=x,\quad \zeta(\eta)=\log(1+e^\eta),\quad \Xi=\R.
+\]
+Poisson 模型中，
+\[
+ e^{-\lambda}\lambda^x/x!
+ =e^{x\eta-e^\eta}/x!,\qquad\eta=\log\lambda\in\R.
+\]
+所以 $T(x)=x$、$h(x)=1/x!$、$\zeta(\eta)=e^\eta$。
+
+正态两参数模型中，
+\[
+ -\frac{(x-\mu)^2}{2\sigma^2}
+ =\frac{\mu}{\sigma^2}x-\frac{x^2}{2\sigma^2}
+ -\frac{\mu^2}{2\sigma^2}.
+\]
+可取
+\[
+ T(x)=(x,x^2),\quad
+ \eta_1=\mu/\sigma^2,\quad \eta_2=-1/(2\sigma^2),\quad h(x)=1,
+\]
+\[
+ \zeta(\eta)=-\frac{\eta_1^2}{4\eta_2}
+ +\frac12\log\frac{-\pi}{\eta_2},
+ \qquad \Xi=\R\times(-\infty,0).
+\]
+\end{examplebox}
+
+对于 i.i.d. 样本，
+\[
+ \begin{aligned}
+ p_\eta^{(n)}(\mathbf x)
+ &=\prod_i e^{\eta^\top T(x_i)-\zeta(\eta)}h(x_i)\\
+ &=\exp\left\{\eta^\top\sum_iT(x_i)-n\zeta(\eta)\right\}
+   \prod_i h(x_i).
+ \end{aligned}
+\]
+因此参数相关部分只需要 $T_n=\sum_iT(X_i)$。正态模型对应 $(\sum_iX_i,\sum_iX_i^2)$，第二项是“平方后求和”，不是 $(\bar X)^2$。
+
+\subsection{学习追问：满秩的两条分别检查什么？}
+讲义对满秩的约定同时要求：
+\begin{enumerate}
+\item 统计量一侧没有仿射冗余：
+\[
+ a^\top T(X)=b\ \text{几乎必然}\quad\Longrightarrow\quad a=0;
+\]
+\item 自然参数一侧含非空开集：
+\[
+ \operatorname{int}_{\R^k}\Xi\ne\varnothing.
+\]
+\end{enumerate}
+第一条的 a.s. 按共同载体测度或其等价概率版本理解；“rank”是指数族表示的性质，不是在计算某个观测向量的矩阵秩。
+
+\begin{notebox}[追问：是不是统计量各分量线性无关？]
+还要把常数 $1$ 算进去。$T=(X,2X)$ 满足 $2T_1-T_2=0$，有冗余；$T=(X,X+1)$ 满足 $T_2-T_1=1$，也有冗余。需排除的是右侧为任意常数的非平凡仿射关系，而不只是齐次线性关系。
+
+对具有正态分布的 $X$，$T=(X,X^2)$ 没有仿射冗余：若 $a_1x+a_2x^2=b$ 几乎处处成立，连续多项式必恒等于零，从而 $a_1=a_2=b=0$。其取值虽在抛物线上，却不被一条直线包含。没有仿射冗余既不意味着分量独立，也不排除非线性函数关系。
+\end{notebox}
+
+“本质值域”忽略零概率修改。对于欧氏空间中的随机向量，点 $t$ 属于本质值域意味着每个邻域都有正概率：
+\[
+ P(\|T-t\|<\varepsilon)>0\quad\forall\varepsilon>0.
+\]
+不要求 $P(T=t)>0$。例如将 $(X,2X)$ 在正态零概率事件 $\{X=0\}$ 上改为 $(0,100)$，仍不能消除几乎必然的仿射冗余。
+
+第二条则要求自然参数集合内至少容得下一个 $k$ 维开球。正态两参数模型的 $\Xi=\R\times(-\infty,0)$ 可容纳以 $(0,-1)$ 为中心、半径 $1/2$ 的圆盘，因此满足第二条。
+
+\subsection{学习追问：弯曲指数族“弯”的是哪一边？}
+通常在光滑、正则的参数化下，弯曲族写为
+\[
+ \eta=\eta(\theta)\in\R^k,\qquad \theta\in\Theta\subseteq\R^d,\quad d<k.
+\]
+原始参数 $\theta$ 只有 $d$ 个自由方向，决定了 $k$ 个自然参数坐标，所以自然参数只能沿低维曲面变化。仅凭任意映射 $d<k$ 不能保证其像为光滑曲面，这里使用通常的正则参数化语境。
+
+例如 $X\sim N(\theta,\theta^2)$，$\theta>0$，仍有 $T=(X,X^2)$，但
+\[
+ \eta_1=1/\theta,\qquad\eta_2=-1/(2\theta^2)
+ \quad\Longrightarrow\quad \eta_2=-\eta_1^2/2.
+\]
+参数在二维平面中沿一条抛物线变化，不能包含二维开球。
+
+\begin{notebox}[两个抛物线，为什么结论不同？]
+统计量 $(x,x^2)$ 落在抛物线上，不违反第一条，因为第一条仅排除仿射超平面，二维中即直线。自然参数落在抛物线上，却违反第二条，因为第二条要求真正的二维开区域。
+
+因此，统计量无仿射冗余，并不推出整个表示满秩。缺少开集也只意味着后面的指数族完备性定理不能直接使用，并非自动证明不完备；不完备需要另构造反例。
+\end{notebox}
+
+\section{充分性}
+
+\subsection{定义：知道摘要后，还剩什么随机性？}
+\begin{definitionbox}{定义 2.3.1：充分统计量}
+若样本 $\mathbf X$ 给定 $T(\mathbf X)$ 的条件分布可以对所有参数选取同一个不含参数的版本，则称 $T$ 充分。
+\end{definitionbox}
+
+充分性不要求 $T$ 的边缘分布不含参数，也不表示 $\mathbf X$ 与 $T$ 独立。完整样本本身总是充分，故“充分”也不自动表示低维或简洁。
+
+Bernoulli 样本中，若 $\sum_i x_i=t$，则
+\[
+ P_p(\mathbf X=\mathbf x\mid T=t)
+ =\frac{p^t(1-p)^{n-t}}{\binom nt p^t(1-p)^{n-t}}
+ =\binom nt^{-1}.
+\]
+否则条件概率为零。给定成功次数后，所有相容排列的条件规律都不含 $p$，故总和充分。
+
+\subsection{共同支配概率：为什么突然引入一个新分布？}
+\begin{definitionbox}{引理 2.3.1：共同支配概率}
+非空模型 $\mathcal P$ 若被某个 $\sigma$-有限测度支配，则可选有限或可数个 $P_j\in\mathcal P$ 及严格正权重 $w_j$，使
+\[
+ \sum_jw_j=1,\qquad Q=\sum_jw_jP_j,\qquad P\ll Q\quad\forall P\in\mathcal P.
+\]
+讲义用无穷序列表示；有限族也可用重复分布写成序列，或直接用有限和。
+\end{definitionbox}
+
+\begin{notebox}[追问：是不是统一在一个概率分布下研究？]
+可以这样理解，但统一的是参考分布，并没有把不同的 $P_\theta$ 变成同一个分布：
+\[
+ E_\theta f(X)=E_Q\left[f(X)\frac{\mathrm dP_\theta}{\mathrm dQ}(X)\right].
+\]
+不同分布的差异保留在各自的权重中。$Q$ 固定，不随当前研究的 $\theta$ 改变；$Q$ 不必属于原模型，也不表示真实数据来自混合机制。引理只适用于满足共同 $\sigma$-有限支配条件的模型，不是所有可能的离散、连续分布都可任意混在一起。
+\end{notebox}
+
+定义上，$P\ll Q$ 意味着 $Q(A)=0\Rightarrow P(A)=0$，不是 $P(A)\le Q(A)$。严格正权重保证
+\[
+ Q(A)=0\Rightarrow P_j(A)=0\quad\forall j.
+\]
+单个模型成员未必能支配整个族。对 $\{U(0,\theta):\theta>0\}$，可取
+\[
+ Q=\sum_{j\ge1}2^{-j}U(0,j).
+\]
+任取 $\theta$，选整数 $j\ge\theta$，则 $U(0,\theta)\ll U(0,j)\ll Q$。选择 $j$ 可以依赖 $\theta$，但 $Q$ 已经固定。
+
+\subsubsection{补充证明：用可数个正密度区域覆盖整个模型}
+讲义以“本质上确界可由可数子族实现”为工具。下面给出针对本引理的集合版本，避免直接调用那个函数定理。
+
+首先将支配测度 $\nu$ 换成等价有限测度。取可数可测分割 $\mathcal X=\bigcup_mE_m$，每个 $\nu(E_m)<\infty$，令
+\[
+ \mu(A)=\sum_{m\ge1}2^{-m}\frac{\nu(A\cap E_m)}{1+\nu(E_m)}.
+\]
+则 $\mu(\mathcal X)\le1$，且 $\mu(A)=0\iff\nu(A)=0$。
+
+对每个 $P$ 取密度 $p_P=\mathrm dP/\mathrm d\nu$，记 $S_P=\{p_P>0\}$，定义
+\[
+ M=\sup\{\mu(S_{P_1}\cup\cdots\cup S_{P_r}):r\ge1,\ P_i\in\mathcal P\}.
+\]
+$M$ 有限。对每个 $n$，选一个有限并 $B_n$ 使 $\mu(B_n)>M-1/n$，再令 $B=\bigcup_nB_n$。由下连续性和有限并的定义，
+\[
+ \mu(B)=M.
+\]
+确实，$\mu(B)\ge\mu(B_n)>M-1/n$；另一方面每个 $B_1\cup\cdots\cup B_N$ 仍是有限个正密度区域的并，其测度不超过 $M$。
+
+任取其他分布 $P$，同理 $\mu(B\cup S_P)\le M$，所以
+\[
+ \mu(S_P\setminus B)=0,\qquad \nu(S_P\setminus B)=0.
+\]
+组成 $B$ 的模型成员至多可数，将它们记为 $P_j$，取正权重构成 $Q$。它的密度是
+\[
+ q=\sum_jw_jp_j,\qquad\{q>0\}=B.
+\]
+若 $Q(A)=0$，则 $\int_Aq\,\mathrm d\nu=0$，由 $q>0$ 于 $B$ 得 $\nu(A\cap B)=0$。任意 $p_P$ 又在 $B$ 外几乎处处为零，故
+\[
+ P(A)=\int_Ap_P\,\mathrm d\nu=0.
+\]
+因此每个 $P\ll Q$，引理得证。
+
+\subsection{Fisher--Neyman 因子分解定理}
+\begin{definitionbox}{定理 2.3.1：因子分解}
+在讲义的标准 Borel 样本空间和值域、共同 $\sigma$-有限支配等条件下，$T$ 充分，当且仅当联合密度可写为
+\[
+ p_\theta(x)=a_\theta(T(x))h(x)
+\]
+（按相应几乎处处意义理解），其中 $h$ 不含参数。这里为简化记号，把完整样本也写作 $X$，其联合分布记为 $P_\theta$。
+\end{definitionbox}
+
+\subsubsection{方向一：因子分解推出充分性}
+离散情形下，在同一个纤维 $\{x:T(x)=t\}$ 内，
+\[
+ P_\theta(X=x\mid T=t)
+ =\frac{a_\theta(t)h(x)}
+ {a_\theta(t)\sum_{y:T(y)=t}h(y)}
+ =\frac{h(x)}{\sum_{y:T(y)=t}h(y)}.
+\]
+分母为正时参数因子消去。连续模型不能直接除以零概率事件，故使用共同概率 $Q$。
+
+由引理，取 $Q=\sum_jw_jP_{\theta_j}$。其密度为
+\[
+ q(x)=h(x)\bar a(T(x)),\qquad
+ \bar a(t)=\sum_jw_ja_{\theta_j}(t).
+\]
+在有效正密度集合上，
+\[
+ \frac{\mathrm dP_\theta}{\mathrm dQ}(x)
+ =\frac{a_\theta(T(x))}{\bar a(T(x))}
+ =:r_\theta(T(x)).
+\]
+零集上任意补定义。换分布时的权重只依赖 $T$，这正是离散消因子的测度论版本。
+
+对任意事件 $A$，先在固定的 $Q$ 下定义
+\[
+ K_A(T)=E_Q(\ind_A\mid T).
+\]
+它是与参数无关的同一个函数。要证明其也是 $P_\theta$ 下的条件概率，除可测性外，只需对每个 $C\in\sigma(T)$ 验证积分：
+\[
+ \begin{aligned}
+ \int_CK_A(T)\,\mathrm dP_\theta
+ &=\int_CK_A(T)r_\theta(T)\,\mathrm dQ\\
+ &=\int_C\ind_A r_\theta(T)\,\mathrm dQ\\
+ &=P_\theta(A\cap C).
+ \end{aligned}
+\]
+第二步使用 $\ind_Cr_\theta(T)$ 为 $\sigma(T)$-可测非负权重；无界时先截断，再用单调收敛。由条件期望唯一性，$K_A(T)=E_\theta(\ind_A\mid T)$，$P_\theta$-a.s.。在标准 Borel 条件下可通过 $Q$ 下的正则条件分布核统一组织这些等式，从而 $T$ 充分。
+
+\subsubsection{方向二：充分性推出因子分解}
+充分性给出不含参数的共同版本
+\[
+ E_\theta(\ind_A\mid T)=K_A(T).
+\]
+混合各个分布，对于 $C\in\sigma(T)$，
+\[
+ \int_CK_A(T)\,\mathrm dQ
+ =\sum_jw_jP_{\theta_j}(A\cap C)=Q(A\cap C).
+\]
+所以 $K_A(T)=E_Q(\ind_A\mid T)$，$Q$-a.s.。
+
+令 $P_\theta^T,Q^T$ 为 $T$ 的边缘分布。由 $P_\theta\ll Q$ 得 $P_\theta^T\ll Q^T$，定义
+\[
+ r_\theta(t)=\frac{\mathrm dP_\theta^T}{\mathrm dQ^T}(t).
+\]
+这是边缘密度比，不是条件期望。对每个事件 $A$，
+\[
+ \begin{aligned}
+ P_\theta(A)
+ &=E_\theta K_A(T)
+ =\int K_A(t)\,\mathrm dP_\theta^T(t)\\
+ &=\int K_A(t)r_\theta(t)\,\mathrm dQ^T(t)\\
+ &=E_Q[K_A(T)r_\theta(T)]\\
+ &=E_Q[\ind_A r_\theta(T)]
+ =\int_A r_\theta(T)\,\mathrm dQ.
+ \end{aligned}
+\]
+故 $\mathrm dP_\theta/\mathrm dQ=r_\theta(T)$，$Q$-a.s.。取 $h=\mathrm dQ/\mathrm d\nu$，RN 链式法则给出
+\[
+ p_\theta(x)=r_\theta(T(x))h(x)\quad\nu\text{-a.e.}
+\]
+因子分解得证。
+
+\begin{notebox}[这一大段证明到底在做什么？]
+引理提供一个固定参考概率 $Q$；因子分解使换测度权重只依赖 $T$；条件期望定义把“纤维内相对权重不变”变成严谨的共同条件分布。
+
+样本空间积分 $E_Q[\phi(T)]$ 与边缘空间积分 $\int\phi(t)\,\mathrm dQ^T(t)$ 相等，但空间和测度不同。不能把 $Q$ 与 $Q^T$、条件期望与边缘密度比混为一谈。
+\end{notebox}
+
+\subsection{典型充分统计量与模型依赖性}
+因子分解给出：Bernoulli、Poisson 样本的总和充分；$U(0,\theta)$ 的最大值充分。正态两参数模型中，充分统计量可以写为
+\[
+ \left(\sum_iX_i,\sum_iX_i^2\right).
+\]
+令 $V=\sum_i(X_i-\bar X)^2$，有
+\[
+ \bar X=\frac1n\sum_iX_i,\quad
+ V=\sum_iX_i^2-n\bar X^2,
+\]
+\[
+ \sum_iX_i=n\bar X,\qquad
+ \sum_iX_i^2=V+n\bar X^2.
+\]
+所以 $(\bar X,V)$ 是同一信息的另一种编码。
+
+已知正态方差时仅 $\bar X$ 已充分；两参数未知时一般还需 $V$。在全部连续密度构成的 i.i.d. 模型中，排序后的完整样本充分：给定排序值，所有排列等概率且与密度无关。讲义同时给出该大模型的最小充分性结论；这里不把它当作已从头证明的非参数定理。
+
+若 $T$ 充分且 $T=\phi(S)$，由
+\[
+ p_\theta(x)=a_\theta(\phi(S(x)))h(x)
+\]
+可知 $S$ 也充分。增加信息不破坏充分性，但对充分统计量任意取函数可能丢失信息。
+
+\section{最小充分性}
+
+\subsection{为什么充分之后还需要最小？}
+充分性排除信息损失，却不排除无关细节。已知正态方差的模型中，完整样本、两块样本均值和总体样本均值都充分，但保留的细节不同。
+
+\begin{definitionbox}{定义 2.4.1：最小充分统计量}
+$T$ 对 $\mathcal P$ 充分，且对任意其他充分统计量 $S$，存在同一个不含参数的可测函数 $\phi$，使
+\[
+ T=\phi(S)\qquad P\text{-a.s.},\quad\forall P\in\mathcal P,
+\]
+则 $T$ 最小充分。
+\end{definitionbox}
+
+\begin{notebox}[追问：“最粗的精确压缩”是什么意思？]
+$T=\phi(S)$ 的方向是“知道 $S$ 就能恢复 $T$”，因此 $S$ 至少包含 $T$ 的信息。最小充分统计量是每一种充分摘要都必须保留的共同核心。
+
+统计量把样本按相同取值分组。摘要越粗，合并的样本越多；最小充分性要求在保持充分性的前提下尽可能合并。它不是简单比较向量维数。具有可测逆的一一变换仅改变编码，不改变信息。
+\end{notebox}
+
+\subsection{学习追问：为什么在小模型里证明，还能推广到大模型？}
+\begin{definitionbox}{命题 2.4.1：最小充分性的推广原则}
+设 $\mathcal P_0\subseteq\mathcal P$，且对每个事件 $A$，
+\[
+ [P(A)=0\ \forall P\in\mathcal P_0]
+ \ \Longrightarrow\
+ [P(A)=0\ \forall P\in\mathcal P].
+\]
+若 $T$ 对 $\mathcal P$ 充分，并对 $\mathcal P_0$ 最小充分，则 $T$ 对 $\mathcal P$ 最小充分。
+\end{definitionbox}
+
+这里“大、小”指候选分布的多少，不是样本量。例如正态均值遍历 $\R$ 是大模型，只保留均值为 $0,1$ 的两个候选分布是小模型，观察的样本向量并未改变。
+
+\textbf{证明分四步。}
+\begin{enumerate}
+\item 任取对大模型充分的 $S$。同一个条件分布版本当然也适用于小模型，所以 $S$ 对小模型充分。
+\item 由 $T$ 对小模型最小充分，存在同一个 $\phi$，使 $T=\phi(S)$ 在每个 $P\in\mathcal P_0$ 下 a.s. 成立。
+\item 定义等式失败的事件
+\[
+ N=\{T\ne\phi(S)\}.
+\]
+则 $P(N)=0$ 对小模型每个分布成立。由假设，它对大模型每个分布也成立。
+\item 因此任意大模型充分统计量 $S$ 都能恢复 $T$。结合已经假设的“大模型下 $T$ 充分”，得到最小充分性。
+\end{enumerate}
+
+\begin{notebox}[为什么不能省略共同零事件条件？]
+取小模型 $\{U(0,1)\}$，大模型 $\{U(0,1),U(0,2)\}$。事件 $(1,2)$ 在小模型下概率为零，却在大模型某成员下有概率 $1/2$。一个等式在小模型几乎必然成立，不能自动推广到大模型。
+
+证明中的异常集必须是 $\{T\ne\phi(S)\}$。若复制文本显示成等号，却又写其概率为零，应核对 PDF 中的不等号。
+\end{notebox}
+
+共同支配引理恰好提供满足零事件条件的可数小模型。若
+\[
+ Q=\sum_jw_jP_j,\qquad P\ll Q\quad\forall P\in\mathcal P,
+\]
+取 $\mathcal P_0=\{P_j\}$，则
+\[
+ P_j(A)=0\ \forall j\Rightarrow Q(A)=0
+ \Rightarrow P(A)=0\ \forall P\in\mathcal P.
+\]
+这就是引理、推广原则和下面可数模型构造之间的衔接。
+
+\subsection{可数模型的显式构造}
+\begin{definitionbox}{定理 2.4.1：可数混合构造}
+设 $\mathcal P_0=\{P_j:j\in J\}$ 为有限或可数族，取
+\[
+ Q=\sum_jw_jP_j,\quad r_j=\frac{\mathrm dP_j}{\mathrm dQ},
+ \quad w_j>0,\quad\sum_jw_j=1.
+\]
+则 $R=(r_j)_{j\in J}$ 最小充分。若族内某个 $P_0$ 已支配所有 $P_j$，也可用 $(\mathrm dP_j/\mathrm dP_0)_j$。
+\end{definitionbox}
+
+\textbf{证明。} 取共同测度 $\nu$，记 $p_j=\mathrm dP_j/\mathrm d\nu$、$q=\mathrm dQ/\mathrm d\nu$。因为 $p_j=r_jq$，因子分解给出 $R$ 充分。
+
+任取充分统计量 $S$，因子分解写为 $p_j(x)=a_j(S(x))h(x)$。由 $J$ 可数，可以合并各个等式的异常零集。于是
+\[
+ q(x)=h(x)\sum_jw_ja_j(S(x)).
+\]
+在有效正密度集合上，
+\[
+ r_j(x)=\frac{a_j(S(x))}{\sum_\ell w_\ell a_\ell(S(x))}.
+\]
+每个坐标都是 $S$ 的函数，因此整个可数向量 $R=\phi(S)$，$Q$-a.s.。由 $P_j\ll Q$，这个表示对每个 $P_j$ 也成立，故最小充分。用 $P_0$ 作参考时，同样由 $p_j/p_0=a_j(S)/a_0(S)$ 得到结论。
+
+\subsection{似然比判别与典型例子}
+\begin{definitionbox}{定理 2.4.2：似然比判别准则}
+在讲义的受支配、标准 Borel 框架下，设 $T$ 已充分。使用讲义指定的密度版本，且在同一个共同零集之外，若
+\[
+ \left[
+ p_P(x)=c(x,y)p_P(y)\ \forall P,\quad
+ c(x,y)>0\text{ 不含 }P
+ \right]\Rightarrow T(x)=T(y),
+\]
+则 $T$ 最小充分。
+\end{definitionbox}
+
+讲义的版本约定不可省略：使用证明中最小充分统计量 $S$ 给出的密度 $p_P(x)=a_P(S(x))h(x)$，并在共同满测 Borel 集上进行比较。不可数个参数分别拥有的零集，其并不一定还是零集。
+
+\textbf{讲义证明的逻辑。} 引用 Bahadur 的存在性结果得到最小充分统计量 $S$。在共同满测集上取 $0<h<\infty$。若 $S(x)=S(y)$，则
+\[
+ p_P(x)=p_P(y)\frac{h(x)}{h(y)}\quad\forall P.
+\]
+假设推出 $T(x)=T(y)$。Blackwell--Mackey 定理及 Doob--Dynkin 引理保证 $T=\psi(S)$ 可测地成立。任意充分统计量 $U$ 都能恢复 $S$，进而恢复 $T$；加上 $T$ 充分，故最小充分。这里的存在性和可测表示结果是讲义引用的基础定理，本笔记不从描述集合论重新证明。
+
+\begin{examplebox}{例 2.4.1：Bernoulli 与 Poisson}
+Bernoulli 中，令 $\Delta=\sum_i x_i-\sum_i y_i$，
+\[
+ \frac{p_p^{(n)}(x)}{p_p^{(n)}(y)}
+ =\left(\frac p{1-p}\right)^\Delta.
+\]
+$p/(1-p)$ 遍历正半轴，比值与 $p$ 无关当且仅当 $\Delta=0$。
+
+Poisson 中，
+\[
+ \frac{p_\lambda^{(n)}(x)}{p_\lambda^{(n)}(y)}
+ =\lambda^\Delta\frac{\prod_i y_i!}{\prod_i x_i!},
+\]
+同样当且仅当 $\Delta=0$。结合充分性，两个模型中的总和均最小充分。
+\end{examplebox}
+
+正态两参数模型中，令 $\Delta_1=\sum_i x_i-\sum_i y_i$、$\Delta_2=\sum_i x_i^2-\sum_i y_i^2$，则
+\[
+ \log\frac{p_{\mu,\sigma^2}^{(n)}(x)}{p_{\mu,\sigma^2}^{(n)}(y)}
+ =\frac{\mu}{\sigma^2}\Delta_1-\frac1{2\sigma^2}\Delta_2.
+\]
+固定方差改变均值，得 $\Delta_1=0$；再改变方差，得 $\Delta_2=0$。反之两差为零时比值为 $1$。因此 $(\sum_iX_i,\sum_iX_i^2)$ 最小充分。
+
+\subsubsection{例 2.4.3：指数族的两条证明路线}
+设自然统计量维数为 $k$，存在 $\theta_0,\ldots,\theta_k$，使
+\[
+ v_i=\eta(\theta_i)-\eta(\theta_0),\quad i=1,\ldots,k
+\]
+线性无关。
+
+第一条路线是选有限子模型。其对数密度比为
+\[
+ \log\frac{p_{\theta_i}(x)}{p_{\theta_0}(x)}
+ =v_i^\top T(x)-[\zeta(\eta(\theta_i))-\zeta(\eta(\theta_0))].
+\]
+把 $v_i^\top$ 排成可逆矩阵 $V$，就可从这些对数比恢复 $VT$，继而恢复 $T$。比值向量在有限子模型中最小充分，所以 $T$ 也最小充分。共同正支撑保证共同零事件条件，再用命题 2.4.1 推广到整个模型。
+
+第二条路线是直接比较整条似然。若 $p_\theta(x)/p_\theta(y)$ 与 $\theta$ 无关，令 $\Delta T=T(x)-T(y)$，对数等式减去 $\theta_0$ 时的等式得
+\[
+ v_i^\top\Delta T=0,\quad i=1,\ldots,k.
+\]
+$V$ 可逆，故 $\Delta T=0$，由判别准则得最小充分。
+
+这里“存在 $k+1$ 个仿射独立自然参数”比“包含开集”更弱。弯曲族仍可能满足本条最小充分性条件，不能把它与后面的完备性开集条件混淆。
+
+对 $U(0,\theta)$ 的正样本，似然为正的参数范围是 $(x_{(n)},\infty)$。两条完整似然成比例当且仅当最大值相同，因此最大值最小充分。
+
+\section{完备性}
+
+\subsection{从压缩信息转向函数唯一性}
+充分性和最小充分性讨论保留哪些数据。完备性改问：两个关于 $T$ 的可积函数，如果在所有参数下期望相同，是否必须几乎必然相同？
+
+\begin{definitionbox}{定义 2.5.1：完备与有界完备}
+对任意不含未知参数的可测函数 $g$，若
+\[
+ E_\theta|g(T)|<\infty,\quad E_\theta g(T)=0\quad\forall\theta
+\]
+必推出
+\[
+ g(T)=0\quad P_\theta\text{-a.s.},\quad\forall\theta,
+\]
+则 $T$ 完备。若只对有界可测 $g$ 要求该结论，则称有界完备。
+\end{definitionbox}
+
+完备推出有界完备。不能取 $g(T)=T-\theta$ 来证明不完备，因为这个函数含有未知参数。结论是随机变量几乎必然为零，不要求 $g$ 在不可能取到的点上也为零。
+
+定义期望变换 $(Kg)(\theta)=E_\theta g(T)$，则完备性表示其核只有几乎必然为零的函数。若 $a(T),b(T)$ 均可积且对所有参数期望相同，对差 $g=a-b$ 应用完备性就有 $a(T)=b(T)$。这保证同一完备统计量的无偏函数的唯一性，但不保证无偏估计存在，也不表示所有基于完整数据的无偏估计都相同。
+
+\subsection{有界完备且充分推出最小充分}
+\begin{definitionbox}{定理 2.5.1}
+在讲义的标准 Borel 条件下，$T$ 有界完备且充分，则 $T$ 最小充分。
+\end{definitionbox}
+
+\textbf{证明。} 任取充分统计量 $U$，选 $T$ 值域上的有界一一 Borel 编码 $b$，其像上的逆可测。实值统计量可取 $b(t)=\arctan t$。定义
+\[
+ q(U)=E_\theta[b(T)\mid U],\qquad
+ r(T)=E_\theta[q(U)\mid T].
+\]
+由 $U,T$ 充分，两个条件期望依次可取同一个不含参数的版本。它们有界，且全期望给出
+\[
+ E_\theta[r(T)-b(T)]=0\quad\forall\theta.
+\]
+有界完备性推出 $r(T)=b(T)$ a.s.。分别对 $U,T$ 条件化，
+\[
+ \begin{aligned}
+ E_\theta[b(T)q(U)]
+ &=E_\theta[q(U)E_\theta(b(T)\mid U)]
+ =E_\theta[q(U)^2],\\
+ E_\theta[b(T)q(U)]
+ &=E_\theta[b(T)E_\theta(q(U)\mid T)]
+ =E_\theta[b(T)^2].
+ \end{aligned}
+\]
+故
+\[
+ E_\theta[(b(T)-q(U))^2]
+ =E_\theta b(T)^2-2E_\theta[b(T)q(U)]+E_\theta q(U)^2=0.
+\]
+非负变量期望为零，得 $b(T)=q(U)$ a.s.，反解即 $T=b^{-1}(q(U))$ a.s.。由于 $U$ 任意，$T$ 最小充分。
+
+\begin{notebox}[为什么不能直接用塔式性质？]
+事先不知道 $\sigma(T)$ 与 $\sigma(U)$ 谁包含谁，不能直接断言
+$E_\theta[E_\theta(b(T)\mid U)\mid T]=b(T)$。证明中是先由完备性得到这个等式，再由平方期望消除残差。
+\end{notebox}
+
+\subsection{两种直接证明：多项式与积分上限}
+\begin{examplebox}{例 2.5.1--2.5.2：二项分布的完备性}
+令 $T\sim\operatorname{Binomial}(n,p)$，$p\in(0,1)$。若所有参数下 $E_pg(T)=0$，则
+\[
+ \sum_{t=0}^n g(t)\binom ntp^t(1-p)^{n-t}=0.
+\]
+除以 $(1-p)^n>0$，令 $u=p/(1-p)$，得到
+\[
+ \sum_{t=0}^ng(t)\binom ntu^t=0\quad\forall u>0.
+\]
+一个有限次多项式在整个区间上为零，所有系数必须为零。由 $\binom nt>0$，得 $g(t)=0$ 对 $t=0,\ldots,n$ 成立。故 $T$ 完备，Bernoulli 样本总和因而完备充分。
+\end{examplebox}
+
+若把模型限制为单个已知 $p_0\in(0,1)$，$n\ge1$，则 $g(T)=T-np_0$ 是合法的固定非零零期望函数，完备性反而失效。完备性也相对于整族参数定义。
+
+\begin{examplebox}{例 2.5.3：均匀上端点模型的完备性}
+若 $X_i$ 独立同分布于 $U(0,\theta)$，$T=X_{(n)}$，则对 $0<t<\theta$，
+\[
+ P_\theta(T\le t)=(t/\theta)^n,\qquad
+ f_\theta^T(t)=nt^{n-1}\theta^{-n}.
+\]
+任取在所有参数下可积的 $g$，零期望给出
+\[
+ \int_0^\theta g(t)t^{n-1}\,\mathrm dt=0\quad\forall\theta>0.
+\]
+对每个 $B>0$，可积性保证 $g(t)t^{n-1}$ 在 $(0,B)$ 绝对可积。因此
+$F(b)=\int_0^b g(t)t^{n-1}\,\mathrm dt$ 在 $[0,B]$ 绝对连续，且
+\[
+ F'(b)=g(b)b^{n-1}\quad\text{Lebesgue-a.e.}
+\]
+$F$ 恒为零且 $b>0$，故 $g(b)=0$ a.e.。对正整数 $B$ 取可数并得到整个正半轴上的结论。$T$ 有 Lebesgue 密度，所以每个参数下 $g(T)=0$ a.s.，完备性成立。
+\end{examplebox}
+
+\subsection{指数族完备性及开集的作用}
+\begin{definitionbox}{定理 2.5.2：指数族完备性}
+若 $T$ 的分布相对于 $\nu$ 的密度为
+\[
+ q_\eta(t)=e^{\eta^\top t-\zeta(\eta)}h_*(t),\quad\eta\in\Xi\subseteq\R^k,
+\]
+且 $\Xi$ 包含非空开集，则 $T$ 完备。这里 $\nu$ 不必是 $k$ 维 Lebesgue 测度。
+\end{definitionbox}
+
+\textbf{证明展开。} 任取所有参数下可积且零期望的 $g$，写 $g=g^+-g^-$。选内点 $\eta_0$ 与 $\varepsilon>0$ 使 $B(\eta_0,\varepsilon)\subseteq\Xi$。消去密度中的归一化因子，得到
+\[
+ \int g^+(t)e^{\eta^\top t}h_*(t)\,\nu(\mathrm dt)
+ =\int g^-(t)e^{\eta^\top t}h_*(t)\,\nu(\mathrm dt).
+\]
+在 $\eta_0$ 处记共同有限值为 $C$。若 $C=0$，非负积分为零，直接得到 $g=0$ 于载体测度 $h_*\nu$ 几乎处处。
+
+若 $C>0$，定义两个概率密度
+\[
+ f_\pm(t)=C^{-1}g^\pm(t)e^{\eta_0^\top t}h_*(t).
+\]
+对于 $\|s\|<\varepsilon$，使用参数 $\eta_0+s$ 的积分恒等式，
+\[
+ \begin{aligned}
+ \int e^{s^\top t}f_+(t)\,\nu(\mathrm dt)
+ &=C^{-1}\int g^+(t)e^{(\eta_0+s)^\top t}h_*(t)\,\nu(\mathrm dt)\\
+ &=C^{-1}\int g^-(t)e^{(\eta_0+s)^\top t}h_*(t)\,\nu(\mathrm dt)\\
+ &=\int e^{s^\top t}f_-(t)\,\nu(\mathrm dt).
+ \end{aligned}
+\]
+可积性保证两边在该邻域有限。引用原点邻域内有限的多元矩母函数唯一性，得到两个概率测度相同，进而 $f_+=f_-$，$\nu$-a.e.。约去正因子可得 $g(t)h_*(t)=0$，$\nu$-a.e.。所有模型分布都关于载体测度绝对连续，故 $g(T)=0$ 在每个参数下 a.s. 成立。
+
+开集允许所有足够小方向的指数倾斜，提供一个原点邻域上的矩母函数信息。“所有阶矩相同必同分布”没有一般保证，不能替代这里的唯一性定理。
+
+\begin{notebox}[弯曲族的不完备必须另证]
+单观测 $X\sim N(\theta,\theta^2)$，$\theta>0$ 时，
+\[
+ X/\theta\sim N(1,1),\qquad P_\theta(X<0)=\Phi(-1).
+\]
+令 $T=(X,X^2)$，取
+\[
+ g(T)=\ind_{\{X<0\}}-\Phi(-1).
+\]
+该函数有界、对所有参数期望为零，但两个可能取值均非零。因此此例不有界完备，也不完备。证明依据是这个具体反例函数，而不只是自然参数空间没有开集。
+\end{notebox}
+
+\section{辅助统计量与 Basu 定理}
+
+\subsection{辅助性要求整个分布不含参数}
+\begin{definitionbox}{定义 2.6.1：辅助统计量}
+若 $A=A(\mathbf X)$ 的分布不依赖 $\theta$，即对每个可测集合 $B$，
+$P_\theta(A\in B)$ 都是关于参数的常数，则 $A$ 辅助。
+\end{definitionbox}
+
+均值恒定不够。例如 $X\sim N(0,\sigma^2)$ 的均值始终为零，但分布随方差变化，因此 $X$ 对该模型不辅助。
+
+正态样本 $n\ge2$ 时，标准化残差方向
+\[
+ A=\frac{(X_1-\bar X,\ldots,X_n-\bar X)}
+ {\{\sum_i(X_i-\bar X)^2\}^{1/2}}
+\]
+对完整位置尺度模型辅助。写 $X_i=\mu+\sigma Z_i$，其中 $Z_i$ 独立标准正态，中心化消去 $\mu$，归一化消去正数 $\sigma$，所以 $A$ 成为标准正态向量的固定函数。分母为零是概率零事件，可任意补定义。
+
+\subsection{Basu 定理的条件与完整证明}
+\begin{definitionbox}{定理 2.6.1：Basu 定理}
+若 $T$ 有界完备且充分，$A$ 辅助，则它们在模型中的每个分布下独立。
+\end{definitionbox}
+
+\textbf{证明。} 任取 $A$ 值域内的可测集合 $B$，辅助性给出不含参数的常数
+\[
+ c_B=P_\theta(A\in B).
+\]
+充分性给出不含参数的共同版本
+\[
+ q_B(T)=E_\theta[\ind_{\{A\in B\}}\mid T],\qquad 0\le q_B\le1.
+\]
+全期望公式给出 $E_\theta[q_B(T)-c_B]=0$ 对所有参数成立。差是 $T$ 的固定有界函数，由有界完备性，
+\[
+ q_B(T)=c_B\quad P_\theta\text{-a.s.}
+\]
+再取 $T$ 值域内的可测集合 $C$，
+\[
+ \begin{aligned}
+ P_\theta(T\in C,A\in B)
+ &=E_\theta[\ind_{\{T\in C\}}E_\theta(\ind_{\{A\in B\}}\mid T)]\\
+ &=E_\theta[\ind_{\{T\in C\}}q_B(T)]\\
+ &=P_\theta(T\in C)P_\theta(A\in B).
+ \end{aligned}
+\]
+这就是独立性；若从联合测度角度表述，可由矩形集上的相等延拓到乘积 $\sigma$-域。
+
+\begin{notebox}[三个条件各用在哪里？]
+辅助性使 $c_B$ 不含参数；充分性使 $q_B$ 可以统一选择；有界完备性使“所有参数下均值为零”升级为“几乎必然为零”。无条件概率不含参数，不能直接推出条件概率是同一常数。
+\end{notebox}
+
+\subsection{正态与指数模型的独立性应用}
+\begin{examplebox}{例 2.6.2：正态均值与样本方差独立}
+设 $n\ge2$，$X_i$ 独立同分布于 $N(\mu,\sigma^2)$。先固定任意 $\sigma^2>0$，仅令 $\mu$ 变化。联合密度的参数项为
+\[
+ \exp\left\{\frac{\mu}{\sigma^2}\sum_i x_i-\frac{n\mu^2}{2\sigma^2}\right\}.
+\]
+所以 $\sum_iX_i$ 充分；自然参数 $\mu/\sigma^2$ 遍历 $\R$，由指数族定理完备。$\bar X$ 与总和一一对应，也完备充分。
+
+写 $X_i=\mu+\sigma Z_i$，则
+\[
+ S^2=\frac{\sigma^2}{n-1}\sum_i(Z_i-\bar Z)^2.
+\]
+在固定方差的子模型中，其分布不含 $\mu$，所以辅助。Basu 定理给出 $\bar X$ 与 $S^2$ 独立；固定的 $\sigma^2$ 任意，因此对整个两参数正态模型中的每个参数点都成立。
+\end{examplebox}
+
+不能直接说 $S^2$ 对完整两参数模型辅助，因为其分布依赖 $\sigma^2$。上述证明也没有预先使用均值、方差独立性，避免循环论证。
+
+\begin{examplebox}{例 2.6.3：指数尺度族}
+设 $X_i$ 独立同分布，密度为 $\theta^{-1}e^{-x/\theta}\ind_{\{x>0\}}$。总和充分，自然参数 $-1/\theta$ 遍历 $(-\infty,0)$，故总和及其一一变换 $\bar X$ 完备充分。
+
+令 $Z_i=X_i/\theta$，则 $Z_i$ 独立同分布于尺度为 $1$ 的指数分布，且
+\[
+ \frac{X_1}{\bar X}=\frac{Z_1}{\bar Z}.
+\]
+比例的分布不含参数，因此辅助。Basu 定理给出
+\[
+ \bar X\ \perp\!\!\!\perp\ X_1/\bar X.
+\]
+$n=1$ 时比例恒为 $1$；$n\ge2$ 时是非平凡结论。它不表示 $X_1$ 与 $\bar X$ 独立。
+\end{examplebox}
+
+\subsection{反例：最小充分并不意味着完备}
+\begin{examplebox}{例 2.6.4：均匀位置族}
+设 $X_i$ 独立同分布于 $U(\theta,\theta+1)$，$\theta\in\R$，$n\ge2$。联合似然为
+\[
+ p_\theta^{(n)}(\mathbf x)
+ =\ind_{\{x_{(n)}-1<\theta<x_{(1)}\}}.
+\]
+在极差小于 $1$ 的共同满测样本集上，两条非零似然成比例当且仅当参数区间两个端点相同。因而 $T=(X_{(1)},X_{(n)})$ 最小充分。
+
+写 $X_i=\theta+U_i$，$U_i$ 独立同分布于 $U(0,1)$。极差
+\[
+ R=X_{(n)}-X_{(1)}=U_{(n)}-U_{(1)}
+\]
+是 $T$ 的辅助函数。极小、极大的联合密度为
+\[
+ f(u,v)=n(n-1)(v-u)^{n-2},\qquad0<u<v<1.
+\]
+令 $r=v-u$，Jacobian 为 $1$，在 $0<u<1-r$ 上积分得
+\[
+ f_R(r)=n(n-1)r^{n-2}(1-r),\qquad0<r<1.
+\]
+因此
+\[
+ ER=n(n-1)\int_0^1r^{n-1}(1-r)\,\mathrm dr
+ =n(n-1)\left(\frac1n-\frac1{n+1}\right)=\frac{n-1}{n+1}.
+\]
+于是 $g(T)=R-(n-1)/(n+1)$ 有界、所有参数下零期望，而 $R$ 有连续密度，故 $g(T)\ne0$ 的概率为 $1$。$T$ 不有界完备，也不完备。
+\end{examplebox}
+
+这里是区间长度固定、位置未知的模型，不能与上端点未知的 $U(0,\theta)$ 混淆。若假定此 $T$ 有界完备，Basu 还会迫使其函数 $R$ 与 $T$ 独立，从而与自身独立而退化，同样矛盾。
+
+\section{总结与学习检查}
+
+\begin{notebox}[四个概念分别回答什么问题？]
+充分性：给定摘要后，剩下样本的条件分布是否与参数无关？
+
+最小充分性：每个充分摘要是否都必须保留这份共同核心？
+
+完备性：一个固定可积函数能否在所有参数下均值为零，却不几乎必然为零？
+
+辅助性：统计量自身的整个分布是否与参数无关？
+\end{notebox}
+
+本章的可靠逻辑关系是
+\[
+ \text{完备}\Rightarrow\text{有界完备},\qquad
+ \text{有界完备且充分}\Rightarrow\text{最小充分}\Rightarrow\text{充分}.
+\]
+最小充分不推出完备。常数统计量对任意模型都完备，却在分布随参数改变的模型中不充分，说明完备不是“信息最多”。
+
+\subsection*{考场证明的起手与收尾}
+\begin{enumerate}
+\item 证明充分：写全联合密度和支撑，明确 $g_\theta(T(x))$ 与 $h(x)$，引用因子分解。
+\item 证明最小充分：先有充分性，再证明完整似然成比例推出 $T(x)=T(y)$；或选择合适小模型并核对共同零事件。
+\item 证明完备：任取所有参数下可积的固定函数 $g$，从零期望推出 $g(T)=0$ a.s.。用指数族定理时写明自然参数及其开集。
+\item 否定完备：明确构造与未知参数无关的 $g$，核对可积、所有参数下零期望、至少一个参数下不几乎必然为零。
+\item 应用 Basu：明确当前模型，分别核对充分、完备、辅助；若固定干扰参数使用子模型，最后说明所固定值任意。
+\end{enumerate}
+
+\subsection*{下一次独立复习的问题}
+\begin{enumerate}
+\item 不看答案，解释为什么统计量和自然参数都落在曲线上时，两条满秩条件的判断仍可能不同。
+\item 从条件期望定义出发，重写因子分解两个方向，标明每一步使用的测度。
+\item 说明共同支配引理、可数混合构造与推广原则怎样共同支持最小充分性证明。
+\item 独立证明二项与均匀最大值的完备性，并构造均匀位置族的不完备反例。
+\item 不预先使用卡方分布或独立性结论，应用 Basu 证明正态样本均值与方差独立。
+\end{enumerate}
+
+\subsection*{来源与引用说明}
+主要来源为 Fang Yao《Advanced Mathematical Statistics》第二章讲义，正文第 27--48 页，并结合第二章 Slides 与本次学习讨论整理。原讲义文件未随笔记重新发布。一般最小充分性证明沿用讲义引用：Bahadur (1954), Theorem 6.2；Srivastava (1998), \emph{A Course on Borel Sets}, Theorem 4.5.7；Kallenberg (2002), \emph{Foundations of Modern Probability}, 2nd ed., Lemma 1.13。书目与编号按课程材料记录，未另行核对相应书籍全文。

@@ -1,13 +1,14 @@
 \input{preamble}
 
 \begin{document}
+\hypersetup{pageanchor=false}
 
 \begin{titlepage}
   \centering
   \vspace*{30mm}
   {\Huge\bfseries\color{LectureBlue}高等统计学中文学习笔记\par}
   \vspace{8mm}
-  {\LARGE 第一章：从样本到经验分布\par}
+  {\LARGE 第二章：模型与信息压缩\par}
   \vspace{22mm}
   {\large 翻译、整理与学习注记\par}
   \vspace{5mm}
@@ -24,8 +25,15 @@
 \end{titlepage}
 
 \frontmatter
+\hypersetup{pageanchor=true}
+\begingroup
+\small
+\renewcommand{\baselinestretch}{1.0}\selectfont
 \tableofcontents
+\endgroup
 \mainmatter
-\input{notes/chapter01/chapter01}
+\setcounter{chapter}{1}
+\renewcommand{\chaptermark}[1]{\markboth{第二章：模型与信息压缩}{}}
+\input{notes/chapter02/chapter02}
 
 \end{document}

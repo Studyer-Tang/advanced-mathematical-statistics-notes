@@ -8,16 +8,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - root: main.tex
+            pdf: main.pdf
+            artifact: chapter-01-cn
+          - root: chapter02.tex
+            pdf: chapter02.pdf
+            artifact: chapter-02-cn
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3
         with:
-          root_file: main.tex
+          root_file: ${{ matrix.root }}
           latexmk_use_xelatex: true
       - name: Rename output
-        run: mv main.pdf chapter-01-cn.pdf
+        run: mv "${{ matrix.pdf }}" "${{ matrix.artifact }}.pdf"
       - uses: actions/upload-artifact@v4
         with:
-          name: chapter-01-cn
-          path: chapter-01-cn.pdf
-
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.artifact }}.pdf

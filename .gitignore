@@ -10,4 +10,6 @@
 *.synctex.gz
 *.toc
 tmp/
-
+/main.pdf
+/chapter02.pdf
+*.xdv

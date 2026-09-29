@@ -1,0 +1,97 @@
+\documentclass[11pt,oneside,openany,fontset=fandol]{ctexbook}
+
+\usepackage[
+  paperwidth=185mm,
+  paperheight=260mm,
+  top=19mm,
+  bottom=20mm,
+  inner=19mm,
+  outer=17mm,
+  headheight=14pt,
+  headsep=7mm,
+  footskip=11mm
+]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{booktabs,array,tabularx,longtable}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage[most]{tcolorbox}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\definecolor{LectureBlue}{HTML}{174F7A}
+\definecolor{NoteBlue}{HTML}{EAF3F8}
+\definecolor{WarmGray}{HTML}{F5F3EF}
+\definecolor{DeepGray}{HTML}{333333}
+\hypersetup{colorlinks=true,linkcolor=LectureBlue,urlcolor=LectureBlue}
+
+\setlength{\parindent}{2em}
+\setlength{\parskip}{0.25em}
+\setlist{nosep,leftmargin=2.2em}
+\renewcommand{\baselinestretch}{1.18}
+
+\ctexset{
+  chapter={
+    name={第,章},
+    number=\arabic{chapter},
+    format=\Huge\bfseries\color{LectureBlue},
+    titleformat=\Huge\bfseries\color{LectureBlue},
+    beforeskip=0pt,
+    afterskip=20pt
+  },
+  section={format=\Large\bfseries\color{LectureBlue}},
+  subsection={format=\large\bfseries\color{LectureBlue}},
+  subsubsection={format=\normalsize\bfseries\color{DeepGray}}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{DeepGray}高等统计学中文学习笔记}
+\fancyhead[R]{\small\color{DeepGray}\nouppercase{\leftmark}}
+\fancyfoot[R]{\small\thepage}
+\renewcommand{\headrulewidth}{0.45pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\newtcolorbox{definitionbox}[1]{
+  breakable,
+  enhanced,
+  colback=NoteBlue,
+  colframe=LectureBlue,
+  boxrule=0.7pt,
+  arc=1.5mm,
+  title={#1},
+  fonttitle=\bfseries
+}
+\newtcolorbox{notebox}[1][学习注记]{
+  breakable,
+  enhanced,
+  colback=WarmGray,
+  colframe=DeepGray!55,
+  boxrule=0.5pt,
+  arc=1.5mm,
+  title={#1},
+  fonttitle=\bfseries
+}
+\newtcolorbox{examplebox}[1]{
+  breakable,
+  enhanced,
+  colback=white,
+  colframe=LectureBlue!70,
+  boxrule=0.6pt,
+  borderline west={2.2pt}{0pt}{LectureBlue},
+  title={#1},
+  fonttitle=\bfseries
+}
+
+\newcommand{\ind}{\mathbf 1}
+\newcommand{\asto}{\xrightarrow{\mathrm{a.s.}}}
+\newcommand{\pto}{\xrightarrow{P}}
+\newcommand{\dto}{\xrightarrow{d}}
+\newcommand{\R}{\mathbb R}
+\newcommand{\E}{\operatorname{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\Cov}{\operatorname{Cov}}
+\newcommand{\argmax}{\operatorname*{arg\,max}}
+\newcommand{\argmin}{\operatorname*{arg\,min}}
+

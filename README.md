@@ -32,6 +32,7 @@ GitHub: [Studyer-Tang](https://github.com/Studyer-Tang)
 - [第 2 章 LaTeX 源文件](notes/chapter02/chapter02.tex)
 - [第 2 章学习历程：从疑问到理解](notes/chapter02/LEARNING_LOG.md)
 - [学习进度记录](PROGRESS.md)
+- [勘误与严谨性补充](ERRATA.md)
 
 ## 本地构建
 

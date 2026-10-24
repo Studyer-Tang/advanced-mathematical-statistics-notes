@@ -2,7 +2,7 @@
 
 数理统计以概率规律以及随机样本如何代表这些规律为起点。本章先复习描述分布、密度、条件期望和积分所需的测度论语言，再引入经验分布函数和经验测度，最后利用大数定律、中心极限定理、连续映射定理、Slutsky 定理和 Delta 方法建立基本渐近工具。
 
-本章的主线可以概括为
+本章各部分的关系是
 \[
   \text{总体分布 }P
   \longrightarrow
@@ -34,7 +34,7 @@
 其中 $\Omega$ 给出全部基本结果，$\mathcal F$ 规定哪些集合是可测事件，$P$ 则为事件分配概率。
 
 \begin{definitionbox}{定义 1.1.2：测度与概率}
-测度 $\mu$ 是定义在 $(\Omega,\mathcal F)$ 上的非负、可列可加集合函数。若 $A_i$ 两两不交，则
+测度 $\mu$ 是定义在 $(\Omega,\mathcal F)$ 上的非负、可列可加集合函数，且 $\mu(\varnothing)=0$。若 $A_i$ 两两不交，则
 \[
  \mu\!\left(\bigcup_{i=1}^{\infty}A_i\right)
  =\sum_{i=1}^{\infty}\mu(A_i).
@@ -140,7 +140,7 @@ RN 导数表示“每单位 $\nu$-测度含有多少 $\mu$-质量”。核心恒
 \]
 
 \begin{notebox}[密度依赖参考测度]
-固定 $\psi$ 时，密度不能脱离参考测度单独存在。同一个概率分布相对于计数测度、Lebesgue 测度或其他控制测度，会有不同的 RN 导数。密度值也可以超过 $1$；只有对集合积分以后才得到概率。
+密度必须连同参考测度理解。对同一个概率分布，若不同参考测度均允许相应的 RN 表示，所得密度可能不同；并不是任意分布对计数测度或 Lebesgue 测度都有密度。密度值也可以超过 $1$；只有对集合积分以后才得到概率。
 \end{notebox}
 
 若 $\mathcal P$ 是概率测度族，并存在同一个 $\sigma$-有限测度 $\nu$ 使每个 $P\in\mathcal P$ 都满足 $P\ll\nu$，则称 $\mathcal P$ 被 $\nu$ 控制，并可由密度族
@@ -439,7 +439,7 @@ M-估计定义为
 的一阶条件给出 $\widehat\theta_n=\bar X$。若取绝对值损失 $|x-\theta|$，相应 M-估计量则是样本中位数。
 \end{examplebox}
 
-在控制模型中取
+在受支配模型中取
 \[
  m_\theta(x)=\log p_\theta(x),
 \]
@@ -505,6 +505,42 @@ $\bm Y_n\pto\bm Y$ 当且仅当每个子序列 $(\bm Y_{n_j})$ 都存在一个�
  \bm Y_{n_{j_\ell}}\asto\bm Y.
 \]
 \end{definitionbox}
+
+\textbf{证明。} 若 $\bm Y_n\pto\bm Y$，对任意子序列可递归选取进一步子序列，使
+\[
+ P(\|\bm Y_{n_{j_\ell}}-\bm Y\|>2^{-\ell})<2^{-\ell}.
+\]
+这些概率之和有限，由第一 Borel--Cantelli 引理，以概率一只有有限多个相应事件发生，故进一步子序列几乎必然收敛。
+
+反之，若不依概率收敛，可选 $\varepsilon,\eta>0$ 及子序列，使每项均有
+$P(\|\bm Y_{n_j}-\bm Y\|>\varepsilon)\ge\eta$。按假设，它有几乎必然收敛的进一步子序列；相应事件的示性函数趋于零，被常数 $1$ 控制，由控制收敛定理其概率趋零，矛盾。
+
+\begin{notebox}[弱收敛的闭集判别及证明]
+欧氏空间中，$Y_n\dto Y$ 等价于对每个闭集 $F$ 有
+\[
+ \limsup_nP(Y_n\in F)\le P(Y\in F).
+\]
+这称为 Portmanteau 定理的闭集刻画。
+
+先假定弱收敛。对非空闭集取连续函数
+$h_\delta(x)=\max\{1-d(x,F)/\delta,0\}$，则 $\ind_F\le h_\delta\le1$，$h_\delta\downarrow\ind_F$ 当 $\delta\downarrow0$。弱收敛及控制收敛给出
+\[
+ \limsup_nP(Y_n\in F)\le\E h_\delta(Y)\downarrow P(Y\in F).
+\]
+空集情形显然。
+
+反之，闭集不等式取补集便得到开集概率的下极限不等式。若 $h$ 连续且 $0\le h\le M$，由分层积分与 Fatou 引理，
+\[
+ \begin{aligned}
+ \liminf_n\E h(Y_n)
+ &=\liminf_n\int_0^M P\{h(Y_n)>t\}\,\mathrm dt\\
+ &\ge\int_0^M\liminf_nP\{h(Y_n)>t\}\,\mathrm dt
+ \ge\E h(Y).
+ \end{aligned}
+\]
+再对 $M-h$ 应用同一结论得上极限不等式。一般有界连续函数先平移到非负，故其期望收敛，得到弱收敛。
+\end{notebox}
+
 
 标准蕴含关系为
 \[
@@ -669,7 +705,7 @@ Lindeberg 条件表示：相对于总方差 $s_n^2$，异常大项贡献的方�
 \subsection{连续映射定理与 Slutsky 定理}
 
 \begin{definitionbox}{定理 1.5.4：连续映射定理}
-若 $g$ 在除 $P_{\bm Y}$-零测集外的每一点连续，则
+设 $g$ 为 Borel 可测映射。若 $g$ 在除 $P_{\bm Y}$-零测集外的每一点连续，则
 \[
  \bm Y_n\asto\bm Y\Rightarrow g(\bm Y_n)\asto g(\bm Y),
 \]
@@ -680,6 +716,25 @@ Lindeberg 条件表示：相对于总方差 $s_n^2$，异常大项贡献的方�
  \bm Y_n\dto\bm Y\Rightarrow g(\bm Y_n)\dto g(\bm Y).
 \]
 \end{definitionbox}
+
+\textbf{证明。} 设 $g$ 可测，$D_g$ 为其不连续点集，$P(\bm Y\in D_g)=0$。几乎必然收敛时，在 $\bm Y_n(\omega)\to\bm Y(\omega)$ 且 $\bm Y(\omega)\notin D_g$ 的概率一事件上应用连续性定义即可。
+
+依概率收敛时，任取子序列。由子序列刻画，可选进一步子序列几乎必然收敛到 $\bm Y$，其像也几乎必然收敛。再用一次子序列刻画，得 $g(\bm Y_n)\pto g(\bm Y)$。
+
+依分布收敛时，取像空间中的闭集 $F$。若 $x\in\overline{g^{-1}(F)}$ 且 $x\notin D_g$，可取 $x_j\in g^{-1}(F)$ 收敛到 $x$；由连续性与 $F$ 的闭性，$g(x)\in F$。故
+\[
+ \overline{g^{-1}(F)}\subseteq g^{-1}(F)\cup D_g.
+\]
+由 Portmanteau 定理的闭集不等式，
+\[
+\begin{aligned}
+ \limsup_n P\{g(\bm Y_n)\in F\}
+ &\le\limsup_n P\{\bm Y_n\in\overline{g^{-1}(F)}\}\\
+ &\le P\{\bm Y\in\overline{g^{-1}(F)}\}
+ \le P\{g(\bm Y)\in F\}.
+\end{aligned}
+\]
+再次使用 Portmanteau 定理即得结论，不要求 $g$ 处处连续。
 
 例如，若 $\bar X_n\pto\mu$ 且 $g$ 在 $\mu$ 处连续，则
 \[
@@ -695,6 +750,13 @@ Lindeberg 条件表示：相对于总方差 $s_n^2$，异常大项贡献的方�
 \]
 则 $\bm V_n\dto\bm U$。
 \end{definitionbox}
+
+\textbf{渐近等价的证明。} 对 $h\in C_c(\R^k)$，令 $M=\sup|h|$。紧支撑连续函数在整个空间一致连续，故给定 $\eta>0$，可选 $\delta>0$ 使距离不超过 $\delta$ 时函数值之差不超过 $\eta$。于是
+\[
+ |\E h(\bm V_n)-\E h(\bm U_n)|
+ \le\eta+2M P(\|\bm V_n-\bm U_n\|>\delta).
+\]
+先令 $n\to\infty$，再令 $\eta\downarrow0$，左侧趋于零。由 $\bm U_n\dto\bm U$，得到 $\E h(\bm V_n)\to\E h(\bm U)$。在欧氏空间，对所有 $C_c$ 函数的积分收敛到一个概率律即可推出弱收敛：用紧支撑连续函数 $0\le\chi_R\le1$ 截断，先控制尾部概率，再把有界连续函数写成 $h\chi_R+h(1-\chi_R)$。因此 $\bm V_n\dto\bm U$。一般有界连续函数未必一致连续，不能直接套用上述 $\delta$。
 
 \begin{definitionbox}{定理 1.5.5：Slutsky 定理}
 若 $Y_n\dto Y$、$Z_n\pto c$，其中 $c$ 为常数，则
@@ -713,8 +775,14 @@ Lindeberg 条件表示：相对于总方差 $s_n^2$，异常大项贡献的方�
 \]
 \end{definitionbox}
 
+\textbf{Slutsky 定理的证明。} 连续映射 $y\mapsto(y,c)$ 给出 $(Y_n,c)\dto(Y,c)$，且
+\[
+ \|(Y_n,Z_n)-(Y_n,c)\|=\|Z_n-c\|\pto0.
+\]
+由渐近等价命题得到联合收敛，再对加法、乘法、除法应用连续映射定理。除法在分母非零处连续，故需 $c\ne0$；若某些 $n$ 的分母为零，可在该事件任意补定义，其概率趋于零。
+
 \begin{examplebox}{学生化样本均值}
-令
+设样本独立同分布，且有限方差 $\sigma^2>0$。令
 \[
  S_n^2=\frac1n\sum_{i=1}^n(X_i-\bar X_n)^2.
 \]
@@ -754,6 +822,12 @@ Lindeberg 条件表示：相对于总方差 $s_n^2$，异常大项贡献的方�
 \]
 \end{definitionbox}
 
+\textbf{随机 Taylor 展开的证明。} 令 $q(h)=R_m(h)/\|h\|^m$（$h\ne0$），并令 $q(0)=0$。由 Peano 余项假设，$q(h)\to0$ 当 $h\to0$。取 $Q_n=q(\bm X_n-\bm c)$。给定 $\varepsilon>0$，可选 $\delta>0$ 使 $\|h\|<\delta$ 时 $|q(h)|\le\varepsilon$，于是
+\[
+ P(|Q_n|>\varepsilon)\le P(\|\bm X_n-\bm c\|\ge\delta)\to0.
+\]
+故 $Q_n=o_p(1)$，代回确定性展开即可；这不要求每条样本路径都收敛。
+
 \begin{definitionbox}{定理 1.5.6：一阶 Delta 方法}
 若 $a_n\to\infty$，
 \[
@@ -774,15 +848,32 @@ Lindeberg 条件表示：相对于总方差 $s_n^2$，异常大项贡献的方�
 \]
 \end{definitionbox}
 
-证明的核心是 Taylor 展开
+\textbf{证明。} 弱收敛序列依概率有界，所以 $H_n=a_n(\bm X_n-\bm c)=O_p(1)$。因 $a_n\to\infty$，$\bm X_n\pto\bm c$。随机 Taylor 展开给出
 \[
- g(\bm X_n)-g(\bm c)
- =\nabla g(\bm c)^{\mathsf T}(\bm X_n-\bm c)
- +\|\bm X_n-\bm c\|Q_n,
+ a_n\{g(\bm X_n)-g(\bm c)\}
+ =\nabla g(\bm c)^{\mathsf T}H_n+\|H_n\|Q_n.
 \]
-其中 $Q_n=o_p(1)$。乘以 $a_n$ 后，余项是 $O_p(1)o_p(1)=o_p(1)$，再应用 Slutsky 定理。
+第一项由连续映射定理依分布收敛，第二项为 $O_p(1)o_p(1)=o_p(1)$。这里乘积规则来自
+\[
+ P(|A_nB_n|>\varepsilon)\le P(|A_n|>K)+P(|B_n|>\varepsilon/K):
+\]
+先选 $K$ 控制第一项，再令 $n\to\infty$ 控制第二项。由 Slutsky 定理得证。
 
-若前 $m-1$ 阶导数均在 $\bm c$ 处为零，而至少一个 $m$ 阶导数非零，则需要用 $a_n^m$ 缩放，并保留 Taylor 展开的第 $m$ 阶齐次多项式。这就是高阶 Delta 方法。
+\begin{definitionbox}{高阶 Delta 方法}
+若 $a_n(\bm X_n-\bm c)\dto\bm Y$，$a_n\to\infty$，$g$ 在 $\bm c$ 有 $m$ 阶 Peano 展开，且 $D^jg(\bm c)=0$ 对 $1\le j<m$ 成立，则
+\[
+ a_n^m\{g(\bm X_n)-g(\bm c)\}
+ \dto\frac1{m!}D^mg(\bm c)[\bm Y,\ldots,\bm Y].
+\]
+一维时右端为 $g^{(m)}(c)Y^m/m!$。
+\end{definitionbox}
+
+\textbf{证明。} 令 $H_n=a_n(\bm X_n-\bm c)$，由低阶导数消失，
+\[
+ a_n^m\{g(\bm X_n)-g(\bm c)\}
+ =\frac1{m!}D^mg(\bm c)[H_n,\ldots,H_n]+\|H_n\|^mQ_n.
+\]
+$m$ 重线性映射在对角线上是连续齐次多项式，第一项由连续映射定理收敛；$H_n=O_p(1)$ 使余项为 $o_p(1)$。再用 Slutsky 定理。即使 $D^mg(\bm c)\ne0$，$\bm Y$ 也可能落在该多项式的零集上，使极限退化。
 
 \begin{examplebox}{样本均值的平方}
 由
@@ -810,7 +901,17 @@ Lindeberg 条件表示：相对于总方差 $s_n^2$，异常大项贡献的方�
 \[
  \nabla h(\mu,Px^2)=(-2\mu,1)^{\mathsf T}.
 \]
-中心化线性项化简为
+记 $\mu=\E X$、$m_j=\E X^j$、$\mu_4=\E(X-\mu)^4$。二维 CLT 的协方差矩阵为
+\[
+ \bm\Sigma=\begin{pmatrix}
+ m_2-\mu^2&m_3-\mu m_2\\m_3-\mu m_2&m_4-m_2^2
+ \end{pmatrix}.
+\]
+二次型 $(-2\mu,1)\bm\Sigma(-2\mu,1)^{\mathsf T}$ 是线性组合的方差。其中心化变量为
+\[
+ (X^2-m_2)-2\mu(X-\mu)=(X-\mu)^2-(m_2-\mu^2).
+\]
+因此中心化线性项化简为
 \[
  L(X)=(X-\mu)^2-\sigma^2,
 \]
@@ -846,7 +947,7 @@ $\sqrt n$ 中心化尺度下，
 
 概率分布与期望描述总体量，经验测度则给出对应的样本量。Markov 和 Chebyshev 不等式把矩信息转化为概率上界；大数定律说明估计误差消失；中心极限定理描述 $n^{-1/2}$ 尺度上的随机波动；连续映射、Slutsky 定理和 Delta 方法则把这些极限传递到非线性代入估计量。
 
-这些工具将继续支撑后续的集中不等式、一致经验过程以及 M-估计与 Z-估计理论。
+第三章的一致性分析、第四章的 U 统计量极限分布都需要这些工具。
 
 \begin{notebox}[复习路线]
 建议按以下顺序复习：
@@ -859,3 +960,12 @@ $\sqrt n$ 中心化尺度下，
 \]
 首先确认估计量是否相合，再寻找其波动尺度，最后分析非线性变换和学生化。
 \end{notebox}
+
+\section*{练习与核对}
+\addcontentsline{toc}{section}{练习与核对}
+\begin{enumerate}
+\item 若 $X_i$ 独立同分布于 $\operatorname{Bernoulli}(p)$，求 $\bar X_n(1-\bar X_n)$ 在 $p\ne1/2$ 与 $p=1/2$ 时适当缩放的极限分布。
+\item $A_n\dto A$、$B_n\dto B$ 能否推出 $A_n+B_n\dto A+B$？说明 Slutsky 定理为何要求其中一个量收敛到常数。
+\item 在四阶中心矩有限时，直接证明 $S_n^2-\sigma^2=(P_n-P)(x-\mu)^2-(\bar X_n-\mu)^2$，据此重做样本方差的极限分布。
+\end{enumerate}
+\textbf{答案线索。} (1) $p\ne1/2$ 时，$\sqrt n$ 极限为 $N(0,(1-2p)^2p(1-p))$；$p=1/2$ 时，$n\{\bar X_n(1-\bar X_n)-1/4\}\dto-Z^2/4$，$Z\sim N(0,1)$。(2) 不能：取标准正态 $Z$，$A_n=Z$、$B_n=(-1)^nZ$，各边缘律不变，和却在 $2Z$ 与 $0$ 之间交替。(3) 展开中心化平方，余项的 $\sqrt n$ 倍为 $O_p(n^{-1/2})$。若 $\mu_4=\sigma^4$，正态极限退化为零，不能据此做非退化正态近似。

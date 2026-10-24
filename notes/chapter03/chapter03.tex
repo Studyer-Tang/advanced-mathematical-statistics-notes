@@ -1,0 +1,721 @@
+\chapter{决策、估计与信息下界}
+
+评价一个统计方法，须先指定模型、估计目标、损失函数及允许比较的规则类。无偏性约束估计量的均值，一致性描述样本量增大时的集中，而风险同时计入误差的大小与发生概率。本章先建立这些比较标准，再由得分恒等式推导 Cramér--Rao 下界，并讨论等号、参数变换和非正则模型。
+
+\section{决策问题与风险比较}
+
+\subsection{从估计规则到风险函数}
+\begin{definitionbox}{统计决策问题}
+给定统计模型 $\mathcal P=\{P_\theta:\theta\in\Theta\}$、行动空间 $\mathcal A$、非负损失 $L(\theta,a)$，以及一类可测规则 $\mathcal D$。规则 $\delta:\mathcal X\to\mathcal A$ 的风险为
+\[
+ R_\theta(\delta)=\E_\theta L(\theta,\delta(X)).
+\]
+固定参数时，损失 $L(\theta,\delta(X))$ 是随机变量，风险是对样本分布取平均后的数值；改变参数，便得到整条风险函数。
+\end{definitionbox}
+
+估计 $g(\theta)\in\R^k$ 时，常用平方损失 $\|a-g(\theta)\|^2$、绝对距离损失 $\|a-g(\theta)\|$，或加权二次损失
+\[
+ L(\theta,a)=(a-g(\theta))^\top W_\theta(a-g(\theta)),
+ \qquad W_\theta\succeq0.
+\]
+平方损失下的风险称均方误差。权重可以改变不同方向的代价，但这种二次损失仍对误差的正负对称。高估与低估代价不同时，应另设非对称损失。
+
+\begin{examplebox}{正态均值：两条相交的风险曲线}
+设 $X_1,\ldots,X_n\overset{\mathrm{i.i.d.}}\sim N(\mu,\sigma^2)$，$\sigma^2$ 已知，估计 $\mu$。平方损失下，
+\[
+ R_\mu(\bar X)=\frac{\sigma^2}{n},\qquad
+ R_\mu(m)=(m-\mu)^2,
+\]
+其中 $m$ 是事先固定的常数。若 $|\mu-m|<\sigma/\sqrt n$，常数规则的风险较低；区间外则样本均值较低。常数规则在 $\mu=m$ 处风险为零，并不能使它成为整个模型中的好规则。
+\end{examplebox}
+
+风险的定义先固定参数，只对数据平均。给参数配置先验 $\pi$ 后再平均，才得到 Bayes 风险
+\[
+ r_\pi(\delta)=\int_\Theta R_\theta(\delta)\,\pi(\mathrm d\theta).
+\]
+这两个期望的对象不同。
+
+\subsection{支配、可容许与极小极大}
+\begin{definitionbox}{三种风险比较}
+若 $R_\theta(\delta_1)\le R_\theta(\delta_2)$ 对所有 $\theta$ 成立，且至少一点严格小于，称 $\delta_1$ 支配 $\delta_2$。在指定规则类中不受任何规则支配的规则称可容许。
+
+若某个 $\delta^*$ 满足
+\[
+ R_\theta(\delta^*)\le R_\theta(\delta)
+ \quad\text{对所有 }\theta\in\Theta,\ \delta\in\mathcal D,
+\]
+则它逐点最优。极小极大规则则要求达到
+\[
+ \inf_{\delta\in\mathcal D}\sup_{\theta\in\Theta}R_\theta(\delta).
+\]
+\end{definitionbox}
+
+逐点最优必然可容许；若逐点最优规则存在，任何可容许规则都须与它具有相同风险函数，否则便被支配。可容许性本身不提供风险的大小：它仅排除一种统一改进。规则类扩大后，原来的可容许性也可能失效。
+
+例如 $X_i\sim N(\theta,1)$ 且 $n\ge2$，$X_1$ 与 $\bar X$ 均无偏，但风险分别为 $1$ 与 $1/n$，故 $X_1$ 不可容许。这个比较尚未证明 $\bar X$ 优于所有估计量。又如 $X\sim N(\theta,1)$，在只含 $X$ 与常数 $3$ 的两元素规则类中，二者风险相交，因此都可容许，却无逐点最优规则。
+
+极小极大比较先固定规则，再找它最坏的参数点，最后在规则间优化。交换这两个优化顺序，会变成知道参数后另选行动的问题。一个实用下界为
+\[
+ \inf_\delta\sup_\theta R_\theta(\delta)
+ \ge \inf_\delta r_\pi(\delta),
+\]
+因为任意规则的最大风险不小于其先验平均风险。若某个规则的最大风险等于右端，就证明了它的极小极大性。
+
+\subsection{检验也是决策}
+检验 $H_0:\theta\in\Theta_0$ 对 $H_1:\theta\in\Theta_1$，约定拒绝为行动 $1$。随机化检验 $\varphi(X)\in[0,1]$ 表示给定数据后的拒绝概率，可用独立 $V\sim U(0,1)$ 实现为 $\ind\{V\le\varphi(X)\}$。记功效
+\[
+ \beta_\varphi(\theta)=\E_\theta\varphi(X).
+\]
+若错误行动的损失为 $1$、正确行动为 $0$，则
+\[
+ R_\theta(\varphi)=
+ \begin{cases}
+ \beta_\varphi(\theta),&\theta\in\Theta_0,\\
+ 1-\beta_\varphi(\theta),&\theta\in\Theta_1.
+ \end{cases}
+\]
+水平不超过 $\alpha$ 要求 $\sup_{\Theta_0}\beta_\varphi\le\alpha$。随后提高备择下的功效，才是带水平约束的风险优化。总不拒绝虽然没有第一类错误，却没有发现备择的能力。
+
+\paragraph{复习题}
+\begin{enumerate}
+ \item 在上面的正态均值例中，把损失改成 $|a-\mu|$，求 $\bar X$ 与常数 $m$ 的风险及交点。
+ \item 逐点最优、可容许、极小极大是否是同一个概念？说明其量词或优化对象的区别。
+\end{enumerate}
+\begin{notebox}[答案线索]
+第一题：$R_\mu(\bar X)=\sigma\sqrt{2/(\pi n)}$，$R_\mu(m)=|m-\mu|$。第二题：逐点最优比较每个竞争者在每个参数点的风险；可容许只排除支配；极小极大只比较最大风险。有限规则类中的结论不能直接推广到所有可测规则。
+\end{notebox}
+
+\section{偏差、方差与收缩}
+
+\subsection{均方误差分解}
+设 $T$ 二阶可积，目标为 $g(\theta)\in\R$，偏差记作
+\[
+ b_\theta(T)=\E_\theta T-g(\theta).
+\]
+将误差拆为 $T-\E_\theta T+b_\theta(T)$，平方后取期望，交叉项因中心化消失，故
+\[
+ \operatorname{MSE}_\theta(T)
+ =\Var_\theta(T)+b_\theta(T)^2.
+\]
+无偏性只使第二项为零，不保证第一项小。允许适当偏差，有时可以显著降低方差。
+
+\begin{examplebox}{固定系数的正态收缩}
+设 $X\sim N(\theta,1)$，$0<a<1$，比较 $aX$ 与 $X$。有
+\[
+ b_\theta(aX)=(a-1)\theta,\qquad
+ R_\theta(aX)=a^2+(1-a)^2\theta^2.
+\]
+因此
+\[
+ R_\theta(aX)<R_\theta(X)=1
+ \iff |\theta|<\sqrt{\frac{1+a}{1-a}}.
+\]
+收缩降低了方差，却引入随 $|\theta|$ 增大的偏差；整个实参数空间上不存在这里的统一支配关系。
+\end{examplebox}
+
+\subsection{二项比例的加权估计}
+设 $Y\sim\operatorname{Bin}(n,p)$，$a,b\ge0$，考虑
+\[
+ \delta_{a,b}=\frac{Y+a}{n+a+b}.
+\]
+当 $a+b>0$ 时，它是样本比例与固定中心的加权平均：
+\[
+ \delta_{a,b}=w\frac Yn+(1-w)q,
+ \qquad w=\frac n{n+a+b},\quad q=\frac a{a+b}.
+\]
+直接计算得
+\[
+ b_p(\delta_{a,b})=\frac{a-(a+b)p}{n+a+b},\qquad
+ R_p(\delta_{a,b})=
+ \frac{np(1-p)+\{a-(a+b)p\}^2}{(n+a+b)^2}.
+\]
+取 $n=16,a=b=1$，令 $u=p(1-p)$，则两个风险分别为 $(1+12u)/324$ 与 $u/16$。前者较小当且仅当
+\[
+ u>\frac4{33}
+ \iff \left|p-\frac12\right|<\frac12\sqrt{\frac{17}{33}}.
+\]
+靠近中心时，减少的方差补偿了偏差；靠近端点时则相反。
+
+\subsection{对称收缩的极小极大计算}
+在 $\delta_c=(Y+c)/(n+2c)$、$c\ge0$ 的规则类内，风险为
+\[
+ R_p(c)=\frac{np(1-p)+c^2(1-2p)^2}{(n+2c)^2},
+ \qquad
+ \frac{\partial R_p(c)}{\partial p}
+ =\frac{(n-4c^2)(1-2p)}{(n+2c)^2}.
+\]
+当 $c<\sqrt n/2$，最大风险在 $p=1/2$；当 $c>\sqrt n/2$，在 $p=0,1$。因而
+\[
+ \sup_{0\le p\le1}R_p(c)=
+ \begin{cases}
+ \dfrac{n}{4(n+2c)^2},&0\le c\le\sqrt n/2,\\[5pt]
+ \dfrac{c^2}{(n+2c)^2},&c\ge\sqrt n/2.
+ \end{cases}
+\]
+第一段随 $c$ 递减，第二段递增。最优选择是
+\[
+ c^*=\frac{\sqrt n}{2},\qquad
+ R_p(c^*)=\frac1{4(\sqrt n+1)^2},
+\]
+此时风险不依赖 $p$。
+
+\begin{notebox}[从类内优化到全部规则：还需一个下界]
+上述微分计算只证明对称规则类内的极小极大性。本例可以再补一步：取真先验 $p\sim\operatorname{Beta}(c^*,c^*)$。平方损失下的后验均值正是 $\delta_{c^*}$，因为条件均方误差由后验均值最小化。它的 Bayes 风险等于常数风险 $1/\{4(\sqrt n+1)^2\}$。Bayes 下界与该规则的最大风险相等，故它实际上也在全部规则中极小极大。若不补这个论证，便不能扩大原有结论的范围。
+\end{notebox}
+
+固定 $a,b$ 时，加权估计的偏差为 $O(n^{-1})$；但 $c^*=\sqrt n/2$ 随样本量改变，偏差一般仅为 $O(n^{-1/2})$。两种渐近比较的前提不同。
+
+\paragraph{复习题}
+\begin{enumerate}
+ \item 设独立 $X_i$ 具有共同均值 $\theta$ 与方差 $\sigma^2>0$。证明所有确定权重的线性无偏估计 $\sum_i c_iX_i$ 中，$\bar X$ 的方差最小，并求等号条件。
+ \item 当 $n=16$ 时，分别计算 $Y/n$ 与 $\delta_{c^*}$ 的最大风险。偏差是否必然增加最大均方误差？
+\end{enumerate}
+\begin{notebox}[答案线索]
+第一题：无偏要求 $\sum_i c_i=1$，Cauchy--Schwarz 给出 $\sum_i c_i^2\ge1/n$；等号当且仅当所有 $c_i=1/n$。结论只在线性无偏类中成立。第二题：最大风险分别为 $1/64$ 与 $1/100$，故有偏规则也可能降低最大风险。
+\end{notebox}
+
+\section{无偏性、一致性与渐近尺度}
+
+\subsection{三种性质应分别检验}
+\begin{definitionbox}{无偏、渐近无偏与一致}
+$T_n$ 对 $g(\theta)$ 无偏，指每个 $n$ 均有 $\E_\theta T_n=g(\theta)$。若期望存在且 $\E_\theta T_n\to g(\theta)$，称渐近无偏。若对每个固定 $\theta$、每个 $\varepsilon>0$，
+\[
+ P_\theta(|T_n-g(\theta)|>\varepsilon)\to0,
+\]
+则称一致。给定 $a_n\to\infty$，若 $a_n(T_n-g(\theta))=O_{P_\theta}(1)$，称具有 $a_n$-一致性。
+\end{definitionbox}
+
+依概率有界可推出 $T_n-g(\theta)=O_{P_\theta}(a_n^{-1})\pto0$。这些都是固定参数下的陈述，未必在整个参数空间上一致，也未声称该速度最优。
+
+由 Markov 不等式，
+\[
+ P_\theta(|T_n-g(\theta)|>\varepsilon)
+ \le\frac{\E_\theta(T_n-g(\theta))^2}{\varepsilon^2}.
+\]
+故偏差与方差都趋零足以推出一致；反向需要额外的尾部控制。
+
+\begin{examplebox}{无偏性与一致性互不替代}
+设 $X_i\sim N(\mu,1)$。
+\begin{enumerate}
+ \item $T_n=(1-1/n)\bar X$ 有偏，偏差 $-\mu/n$，方差 $(1-1/n)^2/n$，却一致。
+ \item $T_n=X_1$ 每个样本量均无偏，但
+ \[
+ P_\mu(|T_n-\mu|>\varepsilon)=P(|Z|>\varepsilon)>0,
+ \quad Z\sim N(0,1),
+ \]
+ 所以不一致。
+ \item 允许外加随机化，取与数据独立的 $U\sim U(0,1)$，令
+ \[
+ T_n=\bar X+n\ind\{U\le1/n\}.
+ \]
+ 则 $\E_\mu T_n=\mu+1$，不渐近无偏，但
+ \[
+ P_\mu(|T_n-\mu|>\varepsilon)
+ \le \frac1{n\varepsilon^2}+\frac1n\to0.
+ \]
+ 此时均方误差为 $1/n+n$，甚至发散。若规则只允许原始样本的确定函数，这个随机化例子须先把 $U$ 纳入实验。
+\end{enumerate}
+\end{examplebox}
+
+证明不一致应回到尾概率，而不能仅以“方差未趋零”代替。相反，上例说明依概率收敛本身并不保证期望或二阶矩收敛。
+
+\subsection{一阶相同不等于有限样本相同}
+设 $X_i\sim N(\mu,\sigma^2)$，$\sigma^2$ 已知，估计 $\mu^2$。考虑
+\[
+ T_n=\bar X^2,\qquad U_n=\bar X^2-\frac{\sigma^2}{n}.
+\]
+前者偏差为 $\sigma^2/n$，后者无偏。利用恒等式
+\[
+ \bar X^2-\mu^2=2\mu(\bar X-\mu)+(\bar X-\mu)^2
+\]
+及 $\sqrt n(\bar X-\mu)=O_P(1)$，有
+\[
+ \sqrt n(T_n-\mu^2)
+ =2\mu\sqrt n(\bar X-\mu)+o_P(1).
+\]
+当 $\mu\ne0$，两个估计量均满足
+\[
+ \sqrt n(T_n-\mu^2),\ \sqrt n(U_n-\mu^2)
+ \dto N(0,4\mu^2\sigma^2),
+\]
+因为 $\sqrt n(T_n-U_n)=\sigma^2/\sqrt n\to0$。
+
+在 $\mu=0$ 处，一阶导数消失。写 $Z_n=\sqrt n\bar X/\sigma\sim N(0,1)$，便有精确分布
+\[
+ nT_n\overset d=\sigma^2\chi_1^2,
+ \qquad nU_n\overset d=\sigma^2(\chi_1^2-1).
+\]
+此处应使用 $n$ 尺度，且偏差修正改变极限分布。尺度和有效的一阶展开可能随参数点改变。
+
+\paragraph{复习题}
+\begin{enumerate}
+ \item 若 $\sqrt n(T_n-g(\theta))\dto N(0,V)$，能否推出一致性？能否直接推出 $n\operatorname{MSE}_\theta(T_n)\to V$？
+ \item 计算上述 $U_n$ 的精确方差，比较 $\mu=0$ 与 $\mu\ne0$ 时的误差尺度。
+\end{enumerate}
+\begin{notebox}[答案线索]
+第一题：弱收敛蕴含依概率有界，因此推出一致；矩收敛不能直接推出，需统一可积性等附加条件。第二题：令 $Z=\bar X-\mu$，使用 $\E Z^3=0$、$\E Z^4=3\sigma^4/n^2$，得到
+\[
+ \Var_\mu(U_n)=\frac{4\mu^2\sigma^2}{n}+\frac{2\sigma^4}{n^2}.
+\]
+\end{notebox}
+
+\section{得分与 Fisher 信息}
+
+\subsection{定义与正则条件}
+令 $\theta\in\Theta\subset\R^d$，单次观测密度为 $p_\theta$，得分取列向量：
+\[
+ \ell_\theta(x)=\log p_\theta(x),\qquad
+ s_\theta(x)=\nabla_\theta\ell_\theta(x),\qquad
+ I(\theta)=\E_\theta[s_\theta(X)s_\theta(X)^\top].
+\]
+信息矩阵总半正定，因为 $a^\top I(\theta)a=\E_\theta(a^\top s_\theta)^2\ge0$，但不一定可逆。导数针对参数，求导时观测值固定；把 $X$ 代入后，得分才成为随机向量。
+
+以下是一组足以使用信息恒等式的局部条件：参数点位于开放参数空间内部；各密度在同一支撑上为正；除一个共同测度零集外，密度关于参数二次连续可微；密度的一、二阶导数在真值邻域内具有可积包络；得分二阶矩与对数密度 Hessian 的期望存在。这些条件使微分与积分可以交换。
+
+\begin{definitionbox}{得分与信息恒等式}
+在上述条件下，
+\[
+ \E_\theta s_\theta(X)=0,\qquad
+ I(\theta)=\Cov_\theta(s_\theta(X))
+ =-\E_\theta\nabla_\theta^2\ell_\theta(X).
+\]
+\end{definitionbox}
+
+\paragraph{证明}
+由 $\nabla p_\theta=p_\theta s_\theta$ 和密度归一化，
+\[
+ \E_\theta s_\theta
+ =\int\nabla p_\theta\,\mathrm d\nu
+ =\nabla\int p_\theta\,\mathrm d\nu=0.
+\]
+逐坐标使用乘积法则，
+\[
+ \nabla^2p_\theta
+ =p_\theta\{\nabla^2\ell_\theta+s_\theta s_\theta^\top\}.
+\]
+再对两边积分，左边为归一化常数的二阶导数 $0$，故得第二条恒等式。单个观测的负 Hessian 不必半正定；这里等于信息矩阵的是它的期望。
+
+对于 i.i.d. 样本，记
+\[
+ \ell_n(\theta)=\sum_{i=1}^n\ell_\theta(X_i),\quad
+ S_n(\theta)=\sum_{i=1}^ns_\theta(X_i),\quad
+ H_n(\theta)=\nabla_\theta^2\ell_n(\theta).
+\]
+独立性与得分均值为零使外积中的交叉项消失，故
+\[
+ I_n(\theta)=\E_\theta S_nS_n^\top=nI(\theta).
+\]
+独立但不同分布时信息仍逐项相加；存在依赖时不能直接写成 $nI$。
+
+\subsection{指数族的归一化函数}
+自然指数族写成
+\[
+ p_\eta(x)=h(x)\exp\{\eta^\top T(x)-\zeta(\eta)\},
+ \qquad Z(\eta)=e^{\zeta(\eta)}.
+\]
+在自然参数空间内部，直接微分归一化积分得到
+\[
+ \nabla\zeta(\eta)=\frac{\nabla Z(\eta)}{Z(\eta)}=\E_\eta T,
+\]
+\[
+ \nabla^2\zeta(\eta)
+ =\frac{\nabla^2Z}{Z}-\frac{\nabla Z\nabla Z^\top}{Z^2}
+ =\Cov_\eta(T).
+\]
+另一方面，$s_\eta=T-\nabla\zeta$，所以 $I(\eta)=\nabla^2\zeta(\eta)$。若 $T$ 无非平凡的几乎必然仿射关系，则任意非零 $a$ 均有 $\Var(a^\top T)>0$，信息矩阵正定。
+
+微分合法性来自参数空间的内部性。一维时，选取 $\eta_0\pm2a$ 仍在自然参数空间内。对 $m=1,2$ 及 $|\eta-\eta_0|\le a$，
+\[
+ |t|^me^{\eta t}
+ \le C_{m,a}\{e^{(\eta_0+2a)t}+e^{(\eta_0-2a)t}\}.
+\]
+乘 $h$ 后右边可积，给出导数所需的局部包络。多维时可用参数邻域内有限个立方体顶点的指数项之和控制。
+
+\subsection{参数变换与 Jacobian 的方向}
+设新参数 $\lambda\in\R^r$，旧参数为 $\theta=\psi(\lambda)\in\R^d$，Jacobian 定义为
+\[
+ J(\lambda)=D\psi(\lambda)
+ =\left(\frac{\partial\theta_j}{\partial\lambda_r}\right)_{j,r}
+ \in\R^{d\times r}.
+\]
+链式法则给出
+\[
+ s_\lambda(X)=J(\lambda)^\top s_\theta(X),\qquad
+ I_\lambda(\lambda)=J(\lambda)^\top
+ I_\theta(\psi(\lambda))J(\lambda).
+\]
+导数方向是“旧参数对新参数”，因为新得分对 $\lambda$ 求导。这里没有变换样本 $X$；Jacobian 来自参数的链式求导，不是密度换元的行列式。
+
+\begin{examplebox}{指数分布：尺度与率}
+尺度参数模型 $p_\theta(x)=\theta^{-1}e^{-x/\theta}\ind\{x>0\}$ 有
+\[
+ s_\theta(x)=\frac{x-\theta}{\theta^2},\qquad
+ I_\theta(\theta)=\frac1{\theta^2}.
+\]
+改用率 $\lambda=1/\theta$，$J=\mathrm d\theta/\mathrm d\lambda=-1/\lambda^2$，因此
+\[
+ I_\lambda(\lambda)=\frac1{\lambda^4}\,I_\theta(1/\lambda)
+ =\frac1{\lambda^2}.
+\]
+直接对 $\log p_\lambda(x)=\log\lambda-\lambda x$ 求导，也有 $s_\lambda=1/\lambda-X$，其方差为 $1/\lambda^2$。只把 $\theta=1/\lambda$ 代入旧信息所得的 $\lambda^2$，仍是旧坐标导数的二阶矩，缺少链式因子。
+\end{examplebox}
+
+\subsection{常见模型核对}
+\begin{center}
+\begin{tabularx}{\textwidth}{@{}lXX@{}}
+\toprule
+模型与参数 & 单次得分 & 单次信息\\
+\midrule
+$N(\mu,\sigma^2)$，$\sigma^2$ 已知 & $(X-\mu)/\sigma^2$ & $1/\sigma^2$\\
+$\operatorname{Bernoulli}(p)$ & $(X-p)/\{p(1-p)\}$ & $1/\{p(1-p)\}$\\
+$\operatorname{Poisson}(\lambda)$ & $X/\lambda-1$ & $1/\lambda$\\
+指数分布，尺度 $\theta$ & $(X-\theta)/\theta^2$ & $1/\theta^2$\\
+\bottomrule
+\end{tabularx}
+\end{center}
+Bernoulli 的自然参数为 $\eta=\log\{p/(1-p)\}$，其信息为 $p(1-p)$，不是原参数 $p$ 下的信息。信息的数值必须连同参数坐标一起解释。
+
+\paragraph{复习题}
+\begin{enumerate}
+ \item 若 Poisson 均值改写为 $\lambda=e^\eta$，用链式法则计算 $I_\eta$，再用对数密度直接验证。
+ \item 为什么从 $\int p_\theta=1$ 合法求导，尚不足以保证可以从 $\int T p_\theta$ 合法求导？
+\end{enumerate}
+\begin{notebox}[答案线索]
+第一题：$I_\eta=(e^\eta)^2/e^\eta=e^\eta$；新得分是 $X-e^\eta$。第二题：多出的 $T$ 可能无界，需要另行控制 $T\,\partial_\theta p_\theta$ 的可积性，例如提供局部可积包络。
+\end{notebox}
+
+\section{Cramér--Rao 下界与等号条件}
+
+\subsection{标量下界的完整证明}
+\begin{definitionbox}{标量 Cramér--Rao 不等式}
+设标量参数模型满足前述得分恒等式，$0<I_n(\theta)<\infty$。统计量 $T$ 无偏估计可微目标 $g(\theta)$，且 $\E_\theta T^2<\infty$。另假设在 $\E_\theta T=\int T p_\theta^{(n)}\,\mathrm d\nu^n$ 中可以交换微分与积分。则
+\[
+ \Cov_\theta(T,S_n)=g'(\theta),\qquad
+ \Var_\theta(T)\ge\frac{g'(\theta)^2}{I_n(\theta)}.
+\]
+i.i.d. 情形 $I_n=nI$。
+\end{definitionbox}
+
+\paragraph{证明}
+$T=T(x)$ 不依赖未知参数。对无偏性求导，
+\[
+ \begin{aligned}
+ g'(\theta)
+ &=\int T(x)\,\partial_\theta p_\theta^{(n)}(x)\,\mathrm d\nu^n(x)\\
+ &=\E_\theta[T S_n(\theta)]
+ =\Cov_\theta(T,S_n),
+ \end{aligned}
+\]
+末步用了 $\E_\theta S_n=0$。Cauchy--Schwarz 不等式给出
+\[
+ g'(\theta)^2
+ =\{\E_\theta[(T-g(\theta))S_n]\}^2
+ \le\Var_\theta(T)I_n(\theta).
+\]
+除以正的信息即得下界。等号成立当且仅当
+\[
+ T-g(\theta)=\frac{g'(\theta)}{I_n(\theta)}S_n(\theta)
+ \quad P_\theta\text{-a.s.}
+\]
+当 $g'(\theta)=0$，下界为零，取等要求 $T=g(\theta)$ 几乎必然，而非任意估计量均取等。
+
+\subsection{投影分解与下界不可达的可能性}
+令
+\[
+ r=T-g(\theta)-\frac{g'(\theta)}{I_n(\theta)}S_n(\theta).
+\]
+则 $\E_\theta r=0$、$\E_\theta(rS_n)=0$。平方展开得到精确分解
+\[
+ \Var_\theta(T)=\frac{g'(\theta)^2}{I_n(\theta)}+\E_\theta r^2.
+\]
+这是 $L^2(P_\theta)$ 中把误差投影到得分方向的勾股关系。残差正交表示不相关，不一般表示独立。投影项可能依赖未知参数，因此不能自动把残差删去、构造一个合法的更好估计量；信息下界可能不可达。
+
+\begin{examplebox}{正态均值与均值平方}
+已知 $\sigma^2$ 时，$S_n(\mu)=n(\bar X-\mu)/\sigma^2$，$I_n=n/\sigma^2$。估计 $g(\mu)=\mu$，样本均值满足等号条件，方差 $\sigma^2/n$ 达到下界。
+
+估计 $g(\mu)=\mu^2$ 时，下界为 $4\mu^2\sigma^2/n$，而无偏估计 $U_n=\bar X^2-\sigma^2/n$ 的方差为
+\[
+ \Var_\mu(U_n)=\frac{4\mu^2\sigma^2}{n}+\frac{2\sigma^4}{n^2}.
+\]
+它未达到有限样本下界。在 $\mu=0$，下界甚至为零。这并不证明存在方差更小的无偏估计，第四章的最优无偏理论还需单独判断。
+\end{examplebox}
+
+\subsection{有偏估计的修正}
+若 $\E_\theta T=g(\theta)+b(\theta)$，$b$ 可微且同样允许求导交换，则
+\[
+ \Cov_\theta(T,S_n)=g'(\theta)+b'(\theta).
+\]
+因此
+\[
+ \Var_\theta(T)\ge\frac{\{g'(\theta)+b'(\theta)\}^2}{I_n(\theta)},
+\]
+\[
+ \operatorname{MSE}_\theta(T)
+ \ge b(\theta)^2+
+ \frac{\{g'(\theta)+b'(\theta)\}^2}{I_n(\theta)}.
+\]
+例如 $X\sim N(\theta,1)$、$T=aX$，$g'=1$、$b'=a-1$，修正后的方差下界是 $a^2$，恰与实际方差相等。不能把无偏下界 $1$ 用于这个有偏估计。
+
+\paragraph{复习题}
+\begin{enumerate}
+ \item 指数尺度模型中，证明 $\bar X$ 达到估计 $\theta$ 的信息下界。
+ \item 正态均值模型下，常数估计 $T=m$ 方差为零，为何不违反信息下界？用有偏版本核对。
+\end{enumerate}
+\begin{notebox}[答案线索]
+第一题：$I_n=n/\theta^2$，$S_n=n(\bar X-\theta)/\theta^2$，等号条件直接成立。第二题：常数规则并非在整个模型中无偏，$b(\theta)=m-\theta$，故 $g'+b'=0$，有偏下界给出 $\operatorname{MSE}\ge(m-\theta)^2$，正好取等。
+\end{notebox}
+
+\section{向量参数与矩阵信息下界}
+
+设 $\theta\in\R^d$，目标 $g(\theta)\in\R^k$，$T\in\R^k$ 无偏，Jacobian 约定为
+\[
+ Dg(\theta)=\left(\frac{\partial g_j}{\partial\theta_r}\right)_{j,r}
+ \in\R^{k\times d}.
+\]
+在二阶矩存在、均值逐分量可交换微分积分、得分正则及 $I_n(\theta)$ 正定的条件下，
+\[
+ \Cov_\theta(T,S_n)=Dg(\theta),
+\]
+\begin{definitionbox}{矩阵 Cramér--Rao 不等式}
+\[
+ \Cov_\theta(T)\succeq
+ Dg(\theta)I_n(\theta)^{-1}Dg(\theta)^\top.
+\]
+$A\succeq B$ 指 $A-B$ 半正定，即 $u^\top(A-B)u\ge0$ 对所有 $u$ 成立，并非逐元素大小。估计参数本身时，下界为 $I_n^{-1}$。
+\end{definitionbox}
+
+\paragraph{证明}
+记 $E=T-g(\theta)$、$A=Dg(\theta)$、$B=I_n(\theta)$。则 $\Cov(E,S_n)=A$、$\Cov(S_n)=B$。令
+\[
+ U=E-AB^{-1}S_n,
+\]
+得到 $\E U=0$、$\Cov(U,S_n)=A-AB^{-1}B=0$。因此
+\[
+ \Cov(T)=AB^{-1}A^\top+\E(UU^\top).
+\]
+末项半正定，得到结论。矩阵等号成立当且仅当 $\E\|U\|^2=0$，即
+\[
+ T-g(\theta)=Dg(\theta)I_n(\theta)^{-1}S_n(\theta)
+ \quad P_\theta\text{-a.s.}
+\]
+这个证明也给出维度核对：$(k\times d)(d\times d)(d\times k)=k\times k$。
+
+\begin{examplebox}{正态均值与未知方差}
+以 $\theta=(\mu,v)^\top$ 参数化 $N(\mu,v)$，$v>0$。单次得分为
+\[
+ s_\theta(X)=
+ \begin{pmatrix}
+ (X-\mu)/v\\[2pt]
+ -1/(2v)+(X-\mu)^2/(2v^2)
+ \end{pmatrix},
+ \qquad
+ I(\theta)=
+ \begin{pmatrix}1/v&0\\0&1/(2v^2)\end{pmatrix}.
+\]
+交叉信息为零来自中心正态的三阶矩为零；右下项来自四阶矩 $3v^2$。估计 $\mu$ 时 $Dg=(1,0)$，下界仍为 $v/n$，由 $\bar X$ 达到。
+
+估计 $v$ 时下界为 $2v^2/n$。无偏样本方差 $S^2$ 的方差为 $2v^2/(n-1)$（$n\ge2$），故未达到此界。方差参数的下界应由整个信息矩阵的逆取得，不能一般地直接用信息矩阵对角元的倒数。
+\end{examplebox}
+
+若把 $\theta=(\psi,\lambda)$ 分为目标与干扰参数，对标量目标 $\psi$，分块信息在 $I_{\lambda\lambda}$ 可逆时给出
+\[
+ (I^{-1})_{\psi\psi}
+ =\{I_{\psi\psi}-I_{\psi\lambda}
+ I_{\lambda\lambda}^{-1}I_{\lambda\psi}\}^{-1}.
+\]
+这解释了为何未知干扰参数一般会减少有效信息。正态例中的交叉块为零是一个特殊情形。
+
+\paragraph{复习题}
+\begin{enumerate}
+ \item 对目标 $g(\theta)=c^\top\theta$，写出标量方差下界。为什么不能逐元素解释矩阵不等式？
+ \item 在正态例中，改用参数 $(\mu,\sigma)$，其中 $v=\sigma^2$，求新信息矩阵。
+\end{enumerate}
+\begin{notebox}[答案线索]
+第一题：下界为 $c^\top I(\theta)^{-1}c/n$；矩阵偏序同时约束全部线性方向的方差。第二题：旧参数对新参数的 Jacobian 是 $\operatorname{diag}(1,2\sigma)$，故新信息矩阵为 $\operatorname{diag}(1/\sigma^2,2/\sigma^2)$。
+\end{notebox}
+
+\section{达到下界与指数族结构}
+
+\subsection{自然统计量达到哪个目标的下界}
+固定样本量，将\emph{整份样本}密度写作
+\[
+ p_\eta^{(n)}(x)=h_n(x)\exp\{\eta T(x)-\zeta(\eta)\}.
+\]
+假设自然参数在归一化积分有限的开区间内变化，且 $\zeta''(\eta)>0$。由归一化函数的导数，
+\[
+ \E_\eta T=\zeta'(\eta),\qquad
+ \Var_\eta(T)=I_n(\eta)=\zeta''(\eta).
+\]
+对目标 $g(\eta)=\zeta'(\eta)$，信息下界恰为
+\[
+ \frac{g'(\eta)^2}{I_n(\eta)}=\zeta''(\eta)=\Var_\eta(T).
+\]
+所以 $T$ 达到其均值目标的下界。这里的 $\zeta$ 已是联合模型的归一化函数，不能再给信息乘一个 $n$。目标是 $\zeta'(\eta)$，并不自动是自然参数 $\eta$ 本身。
+
+\begin{examplebox}{Bernoulli 的自然参数}
+令 $\eta=\log\{p/(1-p)\}$，$Y=\sum_iX_i$，则
+\[
+ p_\eta^{(n)}(x)=\exp\{\eta Y-n\log(1+e^\eta)\}.
+\]
+$Y$ 的均值为 $np$，方差与样本信息均为 $np(1-p)$；$Y$ 达到估计 $np$ 的下界。相应地，$Y/n$ 达到估计 $p$ 的下界，但这没有提供自然参数 $\eta$ 的无偏有效估计。
+\end{examplebox}
+
+\subsection{处处取等反推一维指数族}
+\begin{definitionbox}{CR 等号的逆向结论}
+固定样本量，设标量参数在开区间 $\Theta$ 内变化，模型满足标量 CR 条件；密度在共同支撑上严格为正，除同一个固定测度零集外关于参数连续可微。另设 $I_n(\theta)>0$ 与 $g'(\theta)\ne0$ 连续。
+
+若同一个无偏统计量 $T$ 在每个 $\theta\in\Theta$ 均达到下界，则在一个共同满测度样本集合上，
+\[
+ p_\theta^{(n)}(x)
+ =h_n(x)\exp\{\eta(\theta)T(x)-\zeta(\eta(\theta))\},
+\]
+其中 $\eta'(\theta)=I_n(\theta)/g'(\theta)\ne0$，并有
+$g(\theta)=\zeta'(\eta(\theta))$。
+\end{definitionbox}
+
+\paragraph{证明}
+令 $k(\theta)=I_n(\theta)/g'(\theta)$。CR 等号给出
+\[
+ \partial_\theta\log p_\theta^{(n)}(x)
+ =k(\theta)\{T(x)-g(\theta)\}
+ \quad P_\theta\text{-a.s.}
+\]
+不能直接固定 $x$ 对整个参数区间积分，因为此时异常零集可能随参数改变。
+
+取可数稠密集 $D\subset\Theta$。共同支撑上的密度严格为正，所以每个 $q\in D$ 下的概率零集也是支撑内的控制测度零集。把这些可数零集及密度连续可微的固定异常集一并剔除，得到共同满测度集合 $F$。对 $x\in F$，上式在所有 $q\in D$ 成立；由两边关于参数连续，遂在全部 $\Theta$ 成立。
+
+固定参考点 $\theta_*$ 与 $x\in F$，对参数积分：
+\[
+ \log p_\theta^{(n)}(x)-\log p_{\theta_*}^{(n)}(x)
+ =\left(\int_{\theta_*}^\theta k(t)\,\mathrm dt\right)T(x)
+ -\int_{\theta_*}^\theta k(t)g(t)\,\mathrm dt.
+\]
+定义 $\eta(\theta)=\int_{\theta_*}^\theta k(t)\,\mathrm dt$、
+$c(\theta)=\int_{\theta_*}^\theta k(t)g(t)\,\mathrm dt$，取
+$h_n=p_{\theta_*}^{(n)}$，便得到指数形式。$k$ 连续非零，在区间上不能变号，故 $\eta$ 严格单调，其像为开区间。归一化给出
+\[
+ c(\theta)=\log\int h_n(x)e^{\eta(\theta)T(x)}\,\mathrm d\nu^n(x)
+ =\zeta(\eta(\theta)).
+\]
+最后由 $c'=kg$、$\eta'=k\ne0$ 得 $\zeta'(\eta(\theta))=g(\theta)$。
+
+\subsection{一点取等不足以推断整族结构}
+在样本空间 $\{-1,0,1\}$ 上，设
+\[
+ p_\theta(x)=\frac13\left[1+\theta x+
+ \theta^2\left(x^2-\frac23\right)\right],\qquad |\theta|<\frac12.
+\]
+三点概率均为正且总和为 $1$。取 $T=X$，则 $g(\theta)=2\theta/3$。在 $\theta=0$，得分为 $X$，$I(0)=\Var_0(X)=2/3$，故
+\[
+ \frac{g'(0)^2}{I(0)}=\frac23=\Var_0(X).
+\]
+但若该族能以同一个 $T(x)=x$ 写成一维指数形式，则
+$p_\theta(1)p_\theta(-1)/p_\theta(0)^2$ 必为常数，而实际等于
+\[
+ \frac{1-\theta^2/3+\theta^4/9}{1-4\theta^2/3+4\theta^4/9},
+\]
+会随 $\theta$ 改变。这个反例否定的是“一点取等推出以 $X$ 为自然统计量的整族结构”，不是否定模型嵌入更高维指数族的可能性。
+
+\paragraph{复习题}
+\begin{enumerate}
+ \item 逆向证明中，为什么不能直接合并全部参数点的异常零集？可数稠密集之后为何还要连续性？
+ \item 联合 Poisson 模型中，$Y=\sum_iX_i$ 的自然参数归一化函数为 $\zeta(\eta)=ne^\eta$。说明 $Y$ 和 $Y/n$ 分别达到哪个目标的下界。
+\end{enumerate}
+\begin{notebox}[答案线索]
+第一题：不可数个零集的并未必为零集；可数稠密集先统一样本异常集，连续性再把等式推广至整个区间，才能固定样本点积分。第二题：$Y$ 对 $n\lambda$ 有效，$Y/n$ 对 $\lambda$ 有效，方差分别为 $n\lambda$ 与 $\lambda/n$。
+\end{notebox}
+
+\section{非正则模型、效率与 MLE 展开}
+
+\subsection{移动支撑为什么使正则恒等式失效}
+\begin{examplebox}{均匀模型的边界项}
+设 $X_i\sim U(0,\theta)$，$\theta>0$。只在内部 $0<x<\theta$ 对 $\log p_\theta(x)=-\log\theta$ 求导，会得到形式上的内部得分 $-1/\theta$，其均值不为零。实际上
+\[
+ \frac{\mathrm d}{\mathrm d\theta}\int_0^\theta\frac1\theta\,\mathrm dx
+ =\int_0^\theta-\frac1{\theta^2}\,\mathrm dx+\frac1\theta=0.
+\]
+移动端点贡献的第二项不能省略。因此内部导数的平方均值 $1/\theta^2$ 不能直接代入正则 CR 公式。
+\end{examplebox}
+
+记 $M_n=\max_iX_i$。在 $0<m<\theta$ 上，
+\[
+ P_\theta(M_n\le m)=(m/\theta)^n,\qquad
+ \E_\theta M_n^r=\frac n{n+r}\theta^r\quad(r>0).
+\]
+故 $T_n=(n+1)M_n/n$ 无偏，且
+\[
+ \Var_\theta(T_n)=\frac{\theta^2}{n(n+2)}.
+\]
+这比误用正则公式得到的 $\theta^2/n$ 小，并不构成对定理的反例。模型的正则条件已经失效。
+
+它的自然误差尺度是 $n$。对固定 $z\ge0$，
+\[
+ P_\theta\{n(1-M_n/\theta)>z\}
+ =(1-z/n)^n\to e^{-z}.
+\]
+因此 $n(1-M_n/\theta)\dto E$、$E\sim\operatorname{Exp}(1)$，并有
+\[
+ n(T_n-\theta)\dto\theta(1-E).
+\]
+更快速度来自支撑边界携带的信息；这里的非正态极限不应混同于正则模型中孤立参数点的超效率现象。
+
+\subsection{有限样本效率与渐近效率}
+无偏估计量达到正确的 CR 协方差界，称达到有限样本信息效率。这足以保证它在相应无偏类中无法被方差统一改进；未达到下界则不自动意味着可以改进，因为下界可能不可达。
+
+正则模型中，估计可微目标 $g(\theta)$ 的一阶信息基准为
+\[
+ \sqrt n\{T_n-g(\theta)\}
+ \dto N_k\!\left(0,Dg(\theta)I(\theta)^{-1}Dg(\theta)^\top\right).
+\]
+渐近效率的比较涉及适当的局部正则估计量类，不要求每个有限样本量都精确无偏。不能把有限样本无偏下界直接令 $n\to\infty$，便声称对一切估计量序列成立；弱收敛不自动给出风险收敛，偏差和局部行为也须控制。
+
+\subsection{从得分方程到渐近正态}
+设真参数为 $\theta_0$，$\widehat\theta_n$ 是内部 MLE 或一个选定的得分根，并假设 $S_n(\widehat\theta_n)=0$。多维时使用积分 Hessian，避免给所有分量强设同一个中间点：
+\[
+ \widetilde H_n=
+ \int_0^1H_n\{\theta_0+t(\widehat\theta_n-\theta_0)\}\,\mathrm dt.
+\]
+在线段位于可微参数邻域的事件上，微积分基本定理给出精确等式
+\[
+ 0=S_n(\theta_0)+\widetilde H_n(\widehat\theta_n-\theta_0).
+\]
+若沿线段矩阵最终可逆，则
+\[
+ \sqrt n(\widehat\theta_n-\theta_0)
+ =\left(-\frac{\widetilde H_n}{n}\right)^{-1}
+ \frac{S_n(\theta_0)}{\sqrt n}.
+\]
+得分的多元中心极限定理给出
+\[
+ S_n(\theta_0)/\sqrt n\dto N_d(0,I(\theta_0)).
+\]
+若另有 $-\widetilde H_n/n\pto I(\theta_0)$，且 $I(\theta_0)$ 正定，则由矩阵求逆的连续性与 Slutsky 定理，
+\[
+ \sqrt n(\widehat\theta_n-\theta_0)
+ \dto N_d(0,I(\theta_0)^{-1}).
+\]
+
+\begin{notebox}[展开之外必须补的条件]
+固定点的大数定律 $-H_n(\theta_0)/n\pto I(\theta_0)$ 尚不足以控制随机线段上的 Hessian。一组可用的充分条件是：所选根存在且一致；真值附近有凸邻域；该邻域内 $-H_n(v)/n$ 一致收敛到连续函数 $J_{\theta_0}(v)$，并满足 $J_{\theta_0}(\theta_0)=I(\theta_0)$ 正定。于是随机线段收缩至真值，得到所需收敛。
+
+MLE 是否存在、所选根是否一致、最终是否位于内部、多个根如何选择，都不是得分方程本身保证的。边界极值也未必满足得分为零。本段给出的是在这些条件落实后的证明，不是无条件的一般 MLE 定理。
+\end{notebox}
+
+\begin{examplebox}{正态均值中的展开是精确恒等式}
+已知方差时，$S_n(\mu)=n(\bar X-\mu)/\sigma^2$，$H_n=-n/\sigma^2$ 为常数，MLE 为 $\bar X$。于是
+\[
+ \sqrt n(\bar X-\mu)
+ =\sigma^2\frac{S_n(\mu)}{\sqrt n}
+ \sim N(0,\sigma^2).
+\]
+这里没有 Taylor 余项，且极限方差 $I(\mu)^{-1}=\sigma^2$ 同时也是精确分布的方差。
+\end{examplebox}
+
+\paragraph{复习题}
+\begin{enumerate}
+ \item 在均匀模型中，证明 $n(T_n-\theta)=O_{P_\theta}(1)$，并说明它为何不违背正则模型的信息下界。
+ \item MLE 渐近正态性的证明中，分别指出使用中心极限定理、大数型控制及 Slutsky 定理的位置。固定点 Hessian 收敛还缺少什么？
+\end{enumerate}
+\begin{notebox}[答案线索]
+第一题：$n^2\Var(T_n)=n\theta^2/(n+2)\le\theta^2$，由 Chebyshev 即得随机有界；该模型支撑依赖参数，正则得分恒等式失效。第二题：CLT 用于真值处的得分，局部一致控制用于随机线段上的 Hessian，Slutsky 用于两者的乘积；仅有固定点收敛不能替代随机邻域控制。
+\end{notebox}

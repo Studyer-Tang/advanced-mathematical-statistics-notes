@@ -1,67 +1,53 @@
-# Advanced Mathematical Statistics Notes
+# 高等统计学中文学习笔记
 
-高等统计学中文学习笔记，按课程进度持续更新。内容依据 Fang Yao 老师的课程讲义整理，并加入术语翻译、直观解释、推导和学习中遇到的重点问题。
+[![Build PDF](https://github.com/Studyer-Tang/advanced-mathematical-statistics-notes/actions/workflows/build-pdf.yml/badge.svg)](https://github.com/Studyer-Tang/advanced-mathematical-statistics-notes/actions/workflows/build-pdf.yml)
 
-> 本项目是个人学习记录，并非课程官方讲义或官方译本。感谢 Fang Yao 老师提供原始讲义与课程框架。
+从概率极限到估计与检验的课程笔记。定义之后给出证明和算例，较容易遗漏的假设写在使用处；多次讨论同一问题时，合并成一条完整推导。
 
-## 作者
+**[阅读合订本](output/pdf/complete-cn.pdf)** · [推导索引](notes/REVIEW.md) · [整理范围](PROGRESS.md) · [勘误](ERRATA.md)
 
-GitHub: [Studyer-Tang](https://github.com/Studyer-Tang)
+| 章节 | 内容 | 阅读 | 源码 |
+| --- | --- | --- | --- |
+| 第一章 | 经验分布、随机阶、连续映射、Slutsky 与 Delta 方法 | [PDF](output/pdf/chapter-01-cn.pdf) | [LaTeX](notes/chapter01/chapter01.tex) |
+| 第二章 | 指数族、充分性、最小充分性、完备性与 Basu 定理 | [PDF](output/pdf/chapter-02-cn.pdf) | [LaTeX](notes/chapter02/chapter02.tex) |
+| 第三章 | 风险、无偏与一致性、Fisher 信息、参数变换与 CR 下界 | [PDF](output/pdf/chapter-03-cn.pdf) | [LaTeX](notes/chapter03/chapter03.tex) |
+| 第四章 | UMVUE、Rao–Blackwell、Lehmann–Scheffé、U 统计量及退化极限 | [PDF](output/pdf/chapter-04-cn.pdf) | [LaTeX](notes/chapter04/chapter04.tex) |
+| 第五章 | p 值、NP、MLR、UMP、UMPU、条件检验与置信集合 | [PDF](output/pdf/chapter-05-cn.pdf) | [LaTeX](notes/chapter05/chapter05.tex) |
+| 附录 A | 第一次作业已讨论的第 7–12 题 | 合订本 | [LaTeX](notes/exercises/homework01.tex) |
+| 附录 B | 第二次作业全部 11 题 | 合订本 | [LaTeX](notes/exercises/homework02.tex) |
 
-## 当前进度
+合订本包含五章、两组习题解答及各章复习题，沿用原有的 185 × 260 mm 版面、蓝灰定理框和可检索公式。分章版适合按进度阅读，合订本便于查找和打印。
 
-| 章节 | 内容 | 状态 |
-| --- | --- | --- |
-| 第 1 章 | 从样本到经验分布 | 已整理 |
-| 1.1 | 概率论回顾 | 已整理 |
-| 1.2 | 总体分布、样本与经验 CDF | 已整理 |
-| 1.3 | 经验测度与代入原理 | 已整理 |
-| 1.4 | 收敛方式与随机阶 | 已整理 |
-| 1.5 | 极限定理与变换 | 已整理 |
-| 第 2 章 | 统计模型、指数族、充分性与完备性 | 已整理；继续独立复习 |
-| 2.1–2.2 | 模型与似然、指数族、满秩与弯曲族 | 已整理 |
-| 2.3–2.4 | 充分性、共同支配概率、最小充分性 | 已整理；含实际追问展开 |
-| 2.5–2.7 | 完备性、辅助统计量、Basu 与总结 | 已整理；待独立复习 |
-| 后续章节 | 随课程推进更新 | 待学习 |
+本次整理覆盖已有学习讨论和课件译解，不以“笔记已整理”代替“已独立掌握”。第一次作业第 1–6 题尚未补录。第五章完整收至置信集合；此前讨论的 UMP 复习范围为原 Slides 第 1–27 页，UMPU 自第 28 页起。
 
-## 阅读
+## 来源
 
-- [第 1 章 PDF](output/pdf/chapter-01-cn.pdf)
-- [第 1 章 LaTeX 源文件](notes/chapter01/chapter01.tex)
-- [第 2 章 PDF](output/pdf/chapter-02-cn.pdf)
-- [第 2 章 LaTeX 源文件](notes/chapter02/chapter02.tex)
-- [第 2 章学习历程：从疑问到理解](notes/chapter02/LEARNING_LOG.md)
-- [学习进度记录](PROGRESS.md)
-- [勘误与严谨性补充](ERRATA.md)
+依据 Fang Yao 的 *Advanced Mathematical Statistics* 课程材料整理，加入中文说明、推导与习题解答。感谢原课程作者。本文是 [Studyer-Tang](https://github.com/Studyer-Tang) 的个人学习记录，非官方讲义或官方译本；原课件和作业不在本仓库重新发布。资料范围、编号约定和权利说明见 [SOURCES.md](SOURCES.md)。
 
-## 本地构建
+## 构建
 
-需要安装包含 XeLaTeX 和 `ctex` 的 TeX Live。运行：
+安装包含 XeLaTeX、`ctex`、Fandol 字体及本项目所用宏包的 TeX Live / TinyTeX。
+
+```bash
+# macOS / Linux
+bash build.sh
+```
 
 ```powershell
+# Windows PowerShell
 ./build.ps1
 ```
 
-生成两章独立 PDF，位于 `output/pdf/`。两个脚本都会先在独立临时目录中完成全部章节的编译，再更新发布版 PDF；编译失败或未生成 PDF 时保留之前的两章，退出时清理临时文件。最终复制到发布目录时仍需有足够磁盘空间和写入权限。
+脚本先在临时目录编译全部六份文档，检查输出非空，全部成功后再复制至 `output/pdf/`；编译失败时保留上一版。复制阶段并非文件系统事务，磁盘或权限错误后需修复环境并重新运行。Bash 优先使用 `latexmk`，其次 XeLaTeX，也可使用 Tectonic；PowerShell 使用 XeLaTeX。直接用 XeLaTeX 时脚本运行三遍，以稳定目录和交叉引用。
 
-macOS / Linux 可运行 ./build.sh。该脚本优先使用 latexmk / XeLaTeX，未安装时可使用 Tectonic。也可分别用 XeLaTeX 编译 main.tex（第一章）与 chapter02.tex（第二章），各运行两遍生成目录。两个入口共用 preamble.tex 版式，正文分章维护。
+`main.tex` 仍为第一章入口，`chapter02.tex` 至 `chapter05.tex` 为其他分章入口，`complete.tex` 为合订本。正文只有一份，封面与版式分别共用 `frontmatter.tex`、`preamble.tex`，避免分章版与合订本内容分叉。
 
-## 项目结构
+GitHub Actions 验证六个入口，并在 Linux、macOS、Windows 上检查构建脚本的成功、末份编译失败、缺失输出三类行为。运行脚本回归检查：
 
-```text
-.
-├── main.tex                       # 第一章文档入口
-├── chapter02.tex                  # 第二章文档入口
-├── preamble.tex                   # 共用版式设置
-├── notes/chapter01/chapter01.tex  # 第一章正文
-├── notes/chapter02/chapter02.tex  # 第二章正文
-├── notes/chapter02/LEARNING_LOG.md # 实际追问与学习历程
-├── output/pdf/                    # 发布版 PDF
-├── PROGRESS.md                    # 学习进度和后续计划
-├── build.ps1                      # Windows 构建脚本
-└── build.sh                       # macOS / Linux 构建脚本
+```bash
+python -m unittest discover -s tests -v
 ```
 
-## 更新方式
+## 修订
 
-每学完一个知识块，就在对应章节源文件中补充翻译、理解、例题和疑问，同时更新 `PROGRESS.md`。推送后，GitHub Actions 会自动验证 PDF 能否正常编译，并提供构建产物。构建脚本另有 Windows、macOS、Linux 回归检查，覆盖第二章编译失败、编译器未产生 PDF 和成功发布两章的情况；本地可运行 `python -m unittest discover -s tests -v`，不依赖 TeX 安装。
+发现问题时，请给出章节、公式或题号、所需条件与反例。修订应同时更新正文、PDF 和 [勘误表](ERRATA.md)，避免只在讨论中改正。

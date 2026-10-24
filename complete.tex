@@ -1,0 +1,24 @@
+\input{preamble}
+\newcommand{\NoteSubtitle}{第一至五章与习题解答}
+\begin{document}
+\input{frontmatter}
+\chapter*{阅读说明}
+\addcontentsline{toc}{chapter}{阅读说明}
+本册将课件内容与学习中反复核对的推导合并编排。正文按数学主题组织，不逐页复制课件。第一、二章分别建立渐近工具与模型结构，第三章讨论风险和信息，第四章转向无偏估计与 U 统计量，第五章研究最优检验及置信集合。
+
+定义和定理用蓝色框，例题用白底侧线框，条件与辨析用灰底框。原有第一、二章的编号继续保留；新增章节按本文结构编号，不与原 Slides 页码逐项对应。概率中的“几乎必然”一般按每个模型分布分别解释；若证明需要共同版本或共同零集，则在相应位置单列说明。
+
+附录 A 整理第一次作业实际讨论的第 7--12 题，附录 B 整理第二次作业全部 11 题。重复讨论的题目合并成一份解答，较短证明保留足够的计算步骤，较长证明把使用条件写在相应等式之前。课件已整理为笔记并不表示已经独立完成全部证明；复习时宜先遮住答案，核对条件、推理和退化情形。
+
+第五章完整收录至置信集合。若按原课程 Slides 的 UMP 范围复习，对应第 1--27 页；UMPU 从第 28 页开始，属于本册保留的后续材料。该范围仅记录已有课程讨论，不能替代后续考试通知。
+
+\input{notes/chapter01/chapter01}
+\input{notes/chapter02/chapter02}
+\input{notes/chapter03/chapter03}
+\input{notes/chapter04/chapter04}
+\input{notes/chapter05/chapter05}
+\appendix
+\renewcommand{\chaptermark}[1]{\markboth{附录 \thechapter}{}}
+\input{notes/exercises/homework01}
+\input{notes/exercises/homework02}
+\end{document}

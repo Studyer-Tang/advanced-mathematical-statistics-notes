@@ -1,0 +1,939 @@
+\chapter{最优无偏估计与 U 统计量}
+
+本章的前半部分在全部无偏估计中比较方差。充分性使条件化后的规则能够由数据计算，完备性把充分统计量的无偏函数确定下来。后半部分研究另一种构造：若总体量可以写成若干独立观测的函数的期望，就把同一个函数应用于所有同样大小的子样本，再取平均。所得 U 统计量通常含有相互依赖的核项，其方差与极限分布须由重叠结构和条件投影分析。
+
+除特别说明外，估计量均为不含未知参数的可测数据函数；涉及方差的比较，均要求在每个参数分布下二阶矩有限。记 $\E_\theta$、$\Var_\theta$ 为参数 $\theta$ 下的期望与方差。
+
+\section{条件化与一致最小方差无偏估计}
+
+\subsection{UMVUE 的比较范围}
+
+\begin{definitionbox}{一致最小方差无偏估计}
+设目标为 $g(\theta)$。若同一个统计量 $U$ 满足
+\[
+ \E_\theta U=g(\theta),\qquad
+ \Var_\theta(U)\leq\Var_\theta(W)
+\]
+对每个 $\theta\in\Theta$ 及每个有限方差无偏估计 $W$ 均成立，则称 $U$ 为 $g(\theta)$ 的一致最小方差无偏估计，简称 UMVUE。
+\end{definitionbox}
+
+这里的“一致”指同一规则在全部参数点上最优，并非一致收敛。统计量不能用到未知参数，因此“对每个 $\theta$ 单独找一个最优规则”不等于找到了 UMVUE。无偏条件下，平方误差风险为
+\[
+ \E_\theta\{[U-g(\theta)]^2\}=\Var_\theta(U).
+\]
+因此方差最小等价于在无偏类中均方误差最小；该结论没有把有偏估计纳入比较。
+
+\subsection{条件期望的正交性质}
+
+先固定一个概率分布。对 $\E U^2<\infty$，令
+\[
+ H=\E(U\mid T),\qquad R=U-H.
+\]
+塔式法则给出 $\E H=\E U$；条件 Jensen 不等式给出 $\E H^2\leq\E U^2$。又因 $\E(R\mid T)=0$，对每个二阶可积的 $a(T)$，
+\begin{align*}
+ \E[Ra(T)]
+ &=\E\{\E[Ra(T)\mid T]\}\\
+ &=\E\{a(T)\E(R\mid T)\}=0.
+\end{align*}
+乘积的可积性由 Cauchy--Schwarz 不等式保证。取 $a(T)=H-\E U$，有
+\begin{equation}
+ \Var(U)=\Var(H)+\E R^2
+ =\Var\{\E(U\mid T)\}+\E\{\Var(U\mid T)\}.
+ \label{eq:ch4-total-var}
+\end{equation}
+更一般地，对任意二阶可积的 $b(T)$，
+\[
+ \E\{[U-b(T)]^2\}=\E(U-H)^2+\E\{[H-b(T)]^2\}.
+\]
+所以条件期望是所有 $T$ 的函数中对 $U$ 最好的均方逼近。残差与这些函数正交；正交并不要求独立。
+
+\subsection{Rao--Blackwell 定理及共同版本}
+
+\begin{definitionbox}{Rao--Blackwell 定理}
+设 $T$ 充分，$\E_\theta U^2<\infty$ 对所有参数成立。在通常的支配统计模型中，可以选取同一个参数无关的可测函数 $u^*$，使
+\[
+ U^*=u^*(T)=\E_\theta(U\mid T)
+ \quad P_\theta\text{-几乎处处},\quad\forall\theta.
+\]
+它满足
+\[
+ \E_\theta U^*=\E_\theta U,\qquad
+ \Var_\theta(U^*)\leq\Var_\theta(U).
+\]
+对指定的 $\theta$，方差取等当且仅当 $U=U^*$，$P_\theta$-几乎处处。
+\end{definitionbox}
+
+充分性的作用先于方差比较。一般的 $\E_\theta(U\mid T=t)$ 可能含未知参数，不能直接作为估计规则；充分性保证可选择整个模型共用的条件期望版本。在标准 Borel 样本空间上，用不依赖 $\theta$ 的样本条件分布核 $K(t,dx)$ 表示这一点，即
+\[
+ u^*(t)=\int U(x)K(t,dx).
+\]
+对积分未定义或不有限的 $t$ 可统一赋予任一固定值；由于 $U$ 在每个参数下可积，这些例外在每个 $P_\theta^T$ 下均为零测集。如此得到的是同一个数据函数，而非为每个参数分别选择的公式。在不直接使用正则条件分布的表述中，只需使用充分性的共同条件期望版本。
+
+固定任意参数，由塔式法则有 $\E_\theta U^*=\E_\theta U$。条件 Jensen 不等式保证 $U^*$ 二阶可积，再由式~\eqref{eq:ch4-total-var}，
+\[
+ \Var_\theta(U)-\Var_\theta(U^*)
+ =\E_\theta(U-U^*)^2\geq0.
+\]
+差为零等价于残差几乎处处为零，定理得证。定理本身不要求 $U$ 无偏，只保持其期望；若原估计无偏，条件化后才随之无偏。若要断言每个参数点都严格改进，还须逐一证明 $P_\theta(U\neq U^*)>0$。
+
+\begin{examplebox}{Poisson 尾概率的条件化}
+设 $X_i\overset{\mathrm{i.i.d.}}\sim\operatorname{Poisson}(\lambda)$，$\lambda>0$，$n\geq2$，欲估计 $e^{-\lambda}$。取
+\[
+ U=\ind_{\{X_1=0\}},\qquad T=\sum_{i=1}^nX_i.
+\]
+联合概率质量函数为 $e^{-n\lambda}\lambda^{\sum x_i}/\prod x_i!$，故 $T$ 充分。利用独立的 $X_1$ 与 $T-X_1$，对 $0\leq j\leq t$，
+\[
+ P(X_1=j\mid T=t)
+ =\binom tj\left(\frac1n\right)^j
+       \left(1-\frac1n\right)^{t-j}.
+\]
+所以 $X_1\mid T=t\sim\operatorname{Bin}(t,1/n)$，
+\[
+ U^*=\left(1-\frac1n\right)^T.
+\]
+Poisson 概率母函数 $\E s^T=\exp\{n\lambda(s-1)\}$ 给出
+\[
+ \E U^*=e^{-\lambda},\qquad
+ \Var(U^*)=e^{-2\lambda+\lambda/n}-e^{-2\lambda}.
+\]
+原指标函数的方差为 $e^{-\lambda}-e^{-2\lambda}$，故这里确有严格改进。
+\end{examplebox}
+
+\subsection{Lehmann--Scheff\'e 定理}
+
+\begin{definitionbox}{完备充分统计量给出的 UMVUE}
+设 $T$ 完备且充分，$g(\theta)$ 存在每个参数下均有有限方差的无偏估计。则存在 $T$ 的无偏函数 $h(T)$，它是 $g(\theta)$ 的唯一 UMVUE。
+
+更准确地，$T$ 的任何可积无偏函数都与 $h(T)$ 在每个 $P_\theta$ 下几乎处处相等；所有估计量中的任何另一个 UMVUE 也具有同样的几乎处处唯一性。
+\end{definitionbox}
+
+\textbf{证明。} 从任一有限方差无偏估计 $U_0$ 出发，令 $h(T)=\E(U_0\mid T)$。Rao--Blackwell 定理保证这是参数无关、二阶可积的无偏统计量。对任意无偏竞争者 $W$，同样令 $h_W(T)=\E(W\mid T)$。两者均估计 $g(\theta)$，因此
+\[
+ \E_\theta\{h_W(T)-h(T)\}=0\qquad\forall\theta.
+\]
+差是 $T$ 的可积函数，完备性给出 $h_W(T)=h(T)$，对每个参数几乎处处成立。于是
+\[
+ \Var_\theta\{h(T)\}
+ =\Var_\theta\{h_W(T)\}
+ \leq\Var_\theta(W).
+\]
+由于 $W$ 任意，$h(T)$ 为 UMVUE。若 $W$ 本身也是 UMVUE，则上述方差取等。由 Rao--Blackwell 的等号条件，$W=h_W(T)=h(T)$，$P_\theta$-几乎处处。
+
+最后，若 $\widetilde h(T)$ 只是可积无偏函数，则其与 $h(T)$ 的差仍满足完备性的条件，因而同样相等；不必预先对 $\widetilde h$ 另加二阶矩条件。\hfill$\square$
+
+\begin{notebox}[唯一性的范围]
+“$T$ 的无偏函数唯一”不等于“所有无偏估计唯一”。例如 Poisson 例中的指标函数和条件化结果都无偏，但只有后者是 $T$ 的函数。唯一性均按每个 $P_\theta$ 几乎处处理解，不是说公式在样本空间每一点都必须相同，也不自动承诺存在一个适用于不可数参数集的共同满测度集合。
+\end{notebox}
+
+\section{UMVUE 的几种构造}
+
+已有完备充分统计量时，一种办法是把简单无偏估计条件化，另一种是直接解无偏方程 $\E_\theta h(T)=g(\theta)$。前者多用于事件概率，后者常用积分求导、幂级数比较或矩的偏差修正。两种办法都须核对可积性与有限方差。
+
+\subsection{均匀分布：积分方程与端点条件}
+
+设 $X_i\overset{\mathrm{i.i.d.}}\sim U(0,\theta)$，$\theta>0$，令 $T=X_{(n)}$。联合密度的参数相关部分为 $\theta^{-n}\ind_{\{T<\theta\}}$，故 $T$ 充分。其分布为
+\[
+ P_\theta(T\leq t)=\left(\frac t\theta\right)^n,
+ \qquad
+ f_T(t;\theta)=\frac{nt^{n-1}}{\theta^n}\ind_{(0,\theta)}(t).
+\]
+若可积函数 $v(T)$ 在全部参数下期望为零，则
+\[
+ \int_0^\theta v(t)t^{n-1}\,dt=0\qquad\forall\theta>0.
+\]
+被积函数在每个 $(0,b)$ 上可积，故左侧作为上限的函数绝对连续，导数几乎处处为 $v(\theta)\theta^{n-1}$。因此 $v(t)=0$ 在 $(0,\infty)$ 上 Lebesgue-几乎处处，各个 $P_\theta^T$ 都绝对连续，遂有 $v(T)=0$，$P_\theta$-几乎处处。这里不需要假设 $v$ 连续。
+
+由
+\[
+ \E_\theta T^r=\frac n{n+r}\theta^r\qquad(r>-n),
+\]
+可知对 $r>0$，
+\[
+ \widehat{\theta^r}=\frac{n+r}{n}T^r,
+ \qquad
+ \Var_\theta(\widehat{\theta^r})
+ =\frac{r^2\theta^{2r}}{n(n+2r)}.
+\]
+它是完备充分统计量的有限方差无偏函数，故为 UMVUE。特别地，$\widehat\theta=(n+1)T/n$。
+
+对一般连续可微目标 $g$，无偏方程为
+\[
+ n\int_0^\theta h(t)t^{n-1}\,dt=\theta^ng(\theta).
+\]
+求导得到候选公式
+\begin{equation}
+ h(t)=g(t)+\frac tn g'(t).
+ \label{eq:ch4-uniform-target}
+\end{equation}
+但求导会丢失积分常数。对 $0<\varepsilon<\theta$，代回候选函数可得
+\[
+ n\int_\varepsilon^\theta h(t)t^{n-1}\,dt
+ =\theta^ng(\theta)-\varepsilon^ng(\varepsilon).
+\]
+所以若 $t^ng(t)\to0$（$t\downarrow0$），且 $\E_\theta h(T)^2<\infty$ 对每个参数成立，才能令 $\varepsilon\downarrow0$ 得到所需无偏性。
+
+\begin{examplebox}{不能省略的端点核验}
+若把 $g(\theta)=\theta^{-n}$ 机械地代入式~\eqref{eq:ch4-uniform-target}，所得 $h$ 恒为零，显然不无偏估计正的 $\theta^{-n}$。原因是 $t^ng(t)=1$，没有满足零端点条件。候选公式来自微分方程，并不自动满足原积分方程。
+\end{examplebox}
+
+\subsection{Poisson 分布：下降阶乘与幂级数}
+
+设 $X_i\sim\operatorname{Poisson}(\theta)$ 独立同分布，$T=\sum_iX_i\sim\operatorname{Poisson}(n\theta)$。自然参数 $\log\theta$ 遍历 $\R$，所以 $T$ 完备且充分。记下降阶乘
+\[
+ (t)_{\underline r}=t(t-1)\cdots(t-r+1),
+ \quad (t)_{\underline0}=1,
+\]
+当非负整数 $t<r$ 时令其为零。直接计算可得
+\begin{align*}
+ \E_\theta\frac{(T)_{\underline r}}{n^r}
+ &=\sum_{t=r}^\infty
+ \frac{t!}{n^r(t-r)!}e^{-n\theta}\frac{(n\theta)^t}{t!}\\
+ &=\theta^r e^{-n\theta}
+   \sum_{u=0}^\infty\frac{(n\theta)^u}{u!}
+ =\theta^r.
+\end{align*}
+该统计量是 $T$ 的多项式，Poisson 的所有整数阶矩有限。因此
+\[
+ \widehat{\theta^r}=\frac{(T)_{\underline r}}{n^r}
+\]
+为 UMVUE。例如 $T(T-1)/n^2$ 无偏估计 $\theta^2$，而 $(T/n)^2$ 的期望是 $\theta^2+\theta/n$。
+
+若目标有在全部正实数处收敛的幂级数 $g(\theta)=\sum_{j\geq0}a_j\theta^j$，无偏方程乘以 $e^{n\theta}$ 后，比较 $\theta^t$ 的系数，得到
+\[
+ h(t)=\frac{t!}{n^t}\sum_{j=0}^t\frac{n^{t-j}a_j}{(t-j)!}
+ =\sum_{j=0}^t a_j\frac{(t)_{\underline j}}{n^j}.
+\]
+这里收敛半径为无穷，故 $\sum_j|a_j|\theta^j<\infty$。由 Tonelli 及阶乘矩公式，
+\[
+ \E_\theta\sum_{j\geq0}|a_j|\frac{(T)_{\underline j}}{n^j}
+ =\sum_{j\geq0}|a_j|\theta^j<\infty,
+\]
+所以允许交换求和与期望，证得无偏性。还须另验 $\E_\theta h(T)^2<\infty$，才能按本章的有限方差定义称其为 UMVUE；幂级数绝对收敛不能替代二阶矩条件。
+
+\subsection{正态分布：偏差修正}
+
+设 $X_i\overset{\mathrm{i.i.d.}}\sim N(\mu,\sigma^2)$，$n\geq2$，$\mu\in\R$、$\sigma^2>0$ 均未知。自然统计量与自然参数分别为
+\[
+ \left(\sum_iX_i,\sum_iX_i^2\right),\qquad
+ \left(\frac\mu{\sigma^2},-\frac1{2\sigma^2}\right).
+\]
+自然参数遍历开集 $\R\times(-\infty,0)$，从而统计量完备且充分。令
+\[
+ \bar X=\frac1n\sum_iX_i,\qquad
+ S^2=\frac1{n-1}\sum_i(X_i-\bar X)^2.
+\]
+两组统计量相互确定，因为 $\sum_iX_i^2=(n-1)S^2+n\bar X^2$，故 $(\bar X,S^2)$ 也完备且充分。
+
+由平方和分解，
+\[
+ \sum_i(X_i-\bar X)^2
+ =\sum_i(X_i-\mu)^2-n(\bar X-\mu)^2,
+\]
+取期望得 $\E S^2=\sigma^2$。又 $\E\bar X^2=\mu^2+\sigma^2/n$，因此
+\[
+ \widehat\mu=\bar X,\qquad
+ \widehat{\sigma^2}=S^2,\qquad
+ \widehat{\mu^2}=\bar X^2-\frac{S^2}{n}
+\]
+均为对应目标的 UMVUE。正态分布的矩保证其方差有限。最后一个估计可能为负，无偏性约束的是期望，并不强迫每次输出都落在目标值域内。
+
+\subsection{指数分布：条件概率}
+
+设 $X_i\overset{\mathrm{i.i.d.}}\sim\operatorname{Exp}(\theta)$，这里 $\theta>0$ 为尺度参数，密度为 $\theta^{-1}e^{-x/\theta}\ind_{\{x>0\}}$。固定 $a>0$，欲估计 $e^{-a/\theta}=P_\theta(X_1>a)$。对 $n\geq2$，取
+\[
+ U=\ind_{\{X_1>a\}},\qquad T=\sum_iX_i.
+\]
+$T\sim\operatorname{Gamma}(n,\text{scale }\theta)$，其自然参数 $-1/\theta$ 遍历 $(-\infty,0)$，故 $T$ 完备充分。令 $Y=T-X_1$，它与 $X_1$ 独立，并服从形状 $n-1$ 的同尺度 Gamma 分布。由联合密度除以边缘密度，
+\begin{align*}
+ f_{X_1\mid T}(x\mid t)
+ &=\frac{f_{X_1}(x)f_Y(t-x)}{f_T(t)}\\
+ &=\frac{n-1}{t}\left(1-\frac xt\right)^{n-2},
+ \qquad0<x<t.
+\end{align*}
+因此 $X_1/T\mid T=t\sim\operatorname{Beta}(1,n-1)$，且
+\[
+ h(T)=\E(U\mid T)=
+ \begin{cases}
+  0,&T\leq a,\\
+  (1-a/T)^{n-1},&T>a.
+ \end{cases}
+\]
+第二种情形来自对条件密度在 $(a,t)$ 上积分。塔式法则给出无偏性，$0\leq h\leq1$ 保证有限方差，Lehmann--Scheff\'e 定理遂给出唯一 UMVUE。
+
+\begin{notebox}[练习与核验]
+\begin{enumerate}
+ \item 在 $U(0,\theta)$ 模型中求 $\theta^{-r}$ 的 UMVUE，并说明有限方差条件。\textbf{线索：}用 $\E T^s=n\theta^s/(n+s)$；当 $0<r<n/2$ 时，$(n-r)T^{-r}/n$ 有有限方差。
+ \item 在 Poisson 模型中无偏估计 $\theta^3$。\textbf{答案：}$T(T-1)(T-2)/n^3$；比较它与 $\bar X^3$ 的期望。
+ \item 指数分布例中若 $n=1$，原指标函数是否为 UMVUE？\textbf{线索：}$X_1$ 本身完备充分；上述 Beta 条件密度的推导不适用于 $n=1$，但结论可直接由 Lehmann--Scheff\'e 得出。
+\end{enumerate}
+\end{notebox}
+
+\section{正交判别与参数空间的影响}
+
+\subsection{与所有零均值方向正交}
+
+定义
+\[
+ \mathcal U_0=\{V(X):\E_\theta V=0,\ 
+ \E_\theta V^2<\infty\text{ 对所有 }\theta\in\Theta\}.
+\]
+这里 $V$ 必须是固定的数据函数。虽然 $X_1-\theta$ 在位置模型中可能有零均值，它含未知参数，不能据此列入 $\mathcal U_0$。若 $U,W$ 是同一目标的无偏估计，则 $W-U\in\mathcal U_0$；反之，$U+V$ 对每个 $V\in\mathcal U_0$ 都是无偏竞争者。
+
+\begin{definitionbox}{UMVUE 的正交判别}
+设 $U$ 为有限方差无偏估计，则
+\[
+ U\text{ 为 UMVUE}
+ \quad\Longleftrightarrow\quad
+ \E_\theta(UV)=0
+ \quad\forall V\in\mathcal U_0,\ \forall\theta\in\Theta.
+\]
+由于 $\E_\theta V=0$，右侧等价于 $\Cov_\theta(U,V)=0$。该判别不要求存在完备充分统计量。
+\end{definitionbox}
+
+\textbf{证明。} 若 $U$ 为 UMVUE，则对任意实数 $c$，$U+cV$ 仍无偏，因此
+\[
+ 0\leq\Var_\theta(U+cV)-\Var_\theta(U)
+ =c^2A+2cB,
+\]
+其中 $A=\Var_\theta(V)$、$B=\Cov_\theta(U,V)$。若 $A>0$ 而 $B\neq0$，取 $c=-B/A$ 得矛盾；若 $A=0$，则 $V=0$，$P_\theta$-几乎处处，亦有 $B=0$。
+
+反之，任一竞争者可写为 $W=U+V$，$V\in\mathcal U_0$。正交性给出
+\[
+ \Var_\theta(W)=\Var_\theta(U)+\Var_\theta(V)
+ \geq\Var_\theta(U),
+\]
+故 $U$ 为 UMVUE。\hfill$\square$
+
+若 $U_j$ 分别为 $g_j(\theta)$ 的 UMVUE，则对固定常数 $c_j$，$\sum_jc_jU_j$ 与所有零均值方向仍正交，因而是 $\sum_jc_jg_j(\theta)$ 的 UMVUE。这一性质只保证有限线性组合，不保证平方或其他非线性变换。若 $U_1,U_2$ 为同一目标的 UMVUE，取 $V=U_1-U_2$，则
+\[
+ \E_\theta V^2=\E_\theta(U_1V)-\E_\theta(U_2V)=0,
+\]
+再次得到 UMVUE 的几乎处处唯一性。
+
+若已有充分统计量 $T$，判断其无偏函数 $h(T)$ 是否为 UMVUE，只需检验
+\[
+ \E_\theta[h(T)v(T)]=0
+\]
+对所有零均值、二阶可积的 $v(T)$ 成立。事实上，对一般 $V\in\mathcal U_0$，令 $v(T)=\E(V\mid T)$。充分性、塔式法则和条件 Jensen 保证它属于所检验的类，且
+\[
+ \E_\theta[h(T)V]
+ =\E_\theta[h(T)\E(V\mid T)]
+ =\E_\theta[h(T)v(T)]=0.
+\]
+
+\subsection{限制均匀模型中的改进}
+
+仍考虑 $U(0,\theta)$，现在参数只允许 $\theta\geq1$。最大值 $T$ 的密度不变，也仍充分。但 $\E_\theta v(T)=0$ 对全部 $\theta\geq1$ 成立，仅能推出
+\begin{equation}
+ \int_0^1v(t)t^{n-1}\,dt=0,
+ \qquad v(t)=0\ \text{在 }(1,\infty)\text{ 上几乎处处}.
+ \label{eq:ch4-restricted-zero}
+\end{equation}
+第一项由 $\theta=1$ 得到，第二项由积分上限 $\theta>1$ 的几乎处处求导得到；两条件也反过来保证零均值。区间 $(0,1)$ 上只剩一个积分约束，因此 $T$ 不再完备。例如
+\[
+ v(t)=\left(\frac{n+1}{n}t-1\right)\ind_{\{t\leq1\}}
+\]
+是非零的有界函数，却满足式~\eqref{eq:ch4-restricted-zero}。
+
+要使估计与所有此类函数正交，可以在 $t\leq1$ 上取常数。尝试
+\[
+ h(t)=\begin{cases}c,&t\leq1,\\bt,&t>1.\end{cases}
+\]
+积分得
+\[
+ \E_\theta h(T)=\frac{bn}{n+1}\theta
+ +\left(c-\frac{bn}{n+1}\right)\theta^{-n}.
+\]
+取 $b=(n+1)/n$、$c=1$，得到
+\begin{equation}
+ \widehat\theta_*=\begin{cases}
+ 1,&T\leq1,\\
+ (n+1)T/n,&T>1.
+ \end{cases}
+ \label{eq:ch4-restricted-umvue}
+\end{equation}
+它无偏且在每个参数下有界。对零均值 $v(T)$，只有 $T\leq1$ 部分有贡献，而该处 $h(T)=1$，故
+\[
+ \E_\theta[h(T)v(T)]
+ =\frac n{\theta^n}\int_0^1v(t)t^{n-1}\,dt=0.
+\]
+充分统计量上的正交判别证明式~\eqref{eq:ch4-restricted-umvue} 为 UMVUE，无须完备性。
+
+原估计 $U_0=(n+1)T/n$ 在限制模型中仍无偏。其与新估计的差为上述 $v(T)$，并与新估计正交。因此
+\begin{align*}
+ \Var_\theta(U_0)-\Var_\theta(\widehat\theta_*)
+ &=\E_\theta v(T)^2\\
+ &=\frac n{\theta^n}\int_0^1
+   \left(\frac{n+1}{n}t-1\right)^2t^{n-1}\,dt\\
+ &=\frac{\theta^{-n}}{n(n+2)}>0.
+\end{align*}
+于是
+\[
+ \Var_\theta(\widehat\theta_*)
+ =\frac{\theta^2-\theta^{-n}}{n(n+2)}.
+\]
+在 $\theta=1$ 处，新估计恒为 $1$，方差为零。缩小参数空间会放宽“对所有参数均无偏”的要求，可能出现更多零均值方向与竞争者；UMVUE 因而依赖整个模型，不能只看密度的形式。
+
+\begin{notebox}[练习与证明线索]
+\begin{enumerate}
+ \item 用正交判别证明两个 UMVUE 的固定线性组合仍为 UMVUE，再解释为什么 $U^2$ 未必无偏估计 $g(\theta)^2$。
+ \item 将限制改成 $\theta\geq a>0$，求 $\theta$ 的 UMVUE。\textbf{答案：}$T\leq a$ 时取 $a$，$T>a$ 时取 $(n+1)T/n$；方差为 $[\theta^2-a^{n+2}\theta^{-n}]/[n(n+2)]$。
+ \item 证明限制模型中的任一 UMVUE 若写成 $h(T)$，则它在 $(0,1)$ 上必须几乎处处为常数。\textbf{线索：}令 $c=\E_1h(T)$，用 $(h(T)-c)\ind_{\{T\leq1\}}$ 作零均值方向，在 $\theta=1$ 处应用正交性。
+\end{enumerate}
+\end{notebox}
+
+\section{U 统计量：在所有子样本上平均}
+
+\subsection{核与总体泛函}
+
+设 $X_1,\ldots,X_n\overset{\mathrm{i.i.d.}}\sim P$，总体量具有表示
+\[
+ \vartheta(P)=\E_P h(X_1,\ldots,X_m),\qquad \E_P|h|<\infty,
+\]
+其中 $m\leq n$ 固定，$h$ 是不含未知分布的可测函数，称为核。“泛函”表示它以分布 $P$ 为输入，输出一个数；例如总体方差。这里的核既不是密度，也不要求为正定函数。
+
+若原核不对称，可用
+\[
+ h_s(x_1,\ldots,x_m)=\frac1{m!}\sum_\pi
+ h(x_{\pi(1)},\ldots,x_{\pi(m)})
+\]
+代替，和式遍历全部排列。独立同分布保证排列后的向量同分布，所以 $\E h_s=\E h$；若有二阶矩，Jensen 还给出 $\E h_s^2\leq\E h^2$。以下采用对称核。
+
+\begin{definitionbox}{单样本 U 统计量}
+由 $m$ 元对称核 $h$ 定义
+\[
+ U_n=\binom nm^{-1}
+ \sum_{1\leq i_1<\cdots<i_m\leq n}
+ h(X_{i_1},\ldots,X_{i_m}).
+\]
+每个核项期望均为 $\vartheta(P)$，故 $\E_PU_n=\vartheta(P)$。阶数 $m$ 是每项使用的观测数，并非多项式次数。
+\end{definitionbox}
+
+\subsection{独立随机子集的条件化解释}
+
+在数据之外引入独立随机变量 $J$，它从全部 $m$ 元下标子集中均匀选取一个，令 $Z=h(X_j:j\in J)$。独立性是这里的条件：若根据观测大小偏向选择某些子集，以下等式一般不成立。
+
+给定整份样本 $X$ 后，唯一剩下的随机性是选中哪个子集。因 $P(J=A\mid X)=\binom nm^{-1}$，
+\[
+ \E(Z\mid X)=\sum_{|A|=m}h(X_i:i\in A)P(J=A\mid X)=U_n.
+\]
+每个子集均有 $m$ 个独立同分布观测，故 $\E Z=\vartheta$，塔式法则给出 $\E U_n=\vartheta$。若 $\E h^2<\infty$，则
+\[
+ \Var(Z)=\Var(U_n)+\E\{\Var(Z\mid X)\}\geq\Var(U_n).
+\]
+这是消除额外抽选波动的方差比较，没有单凭此式断言 $U_n$ 在任意参数模型中都是 UMVUE。
+
+\begin{examplebox}{一份数据固定以后还剩什么随机性}
+取 $n=3,m=2$、$h(x,y)=(x+y)/2$。若观测为 $(1,3,8)$，三个可能子集给出 $2$、$4.5$、$5.5$，各以概率 $1/3$ 被选中。条件平均为
+\[
+ \E(Z\mid X=(1,3,8))=\frac{2+4.5+5.5}{3}=4.
+\]
+一般地，三个二元均值的平均正好为 $\bar X$。单次随机子集估计的方差为 $\sigma^2/2$，$U_3=\bar X$ 的方差为 $\sigma^2/3$；平均消除了子集抽选造成的那部分波动。
+\end{examplebox}
+
+\subsection{均值的幂与样本方差}
+
+若 $\E|X|<\infty$、$\mu=\E X$，独立性给出 $\E(X_1\cdots X_m)=\mu^m$。因此乘积核产生 $\mu^m$ 的无偏估计。二阶时，
+\[
+ U_n=\frac{(\sum_iX_i)^2-\sum_iX_i^2}{n(n-1)}.
+\]
+若二阶矩有限，还可写为 $\bar X^2-S^2/n$。这个无偏性并不限于正态总体；它在何种参数模型下为 UMVUE，要另行证明。
+
+若 $\E X^2<\infty$，取 $h(x,y)=(x-y)^2/2$，则 $\E h(X_1,X_2)=\sigma^2$。利用
+\begin{align*}
+ \sum_{i<j}(X_i-X_j)^2
+ &=n\sum_iX_i^2-\left(\sum_iX_i\right)^2\\
+ &=n\sum_i(X_i-\bar X)^2,
+\end{align*}
+对应的 U 统计量恰为
+\[
+ U_n=\frac1{n(n-1)}\sum_{i<j}(X_i-X_j)^2=S^2.
+\]
+二阶矩足以保证此无偏性；分析其方差和通常的方差 CLT 则需四阶矩。包含重复下标的平均并非同一个对象，例如 $n^{-2}\sum_{i,j}X_iX_j=\bar X^2$ 含有对角项，通常有偏估计 $\mu^2$，属于 V 统计量形式。
+
+\section{条件核与精确方差}
+
+本节及后续单样本理论均假定 $m$ 与 $P$ 固定，$\E h^2<\infty$，令 $n\to\infty$。若核阶数也随样本量变化，下面固定阶的余项估计不能直接沿用。
+
+\subsection{重叠下标决定协方差}
+
+定义条件核
+\[
+ h_k(x_1,\ldots,x_k)
+ =\E h(x_1,\ldots,x_k,X_{k+1},\ldots,X_m),
+ \quad 1\leq k\leq m,
+\]
+以及 $h_0=\vartheta$、$h_m=h$，并记
+\[
+ \zeta_k=\Var\{h_k(X_1,\ldots,X_k)\},\qquad\zeta_0=0.
+\]
+塔式法则和条件 Jensen 给出 $\E h_k=\vartheta$、$\E h_k^2\leq\E h^2$。
+
+对两个 $m$ 元下标集 $A,B$，设 $C=A\cap B$、$|C|=k$。给定公共观测 $X_C$，两核其余输入来自互不相交的观测，因而条件独立。其中心化条件均值均为 $h_k(X_C)-\vartheta$，所以
+\begin{align*}
+ \Cov\{h(X_A),h(X_B)\}
+ &=\E\bigl[\E\{(h(X_A)-\vartheta)
+          (h(X_B)-\vartheta)\mid X_C\}\bigr]\\
+ &=\E\{[h_k(X_C)-\vartheta]^2\}=\zeta_k.
+\end{align*}
+无公共下标时协方差为零；$A=B$ 时协方差为 $\zeta_m=\Var(h)$。
+
+\begin{definitionbox}{Hoeffding 精确方差公式}
+对 $n\geq m$，
+\begin{equation}
+ \Var(U_n)=\binom nm^{-1}
+ \sum_{k=1}^m\binom mk\binom{n-m}{m-k}\zeta_k.
+ \label{eq:ch4-exact-variance}
+\end{equation}
+选取数目不合法时，组合数按零处理。特别地，二阶核满足
+\[
+ \Var(U_n)=\frac{4(n-2)}{n(n-1)}\zeta_1
+          +\frac2{n(n-1)}\zeta_2.
+\]
+\end{definitionbox}
+
+\textbf{计数证明。} 令 $N=\binom nm$，$H_A=h(X_A)-\vartheta$。展开
+\[
+ \Var(U_n)=\frac1{N^2}\sum_{|A|=m}\sum_{|B|=m}\E H_AH_B.
+\]
+固定 $A$，要使 $|A\cap B|=k$，须从 $A$ 内选 $k$ 个下标，再从 $A$ 外选 $m-k$ 个下标，恰有 $\binom mk\binom{n-m}{m-k}$ 种。外层有 $N$ 个 $A$，故相应有序对数目为 $N\binom mk\binom{n-m}{m-k}$。双和原本计算有序对，不能再除以 $2$。代入协方差 $\zeta_k$，并利用 $\zeta_0=0$，即得公式。当 $n=m$ 时只剩一项，公式为 $\Var(U_n)=\zeta_m$，与定义一致。\hfill$\square$
+
+\subsection{方差速度与退化阶数}
+
+令 $H_k=h_k(X_1,\ldots,X_k)$，$\mathcal F_k=\sigma(X_1,\ldots,X_k)$。逐次条件化给出 $\E(H_{k+1}\mid\mathcal F_k)=H_k$，因此
+\[
+ \zeta_{k+1}=\zeta_k+
+ \E\{\Var(H_{k+1}\mid\mathcal F_k)\}\geq\zeta_k.
+\]
+于是 $0\leq\zeta_1\leq\cdots\leq\zeta_m$。对固定 $m,k$，精确方差系数满足
+\begin{align*}
+ c_{n,k}
+ &:=\frac{\binom mk\binom{n-m}{m-k}}{\binom nm}\\
+ &=\frac{k!\binom mk^2}{n^k}
+ \frac{\prod_{r=0}^{m-k-1}(1-(m+r)/n)}
+      {\prod_{r=0}^{m-1}(1-r/n)}\\
+ &=\frac{k!\binom mk^2}{n^k}+O(n^{-k-1}).
+\end{align*}
+空乘积取 $1$。由于每个乘积的因子数固定，最后的比值为 $1+O(n^{-1})$。若第一个非零条件核方差为 $\zeta_k$，则
+\begin{equation}
+ \Var(U_n)=\frac{k!\binom mk^2\zeta_k}{n^k}
+            +O(n^{-k-1}).
+ \label{eq:ch4-var-rate}
+\end{equation}
+特别地，$\zeta_1>0$ 时方差为 $m^2\zeta_1/n+O(n^{-2})$；$\zeta_1=0$、$\zeta_2>0$ 时为 $n^{-2}$ 量级。
+
+各系数趋零，故 $\E(U_n-\vartheta)^2\to0$，即 $U_n\to\vartheta$ 于 $L^2$，从而也依概率收敛。如果全部 $\zeta_k=0$，则核本身几乎处处为常数，结论仍成立。方差的速度给出可能的放大尺度，却不单独保证极限分布存在。
+
+\begin{notebox}[练习与答案线索]
+\begin{enumerate}
+ \item 对 $h(x,y)=xy$、$\E X=\mu$、$\Var(X)=\sigma^2<\infty$，求 $\vartheta,h_1,\zeta_1,\zeta_2$。\textbf{答案：}$\vartheta=\mu^2$，$h_1(x)=\mu x$，$\zeta_1=\mu^2\sigma^2$，$\zeta_2=\sigma^4+2\mu^2\sigma^2$。
+ \item 将上题代入精确公式，证明 $\Var(U_n)=4\mu^2\sigma^2/n+2\sigma^4/[n(n-1)]$。
+ \item 为什么不能把 $\binom nm$ 个核项当成独立项？\textbf{线索：}即使样本观测独立，两个核项仍可能共享下标。逐一写出 $h(X_1,X_2)$ 与 $h(X_1,X_3)$ 的协方差。
+\end{enumerate}
+\end{notebox}
+
+\section{H\'ajek 投影与非退化极限}
+
+\subsection{投影到单变量加性函数}
+
+对独立观测 $X_1,\ldots,X_n$ 及任意二阶可积 $W$，定义
+\[
+ a_i(X_i)=\E(W\mid X_i)-\E W,\qquad
+ \widehat W=\E W+\sum_{i=1}^na_i(X_i).
+\]
+独立性保证当 $j\neq i$ 时 $\E[a_j(X_j)\mid X_i]=0$，从而
+\[
+ \E(W-\widehat W\mid X_i)=0.
+\]
+所以残差与每个二阶可积单变量函数 $b_i(X_i)$ 正交，也与其有限和及常数正交。对任何加性函数 $Q=c+\sum_ib_i(X_i)$，
+\[
+ \E(W-Q)^2=\E(W-\widehat W)^2+\E(\widehat W-Q)^2.
+\]
+这称为 H\'ajek 投影：允许每个单变量函数非线性，但不保留不同观测间的交互项。它并不是对完整数据取条件期望；后者对统计量 $W$ 仍给出 $W$ 本身。例如零均值独立变量的乘积 $X_1X_2$，对两个单变量的条件期望均为零，所以其 H\'ajek 投影为零，而完整数据仍确定该乘积。
+
+\subsection{U 统计量的一阶项与余项}
+
+令
+\[
+ \varphi(x)=h_1(x)-\vartheta,
+ \qquad \E\varphi(X)=0,\quad\Var\{\varphi(X)\}=\zeta_1.
+\]
+固定下标 $i$，包含它的 $m$ 元子集有 $\binom{n-1}{m-1}$ 个，不包含它的有 $\binom{n-1}{m}$ 个。因此
+\[
+ \E(U_n\mid X_i)-\vartheta
+ =\frac{\binom{n-1}{m-1}}{\binom nm}\varphi(X_i)
+ =\frac mn\varphi(X_i).
+\]
+故投影为
+\begin{equation}
+ \widehat U_n=\vartheta+L_n,
+ \qquad L_n=\frac mn\sum_{i=1}^n\varphi(X_i),
+ \qquad R_n=U_n-\widehat U_n.
+ \label{eq:ch4-hajek}
+\end{equation}
+由独立性，$\Var(L_n)=m^2\zeta_1/n$。同时
+\begin{align*}
+ \E[(U_n-\vartheta)\varphi(X_i)]
+ &=\E[\E(U_n-\vartheta\mid X_i)\varphi(X_i)]\\
+ &=\frac mn\zeta_1,
+\end{align*}
+因此 $\Cov(U_n,L_n)=m^2\zeta_1/n=\Var(L_n)$。展开残差平方得到精确恒等式
+\begin{equation}
+ \E R_n^2=\Var(U_n)-\frac{m^2\zeta_1}{n}.
+ \label{eq:ch4-residual}
+\end{equation}
+这也就是 $R_n$ 与 $L_n$ 正交后的勾股关系，不需要二者独立。将方差展开代入，得 $\E R_n^2=O(n^{-2})$，于是
+\[
+ P(|\sqrt nR_n|>\varepsilon)
+ \leq\frac{n\E R_n^2}{\varepsilon^2}\longrightarrow0.
+\]
+所以 $R_n=O_P(n^{-1})$，且
+\begin{equation}
+ \sqrt n(U_n-\vartheta)
+ =\frac m{\sqrt n}\sum_{i=1}^n\varphi(X_i)+o_P(1).
+ \label{eq:ch4-asym-linear}
+\end{equation}
+
+\begin{definitionbox}{非退化 U 统计量的中心极限定理}
+若核阶数 $m$ 固定、$\E h^2<\infty$ 且 $\zeta_1>0$，则
+\[
+ \sqrt n(U_n-\vartheta)\dto N(0,m^2\zeta_1).
+\]
+\end{definitionbox}
+
+\textbf{证明。} $\varphi(X_i)$ 独立同分布，均值为零、有限方差为 $\zeta_1$。普通中心极限定理给出 $n^{-1/2}\sum_i\varphi(X_i)\dto N(0,\zeta_1)$；将式~\eqref{eq:ch4-asym-linear} 代入 Slutsky 定理即可。\hfill$\square$
+
+这里的极限方差来自一阶条件核，不是原核方差 $\zeta_m$；核阶数还贡献系数 $m^2$。若 $\zeta_1=0$，同一推导只能得到 $\sqrt n(U_n-\vartheta)\pto0$，更细的波动须换用其他尺度。
+
+\subsection{样本方差：与 Delta 方法的核对}
+
+对 $h(x,y)=(x-y)^2/2$，$\vartheta=\sigma^2$。固定 $x$ 并平均另一个观测，得
+\[
+ h_1(x)=\frac12[(x-\mu)^2+\sigma^2],\qquad
+ \varphi(x)=\frac12[(x-\mu)^2-\sigma^2].
+\]
+设 $\mu_4=\E(X-\mu)^4<\infty$。由于
+\[
+ (X_1-X_2)^4\leq8[(X_1-\mu)^4+(X_2-\mu)^4],
+\]
+核二阶矩有限，并且
+\[
+ 4\zeta_1=\Var\{(X-\mu)^2\}=\mu_4-\sigma^4.
+\]
+若 $\mu_4>\sigma^4$，则
+\begin{equation}
+ \sqrt n(S^2-\sigma^2)\dto N(0,\mu_4-\sigma^4).
+ \label{eq:ch4-variance-clt}
+\end{equation}
+它与第一章通过样本一、二阶矩及 Delta 方法所得结果一致：两种方法找到的主导项都是 $(X-\mu)^2-\sigma^2$。正态总体有 $\mu_4=3\sigma^4$，极限方差为 $2\sigma^4$。
+
+还可计算精确方差。令 $Z_i=X_i-\mu$，独立性与 $\E Z_i=0$ 给出
+\[
+ \E(Z_1-Z_2)^4=2\mu_4+6\sigma^4,
+ \qquad\zeta_2=\frac12(\mu_4+\sigma^4).
+\]
+代入二阶精确公式，得
+\[
+ \Var(S^2)=\frac1n
+ \left[\mu_4-\frac{n-3}{n-1}\sigma^4\right].
+\]
+正态时为 $2\sigma^4/(n-1)$，与样本方差的精确卡方分布相符。
+
+\begin{examplebox}{样本方差也可能一阶退化}
+若 $P(X=\mu+a)=P(X=\mu-a)=1/2$，$a>0$，则 $(X-\mu)^2=a^2$ 恒定，故 $\mu_4-\sigma^4=0$。式~\eqref{eq:ch4-variance-clt} 的 $\sqrt n$ 极限退化为零，不能再除以该极限标准差做正态标准化。
+
+写 $X_i=\mu+a\varepsilon_i$，其中 $P(\varepsilon_i=\pm1)=1/2$。则
+\[
+ S^2=\frac{na^2}{n-1}(1-\bar\varepsilon^2),
+\]
+所以
+\[
+ n(S^2-a^2)=\frac n{n-1}a^2
+ \left[1-\left(\frac1{\sqrt n}\sum_i\varepsilon_i\right)^2\right]
+ \dto a^2(1-Z^2),\quad Z\sim N(0,1).
+\]
+退化后出现的是中心化卡方型极限，而非非零方差的正态极限。
+\end{examplebox}
+
+\begin{notebox}[练习与答案线索]
+\begin{enumerate}
+ \item 对乘积核 $h(x,y)=xy$，在 $\mu\neq0$、$\sigma^2>0$ 时求渐近分布。\textbf{答案：}$\sqrt n(U_n-\mu^2)\dto N(0,4\mu^2\sigma^2)$。
+ \item 对 $h(x,y)=(x+y)/2$ 求 H\'ajek 投影和余项。\textbf{答案：}$U_n=\bar X$，投影等于统计量本身，余项恒为零；虽是二阶核，却没有真正的二阶交互。
+ \item 对 $X\sim U(0,1)$，求 $\sqrt n(S^2-1/12)$ 的极限方差。\textbf{答案：}$\mu_4=1/80$，故方差为 $1/80-1/144=1/180$。
+\end{enumerate}
+\end{notebox}
+
+\section{两样本秩统计量}
+
+\subsection{Mann--Whitney 与 Wilcoxon 秩和}
+
+本节的 $m,n$ 均表示样本量，不再表示单样本核阶数。设 $X_1,\ldots,X_m\sim F$、$Y_1,\ldots,Y_n\sim G$，两组内部独立同分布，组间独立，$F,G$ 连续。约定
+\[
+ h(x,y)=\ind_{\{x>y\}},\qquad
+ \vartheta=P(X>Y),\qquad
+ U_{m,n}=\frac1{mn}\sum_{i=1}^m\sum_{j=1}^n\ind_{\{X_i>Y_j\}}.
+\]
+它是所有跨组比较中 $X$ 大于 $Y$ 的比例，无偏估计 $\vartheta$。部分教材或软件把未归一化的胜出次数 $mnU_{m,n}$ 称为 Mann--Whitney $U$，另一些使用相反的比较方向，核对约定后才能直接引用公式。
+
+把 $m+n$ 个观测合并排序，无并列值时，记 $X_i$ 的合并秩为 $R_i$，Wilcoxon 秩和为 $R_X=\sum_iR_i$。把 $X$ 组内部排序为 $X_{(1)}<\cdots<X_{(m)}$，相应合并秩为 $r_a$。位于 $X_{(a)}$ 之前的 $r_a-1$ 个观测中，$a-1$ 个来自 $X$ 组，所以
+\[
+ r_a-a=\#\{j:Y_j<X_{(a)}\}.
+\]
+对 $a$ 求和即得
+\begin{equation}
+ R_X-\frac{m(m+1)}2=mnU_{m,n}.
+ \label{eq:ch4-rank-equivalence}
+\end{equation}
+因此秩和与跨组胜出次数是已知的线性变换，携带相同信息；U 统计量的分析可以直接转给秩和。若合并次序为 $Y,X,Y,Y,X,Y,X$，则 $m=3,n=4$，$X$ 的秩为 $(2,5,7)$，胜出次数为 $1+3+4=8$，故 $R_X=14$、$U_{3,4}=2/3$。
+
+\subsection{两个一阶投影与余项控制}
+
+连续性给出 $\E[h(x,Y)]=G(x)$、$\E[h(X,y)]=1-F(y)$。定义
+\[
+ a(x)=G(x)-\vartheta,\qquad
+ b(y)=1-F(y)-\vartheta,
+\]
+以及
+\[
+ r(x,y)=h(x,y)-\vartheta-a(x)-b(y).
+\]
+两个投影均值为零，且 $\E[r(X,Y)\mid X]=\E[r(X,Y)\mid Y]=0$。于是有精确分解
+\begin{equation}
+ U_{m,n}-\vartheta
+ =\frac1m\sum_i a(X_i)+\frac1n\sum_j b(Y_j)+R_{m,n},
+ \label{eq:ch4-twosample-projection}
+\end{equation}
+其中 $R_{m,n}=(mn)^{-1}\sum_{i,j}r(X_i,Y_j)$。
+
+残差核与两个单变量项均正交。两个不同配对若没有共享下标，则独立；若只共享 $X_i$，给定 $X_i$ 后两残差核条件独立且条件均值零，协方差也为零；只共享 $Y_j$ 同理。故仅完全相同的下标对贡献方差，
+\[
+ \E R_{m,n}^2=\frac{\E r(X,Y)^2}{mn}.
+\]
+若 $N=m+n$、$m/N\to\rho\in(0,1)$，则 $N/(mn)\to0$，因而 $\sqrt N R_{m,n}\pto0$。两组主项相互独立，分别使用 CLT 得到
+\[
+ \sqrt N(U_{m,n}-\vartheta)\dto
+ N\left(0,\frac{\Var(G(X))}{\rho}
+          +\frac{\Var(F(Y))}{1-\rho}\right).
+\]
+若显示的极限方差为零，应另作退化分析，而不能使用非零方差的标准化。
+
+\subsection{相同分布原假设下的检验}
+
+在 $H_0:F=G$ 下，连续性与交换性给出 $\vartheta=1/2$，概率积分变换给出 $F(X),F(Y)\sim U(0,1)$。因此两个投影方差都是 $1/12$，有
+\[
+ \sqrt{m+n}\left(U_{m,n}-\frac12\right)
+ \dto N\left(0,\frac1{12\rho(1-\rho)}\right),
+\]
+等价地，
+\[
+ Z_{m,n}=\sqrt{\frac{12mn}{m+n}}
+ \left(U_{m,n}-\frac12\right)\dto N(0,1).
+\]
+于是 $|Z_{m,n}|>z_{1-\alpha/2}$ 为渐近双侧水平 $\alpha$ 的拒绝规则。渐近水平表示拒绝概率趋于 $\alpha$，不表示每个有限样本都精确等于 $\alpha$。
+
+在原假设下，$\Var(h)=1/4$。由核的正交分解，$\E r^2=1/4-1/12-1/12=1/12$，所以精确方差为
+\[
+ \Var_0(U_{m,n})=\frac1{12m}+\frac1{12n}+\frac1{12mn}
+ =\frac{m+n+1}{12mn}.
+\]
+相应地，
+\[
+ \E_0R_X=\frac{m(m+n+1)}2,\qquad
+ \Var_0(R_X)=\frac{mn(m+n+1)}{12}.
+\]
+用精确方差作正态近似时，标准化可采用 $\sqrt{12mn/(m+n+1)}$，与上述渐近形式等价。有并列值时，须明确比较核、平均秩或其他并列处理，并重新修正方差；这里的无并列值公式不能直接照搬。
+
+\begin{notebox}[检验目标与练习]
+$F=G$ 蕴含 $P(X>Y)=1/2$，反之不成立。例如 $X\sim N(0,1)$、$Y\sim N(0,4)$ 独立时，$X-Y$ 关于零对称，仍有 $P(X>Y)=1/2$。因此该统计量不能保证对所有 $F\neq G$ 的备择都具有趋于 $1$ 的功效。
+\begin{enumerate}
+ \item 若改用 $\ind_{\{X<Y\}}$，秩和等式如何变化？\textbf{答案：}新统计量为 $1-U_{m,n}$，故 $R_X=m(m+1)/2+mn(1-U_{m,n}^{\mathrm{new}})$。
+ \item 当 $m=n$ 时写出 $U_{m,n}$ 与秩和的原假设精确方差，再比较两种标准化。
+ \item 用条件均值零逐一证明残差核共享一个下标时协方差仍为零；这一步解释了为何两样本余项只保留 $1/(mn)$ 量级。
+\end{enumerate}
+\end{notebox}
+
+\section{一阶退化与中心化卡方极限}
+
+本节保留一般证明，也先列出可用普通 CLT 与 LLN 独立核验的例子。需要额外借用的泛函分析结论只有平方可积对称核的谱展开；其余概率步骤均在此前工具范围内。
+
+\subsection{乘积核的直接计算}
+
+设 $\E X=0$、$\E X^2=\sigma^2>0$，取 $h(x,y)=xy$。此时 $\vartheta=0$、$h_1(x)=0$、$\zeta_2=\sigma^4$，精确方差为 $2\sigma^4/[n(n-1)]$。由乘积恒等式，
+\[
+ nU_n=\frac n{n-1}
+ \left[\left(\frac1{\sqrt n}\sum_iX_i\right)^2
+       -\frac1n\sum_iX_i^2\right].
+\]
+CLT 给出括号第一项趋于 $\sigma^2Z^2$，LLN 给出第二项依概率趋于 $\sigma^2$。因此
+\[
+ nU_n\dto\sigma^2(Z^2-1),\qquad Z\sim N(0,1).
+\]
+这里只需二阶矩，因为 $\E h(X_1,X_2)^2=(\E X^2)^2$。中心化卡方来自“和的平方减去平均平方”，而不是把退化情形继续当作非退化 CLT 使用。
+
+\subsection{积分算子是矩阵作用的推广}
+
+回到固定 $m\geq2$ 的一般核，假设 $\zeta_1=0$、$\zeta_2>0$。定义
+\[
+ K(x,y)=h_2(x,y)-\vartheta.
+\]
+因为 $h_1(X)=\vartheta$ 几乎处处，
+\[
+ \E[K(X_1,X_2)\mid X_1]=0,
+ \qquad\E K(X_1,X_2)^2=\zeta_2.
+\]
+一般非退化情形的二阶正交核应为 $h_2(x,y)-h_1(x)-h_1(y)+\vartheta$；在本节条件下，它才等于 $K$。
+
+考虑 $L^2(P)$ 上的积分算子
+\[
+ (\mathcal Kf)(x)=\int K(x,y)f(y)\,dP(y).
+\]
+若 $P$ 在 $r$ 个点 $x_1,\ldots,x_r$ 等概率取值，积分变成
+\[
+ (\mathcal Kf)(x_i)=\frac1r\sum_{j=1}^rK(x_i,x_j)f(x_j),
+\]
+即矩阵 $(K(x_i,x_j)/r)_{i,j}$ 乘上函数值向量。一般分布只是把离散求和换成积分，把向量换成函数。特征方程为
+\[
+ \int K(x,y)e_j(y)\,dP(y)=\lambda_je_j(x).
+\]
+对称核给出自伴算子，核平方可积给出 Hilbert--Schmidt 性质。在通常的实值观测（标准 Borel）设置中，谱定理允许在 $L^2(P\times P)$ 意义下写为
+\begin{equation}
+ K(x,y)=\sum_{j\geq1}\lambda_je_j(x)e_j(y),
+ \qquad\sum_j\lambda_j^2=\zeta_2,
+ \label{eq:ch4-spectrum}
+\end{equation}
+其非零特征值均实，特征函数正交归一，即 $\E[e_j(X)e_\ell(X)]=\ind_{\{j=\ell\}}$。等式是均方收敛，不要求每个 $(x,y)$ 都逐点成立。
+
+退化性和对称性给出 $\int K(x,y)\,dP(x)=0$ 对几乎所有 $y$ 成立。对特征方程积分，利用 Cauchy--Schwarz 保证绝对可积，可得
+\[
+ \lambda_j\E e_j(X)
+ =\iint K(x,y)e_j(y)\,dP(y)dP(x)=0.
+\]
+所以非零特征值对应的 $e_j$ 均值为零。乘积例中只有一个方向：$e(x)=x/\sigma$、$\lambda=\sigma^2$，于是 $K(x,y)=\sigma^2e(x)e(y)$，正好恢复上一小节的极限。
+
+\begin{definitionbox}{一阶退化 U 统计量的极限}
+若 $m\geq2$ 固定、$\E h^2<\infty$，且 $\zeta_1=0$、$\zeta_2>0$，则
+\begin{equation}
+ n(U_n-\vartheta)\dto
+ \binom m2\sum_{j\geq1}\lambda_j(Z_j^2-1),
+ \label{eq:ch4-degenerate-limit}
+\end{equation}
+其中 $Z_j$ 相互独立且服从 $N(0,1)$，$\lambda_j$ 为式~\eqref{eq:ch4-spectrum} 的非零特征值。无限和按 $L^2$ 收敛理解，权重可以为正也可以为负。
+\end{definitionbox}
+
+\subsection{第一步：严格降到二阶核}
+
+令
+\[
+ V_n=\binom n2^{-1}\sum_{i<j}K(X_i,X_j),
+\]
+并定义扣除所有成对贡献后的核
+\[
+ q(x_1,\ldots,x_m)=h(x_1,\ldots,x_m)-\vartheta
+                  -\sum_{1\leq a<b\leq m}K(x_a,x_b).
+\]
+它对称、均值为零且二阶可积。给定 $X_1,X_2$，原核的条件均值为 $h_2(X_1,X_2)$；成对和中只有 $K(X_1,X_2)$ 保留。只含一个已知下标的项因退化性条件均值零，两个下标都未知的项也均值零。因此
+\[
+ \E[q(X_1,\ldots,X_m)\mid X_1,X_2]
+ =h_2(X_1,X_2)-\vartheta-K(X_1,X_2)=0.
+\]
+再取条件期望得一阶投影也为零。对称性保证任意一个或一对下标均有该性质。
+
+固定样本中的一对下标，它在 $\binom{n-2}{m-2}$ 个 $m$ 元子集中出现。于是
+\begin{align*}
+ U_n-\vartheta
+ &=\frac{\binom{n-2}{m-2}}{\binom nm}
+       \sum_{i<j}K(X_i,X_j)+U_n(q)\\
+ &=\binom m2V_n+U_n(q).
+\end{align*}
+这给出了式~\eqref{eq:ch4-degenerate-limit} 中不能遗漏的 $\binom m2$。若 $m\geq3$，核 $q$ 的前两阶条件方差均为零，精确方差公式只剩 $k\geq3$ 项，故 $\Var\{U_n(q)\}=O(n^{-3})$，
+\[
+ \E\{[nU_n(q)]^2\}=O(n^{-1})\to0.
+\]
+若 $m=2$，$q$ 恒为零。因此一般问题归结为证明 $nV_n$ 的极限。
+
+\subsection{第二步：固定有限谱应用 CLT}
+
+令 $K_J(x,y)=\sum_{j=1}^J\lambda_je_j(x)e_j(y)$，并记对应二阶 U 统计量为 $V_{n,J}$。利用成对乘积恒等式，
+\begin{equation}
+ \begin{split}
+ nV_{n,J}=\frac n{n-1}\sum_{j=1}^J\lambda_j
+ \bigg[&\left(\frac1{\sqrt n}\sum_{i=1}^ne_j(X_i)\right)^2\\
+       &-\frac1n\sum_{i=1}^ne_j(X_i)^2\bigg].
+ \end{split}
+ \label{eq:ch4-finite-spectrum}
+\end{equation}
+对固定 $J$，向量 $(e_1(X_i),\ldots,e_J(X_i))$ 独立同分布，均值零、协方差为单位阵。多元 CLT 给出
+\[
+ \frac1{\sqrt n}\sum_{i=1}^n
+ (e_1(X_i),\ldots,e_J(X_i))^\mathsf T
+ \dto (Z_1,\ldots,Z_J)^\mathsf T\sim N_J(0,I_J).
+\]
+有限样本下，同一个 $X_i$ 产生的各个 $e_j(X_i)$ 不必独立；正交性给出协方差阵，联合正态极限才使 $Z_j$ 独立。又因 $\E e_j(X)^2=1$，LLN 给出 $n^{-1}\sum_ie_j(X_i)^2\pto1$。这里只需 $e_j^2$ 可积，不要求特征函数有四阶矩。连续映射与 Slutsky 因而给出
+\[
+ nV_{n,J}\dto L_J:=\sum_{j=1}^J\lambda_j(Z_j^2-1).
+\]
+
+\subsection{第三步：以统一均方界处理无限尾项}
+
+由于 $\Var(Z_j^2-1)=2$，$\sum_j\lambda_j^2<\infty$ 保证 $L_J$ 在 $L^2$ 中为 Cauchy 列，故存在
+\[
+ L=\sum_{j\geq1}\lambda_j(Z_j^2-1),\qquad
+ \E(L-L_J)^2=2\sum_{j>J}\lambda_j^2\to0.
+\]
+平方可和不保证绝对可和。因此上式须按中心化级数的 $L^2$ 极限理解，不能拆成两个未必各自收敛的级数之差：
+\[
+ \sum_j\lambda_j Z_j^2-\sum_j\lambda_j.
+\]
+
+样本端同样需要尾项控制。核 $K-K_J$ 仍退化，其二阶矩为 $\sum_{j>J}\lambda_j^2$。由二阶退化精确方差公式，
+\begin{equation}
+ \E\{[n(V_n-V_{n,J})]^2\}
+ =\frac{2n}{n-1}\sum_{j>J}\lambda_j^2
+ \leq4\sum_{j>J}\lambda_j^2,\qquad n\geq2.
+ \label{eq:ch4-spectral-tail}
+\end{equation}
+界不依赖 $n$，因此可以先固定 $J$ 令 $n$ 趋于无穷，再令 $J$ 趋于无穷。严格地，对任一有界且 Lipschitz 常数不超过 $1$ 的函数 $b$，
+\begin{align*}
+ |\E b(nV_n)-\E b(L)|
+ &\leq\E|n(V_n-V_{n,J})|\\
+ &\quad+|\E b(nV_{n,J})-\E b(L_J)|
+       +\E|L_J-L|.
+\end{align*}
+固定 $J$ 后，中间项随 $n\to\infty$ 趋零。两边项由 Cauchy--Schwarz 及式~\eqref{eq:ch4-spectral-tail}，分别不超过
+\[
+ 2\left(\sum_{j>J}\lambda_j^2\right)^{1/2},\qquad
+ \left(2\sum_{j>J}\lambda_j^2\right)^{1/2},
+\]
+再令 $J\to\infty$，二者均趋零。有界 Lipschitz 函数刻画依分布收敛，故 $nV_n\dto L$。结合第一步的 $nU_n(q)\pto0$，使用 Slutsky 即得式~\eqref{eq:ch4-degenerate-limit}。\hfill$\square$
+
+\begin{notebox}[退化情形的核验与练习]
+\begin{enumerate}
+ \item 对一般 $m$，用式~\eqref{eq:ch4-var-rate} 核对极限的方差系数。\textbf{答案：}$n^2\Var(U_n)\to2\binom m2^2\zeta_2$，而极限和的方差正是 $2\binom m2^2\sum_j\lambda_j^2$。
+ \item 取三阶核 $h(x,y,z)=xy+xz+yz$，总体均值零、方差 $\sigma^2$。求 $h_2$ 与极限。\textbf{答案：}$h_2(x,y)=xy$，故 $nU_n\dto3\sigma^2(Z^2-1)$；直接计数也有 $U_n=3\binom n2^{-1}\sum_{i<j}X_iX_j$。
+ \item 设 $a,b$ 为均值零、正交归一的平方可积函数，核为 $K(x,y)=a(x)a(y)-2b(x)b(y)$。\textbf{答案：}二阶 U 统计量满足 $nU_n\dto(Z_1^2-1)-2(Z_2^2-1)$。负权重并不妨碍核对称或平方可积，极限也不必非负。
+ \item 指出无限谱证明中若只写“固定 $J$ 的 CLT，再令 $J=\infty$”，缺了哪一步。\textbf{线索：}必须同时控制样本端尾项与极限端尾项，且样本端的界须对 $n$ 一致。
+\end{enumerate}
+\end{notebox}
+
+\section{综合练习}
+
+\begin{enumerate}
+ \item \textbf{条件化与完备性。} 设 $X_i\sim\operatorname{Bernoulli}(p)$ 独立同分布，$0<p<1$，$n\geq2$。从 $\ind_{\{X_1=1,X_2=0\}}$ 出发，求 $p(1-p)$ 的 UMVUE，要求写出条件分布与有限方差核验。\par
+ \textbf{解答线索：}给定 $T=\sum_iX_i=t$，全部含 $t$ 个 $1$ 的序列等概率，所求条件概率为 $t(n-t)/[n(n-1)]$。$T$ 的自然参数遍历 $\R$，完备充分；估计有界，故适用 Lehmann--Scheff\'e。
+
+ \item \textbf{同一核在不同参数点的变化。} 设 $\E X^2<\infty$、$\Var(X)=\sigma^2>0$。对乘积核 $h(x,y)=xy$，比较 $\mu\neq0$ 与 $\mu=0$ 时的方差速度、放大尺度和极限。\par
+ \textbf{解答线索：}$\mu\neq0$ 时为 $n^{-1}$ 方差及 $\sqrt n$ 正态极限；$\mu=0$ 时为 $n^{-2}$ 方差及 $nU_n\dto\sigma^2(Z^2-1)$。退化由分布和核共同决定，不是核公式本身的固定标签。
+
+ \item \textbf{构造但不误称最优。} 独立同分布总体具有二阶矩，证明 $\bar X^2-S^2/n$ 无偏估计 $\mu^2$；再说明在哪个已讨论的模型中可以进一步称它为 UMVUE。\par
+ \textbf{解答线索：}一般总体由乘积核即可得到无偏性；正态双参数模型中它是完备充分统计量的函数，故为 UMVUE。无偏或 U 统计量形式本身不足以替代模型内的最优性论证。
+
+ \item \textbf{由秩恢复胜出次数。} 两组各有三个观测，$X$ 的合并秩为 $(2,4,6)$。求 $U_{3,3}$、原假设下 $R_X$ 的均值与方差，并说明为什么仅此观测结果不能证明两总体相同。\par
+ \textbf{答案：}$R_X=12$，胜出次数 $12-6=6$，$U_{3,3}=2/3$；原假设均值为 $21/2$、方差为 $21/4$。检验需参照零分布或近似分布，且不拒绝不等于证实原假设。
+
+ \item \textbf{证明题。} 不直接引用全方差公式，从 $R=U-\E(U\mid T)$ 的条件均值为零出发，证明 Rao--Blackwell 方差比较及其等号条件；说明充分性用在何处。\par
+ \textbf{解答线索：}先证残差与所有二阶可积 $T$ 的函数正交，再展开平方。方差恒等式对任意 $T$ 成立，充分性用来保证条件期望可取同一个参数无关的版本。
+
+ \item \textbf{退化证明题。} 在 $\zeta_1=0$、$\zeta_2>0$ 时，不依赖完整的高阶 Hoeffding 分解，证明扣除全部成对核后的余项在 $n$ 尺度可忽略。\par
+ \textbf{解答线索：}构造本章的 $q$，证明它的一、二阶条件投影均为零，再用重叠计数方差公式得到 $O(n^{-3})$；$m=2$ 时单独观察 $q=0$。最后仍须用有限谱 CLT 和统一尾界，才能确定极限分布。
+\end{enumerate}
+

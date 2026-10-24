@@ -1,5 +1,8 @@
 name: Build PDF
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
@@ -29,6 +32,18 @@ jobs:
           - root: chapter02.tex
             pdf: chapter02.pdf
             artifact: chapter-02-cn
+          - root: chapter03.tex
+            pdf: chapter03.pdf
+            artifact: chapter-03-cn
+          - root: chapter04.tex
+            pdf: chapter04.pdf
+            artifact: chapter-04-cn
+          - root: chapter05.tex
+            pdf: chapter05.pdf
+            artifact: chapter-05-cn
+          - root: complete.tex
+            pdf: complete.pdf
+            artifact: complete-cn
     steps:
       - uses: actions/checkout@v4
       - uses: xu-cheng/latex-action@v3

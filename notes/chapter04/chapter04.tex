@@ -274,7 +274,7 @@ $T\sim\operatorname{Gamma}(n,\text{scale }\theta)$，其自然参数 $-1/\theta$
 
 定义
 \[
- \mathcal U_0=\{V(X):\E_\theta V=0,\ 
+ \mathcal U_0=\{V(X):\E_\theta V=0,
  \E_\theta V^2<\infty\text{ 对所有 }\theta\in\Theta\}.
 \]
 这里 $V$ 必须是固定的数据函数。虽然 $X_1-\theta$ 在位置模型中可能有零均值，它含未知参数，不能据此列入 $\mathcal U_0$。若 $U,W$ 是同一目标的无偏估计，则 $W-U\in\mathcal U_0$；反之，$U+V$ 对每个 $V\in\mathcal U_0$ 都是无偏竞争者。
@@ -936,4 +936,3 @@ CLT 给出括号第一项趋于 $\sigma^2Z^2$，LLN 给出第二项依概率趋�
  \item \textbf{退化证明题。} 在 $\zeta_1=0$、$\zeta_2>0$ 时，不依赖完整的高阶 Hoeffding 分解，证明扣除全部成对核后的余项在 $n$ 尺度可忽略。\par
  \textbf{解答线索：}构造本章的 $q$，证明它的一、二阶条件投影均为零，再用重叠计数方差公式得到 $O(n^{-3})$；$m=2$ 时单独观察 $q=0$。最后仍须用有限谱 CLT 和统一尾界，才能确定极限分布。
 \end{enumerate}
-

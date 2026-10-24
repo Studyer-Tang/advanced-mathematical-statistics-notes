@@ -10,8 +10,9 @@ build_chapter() {
   if command -v latexmk >/dev/null 2>&1; then
     latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir="$build_dir" "$source.tex"
   elif command -v xelatex >/dev/null 2>&1; then
-    xelatex -interaction=nonstopmode -halt-on-error -output-directory="$build_dir" "$source.tex"
-    xelatex -interaction=nonstopmode -halt-on-error -output-directory="$build_dir" "$source.tex"
+    for pass in 1 2 3; do
+      xelatex -interaction=nonstopmode -halt-on-error -output-directory="$build_dir" "$source.tex"
+    done
   elif command -v tectonic >/dev/null 2>&1; then
     tectonic -X compile "$source.tex" --outdir "$build_dir" --keep-logs
   else
@@ -24,9 +25,13 @@ build_chapter() {
   fi
 }
 
-# A compilation failure must not publish only one chapter of a new edition.
-build_chapter main
-build_chapter chapter02
+# Compile the entire edition before replacing published PDFs.
+sources=(main chapter02 chapter03 chapter04 chapter05 complete)
+targets=(chapter-01-cn chapter-02-cn chapter-03-cn chapter-04-cn chapter-05-cn complete-cn)
+for source in "${sources[@]}"; do
+  build_chapter "$source"
+done
 mkdir -p output/pdf
-cp "$build_dir/main.pdf" output/pdf/chapter-01-cn.pdf
-cp "$build_dir/chapter02.pdf" output/pdf/chapter-02-cn.pdf
+for index in "${!sources[@]}"; do
+  cp "$build_dir/${sources[$index]}.pdf" "output/pdf/${targets[$index]}.pdf"
+done

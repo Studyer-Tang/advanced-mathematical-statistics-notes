@@ -9,6 +9,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+TARGETS = {"main": "chapter-01-cn", **{f"chapter{i:02}": f"chapter-{i:02}-cn" for i in range(2, 6)}, "complete": "complete-cn"}
 FAKE_COMPILER = '''import os
 from pathlib import Path
 import sys
@@ -37,11 +38,11 @@ class BuildScriptChecks(unittest.TestCase):
         project = Path(temporary.name)
         for name in ["build.sh", "build.ps1"]:
             shutil.copyfile(ROOT / name, project / name)
-        (project / "main.tex").touch()
-        (project / "chapter02.tex").touch()
+        for source in TARGETS:
+            (project / (source + ".tex")).touch()
         published = project / "output" / "pdf"
         published.mkdir(parents=True)
-        for name in ["chapter-01-cn.pdf", "chapter-02-cn.pdf"]:
+        for name in [target + ".pdf" for target in TARGETS.values()]:
             (published / name).write_bytes(b"previous " + name.encode())
         # A stale earlier build must never be mistaken for a successful new one.
         stale = project / "tmp" / "build" / "chapter02"
@@ -85,10 +86,10 @@ class BuildScriptChecks(unittest.TestCase):
     def backends(self):
         return ["xelatex"] if os.name == "nt" else ["latexmk", "xelatex", "tectonic"]
 
-    def test_second_chapter_failure_preserves_both_published_chapters(self):
+    def test_last_document_failure_preserves_complete_edition(self):
         for backend in self.backends:
             with self.subTest(backend=backend):
-                completed, published = self.build(backend, fail="chapter02")
+                completed, published = self.build(backend, fail="complete")
                 self.assertNotEqual(completed.returncode, 0)
                 for path in published.iterdir():
                     self.assertEqual(path.read_bytes(), b"previous " + path.name.encode())
@@ -96,18 +97,20 @@ class BuildScriptChecks(unittest.TestCase):
     def test_missing_compiler_output_does_not_publish_a_stale_pdf(self):
         for backend in self.backends:
             with self.subTest(backend=backend):
-                completed, published = self.build(backend, missing="chapter02")
+                completed, published = self.build(backend, missing="complete")
                 self.assertNotEqual(completed.returncode, 0)
                 for path in published.iterdir():
                     self.assertEqual(path.read_bytes(), b"previous " + path.name.encode())
 
-    def test_success_publishes_both_chapters(self):
+    def test_success_publishes_complete_edition(self):
         for backend in self.backends:
             with self.subTest(backend=backend):
                 completed, published = self.build(backend)
                 self.assertEqual(completed.returncode, 0, completed.stdout + completed.stderr)
-                self.assertEqual((published / "chapter-01-cn.pdf").read_bytes(), b"%PDF-1.5 new main")
-                self.assertEqual((published / "chapter-02-cn.pdf").read_bytes(), b"%PDF-1.5 new chapter02")
+                self.assertEqual(len(list(published.glob("*.pdf"))), len(TARGETS))
+                for source, target in TARGETS.items():
+                    self.assertEqual((published / (target + ".pdf")).read_bytes(), b"%PDF-1.5 new " + source.encode())
+
 
 
 if __name__ == "__main__":

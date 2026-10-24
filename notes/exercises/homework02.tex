@@ -1,0 +1,1711 @@
+\chapter{估计、信息与 U 统计量习题}
+
+本组对应第二次作业的全部 11 题。题意按数学条件重新表述。风险比较均在平方损失下进行；最优性总是相对于明确给定的模型和规则类。第 10 题沿用第 9 题的投影记号。
+
+\section{第 1 题 二项分布中不存在 1/p 的无偏估计}
+
+\textbf{题意。} $X\sim\operatorname{Bin}(n,p)$，$n$ 已知，$p\in(0,1)$ 未知，证明 $p^{-1}$ 不存在无偏估计。
+
+ 样本空间只有 $n+1$ 个点，任何统计量的期望都是关于 $p$ 的至多 $n$ 次多项式，不可能在整个 $(0,1)$ 上等于 $1/p$。
+
+\textbf{证明。} 反设存在统计量 $\delta(X)$，使得
+
+\[
+E_p\delta(X)=\frac1p,\qquad 0<p<1.
+\]
+
+记 $\delta(j)=d_j$。由于每个点 $j=0,\ldots,n$ 在每个 $p\in(0,1)$ 下都有正概率，而无偏估计要求期望存在且有限，故每个 $d_j$ 都是有限实数。于是
+
+\[
+P(p):=E_p\delta(X)
+=\sum_{j=0}^n d_j\binom nj p^j(1-p)^{n-j}
+\]
+
+是至多 $n$ 次多项式。无偏性给出
+
+\[
+pP(p)-1=0,\qquad 0<p<1.
+\]
+
+左边是一个多项式，却在区间 $(0,1)$ 上有无穷多个零点，因此必为零多项式。代入 $p=0$，得到 $-1=0$，矛盾。因此
+
+\[
+\boxed{\text{不存在 }p^{-1}\text{ 的无偏估计。}}
+\]
+
+ 这里把 $p=0$ 代入的是已经证明恒为零的多项式，不是擅自把参数空间扩大到 $p=0$。也可直接令 $p\downarrow0$：左边期望趋于有限的 $d_0$，右边 $1/p\to\infty$。
+
+\section{第 2 题 平方误差下的最优规则与最优线性无偏估计}
+
+\textbf{题意。} $X_1,\ldots,X_n$ 有共同有限均值 $\mu$ 和有限方差，估计 $\mu$，损失为 $(\delta-\mu)^2$。
+
+\subsection{(a) 所有估计量组成的规则类中不存在统一最优规则}
+
+ 任意常数规则都允许时，假如存在一个处处最优的规则，它必须在每个参数点都达到零风险，即从一份样本精确知道未知均值。正态子模型已经能排除这种可能。
+
+\textbf{证明。} 假设 $\delta^*(X)$ 在所有估计量中统一最优。对每个固定实数 $c$，常数规则 $\delta_c(X)\equiv c$ 都属于允许的规则类。因此在均值为 $\mu$ 的任意模型分布下，
+
+\[
+R_\mu(\delta^*)\le R_\mu(\delta_\mu)=0.
+\]
+
+这里 $\delta_\mu$ 的意思是：在比较真值 $\mu$ 处风险时，从全部常数规则中取数值恰为 $\mu$ 的那一个；并未允许实际估计规则依赖未知参数。
+
+风险非负，故上式强迫
+
+\[
+E_\mu(\delta^*-\mu)^2=0,
+\qquad
+\delta^*=\mu\quad P_\mu\text{-a.s.}
+\]
+
+现在只考虑题目允许的子模型
+
+\[
+X_1,\ldots,X_n\overset{\mathrm{i.i.d.}}{\sim}N(\mu,1),
+\qquad \mu\in\mathbb R.
+\]
+
+取两个不同的均值 $\mu_0\ne\mu_1$。这两个样本分布在 $\mathbb R^n$ 上的密度均处处为正，因此具有相同的零测集。由
+
+\[
+\delta^*=\mu_0\quad P_{\mu_0}\text{-a.s.}
+\]
+
+可推出
+
+\[
+\delta^*=\mu_0\quad P_{\mu_1}\text{-a.s.}
+\]
+
+但最优性同时要求 $\delta^*=\mu_1$，$P_{\mu_1}$-几乎处处成立，与 $\mu_0\ne\mu_1$ 矛盾。故不存在统一最优规则。
+
+\textbf{适用范围。} 仅凭“共同均值、有限方差”不能对任意另外指定的小模型都断言无最优规则。例如若模型只有 $X_1=\cdots=X_n=\mu$ 几乎处处的退化分布，则 $X_1$ 风险恒为零。上述证明针对本题通常意指的完整分布类；它包含正态子模型，所以结论成立。
+
+\subsection{(b) 独立、方差不同时的最优权重}
+
+设
+
+\[
+\operatorname{Var}(X_i)=\frac{\sigma^2}{a_i},
+\qquad a_i>0,\quad \sigma^2>0,
+\]
+
+其中 $a_i$ 已知。考虑
+
+\[
+\mathcal I_2=
+\left\{\sum_{i=1}^n c_iX_i:\ c_i\in\mathbb R,
+\sum_{i=1}^n c_i=1\right\}.
+\]
+
+\textbf{解。} 对 $\delta_c=\sum_i c_iX_i$，
+
+\[
+E\delta_c=\sum_i c_i\mu=\mu,
+\]
+
+故类内所有规则均无偏。利用独立性，
+
+\[
+R(\delta_c)=\operatorname{Var}(\delta_c)
+=\sigma^2\sum_{i=1}^n\frac{c_i^2}{a_i}.
+\]
+
+由 Cauchy--Schwarz 不等式，
+
+\[
+1=\left(\sum_i c_i\right)^2
+=\left(\sum_i\frac{c_i}{\sqrt{a_i}}\sqrt{a_i}\right)^2
+\le
+\left(\sum_i\frac{c_i^2}{a_i}\right)\left(\sum_i a_i\right).
+\]
+
+因此
+
+\[
+R(\delta_c)\ge\frac{\sigma^2}{\sum_i a_i}.
+\]
+
+等号成立当且仅当存在常数 $\lambda$，使
+
+\[
+\frac{c_i}{\sqrt{a_i}}=\lambda\sqrt{a_i},
+\qquad c_i=\lambda a_i.
+\]
+
+结合 $\sum_i c_i=1$，得 $\lambda=(\sum_i a_i)^{-1}$。所以
+
+\[
+\boxed{\delta^*=\frac{\sum_{i=1}^n a_iX_i}{\sum_{i=1}^n a_i}},
+\qquad
+\boxed{R(\delta^*)=\frac{\sigma^2}{\sum_{i=1}^n a_i}}.
+\]
+
+权重与方差的倒数成正比；公共未知因子 $\sigma^2$ 在权重归一化时消去，因此规则不依赖未知参数。
+
+\subsection{(c) 同分布且任意两项具有相同相关系数}
+
+设共同方差为 $\sigma^2>0$，且对所有 $i\ne j$，
+
+\[
+\operatorname{Cov}(X_i,X_j)=\rho\sigma^2.
+\]
+
+对 $\sum_i c_i=1$ 的规则仍有无偏性，并且
+
+\[
+\begin{aligned}
+R(\delta_c)
+&=\sigma^2\sum_i c_i^2
++2\rho\sigma^2\sum_{i<j}c_ic_j\\
+&=\sigma^2\left[
+(1-\rho)\sum_i c_i^2+\rho\left(\sum_i c_i\right)^2
+\right]\\
+&=\sigma^2\left[(1-\rho)\sum_i c_i^2+\rho\right].
+\end{aligned}
+\]
+
+相关矩阵必须半正定，故当 $n\ge2$ 时，
+
+\[
+-\frac1{n-1}\le\rho\le1.
+\]
+
+若 $\rho<1$，最小化风险等价于最小化 $\sum_i c_i^2$。再次用 Cauchy--Schwarz，
+
+\[
+1=\left(\sum_i c_i\right)^2\le n\sum_i c_i^2,
+\]
+
+等号当且仅当 $c_1=\cdots=c_n=1/n$。因此
+
+\[
+\boxed{\delta^*=\bar X},
+\qquad
+\boxed{R(\bar X)=\frac{\sigma^2}{n}[1+(n-1)\rho]}.
+\]
+
+若 $\rho=1$，上式风险对任何满足 $\sum_i c_i=1$ 的权重都等于 $\sigma^2$，所以所有类内规则均最优，$\bar X$ 仍是其中之一。若 $\rho=-1/(n-1)$，$\bar X$ 的风险为零。
+
+\section{第 3 题 有限参数空间中的一致性与任意收敛速度}
+
+\textbf{题意。} 参数空间 $\Theta=\{\theta_1,\ldots,\theta_k\}$ 有限，估计量 $T_n$ 也只取这些值。证明一致性等价于选对参数的概率趋于 1，并证明一致估计量具有任意正数列所指定的 $O_P(1)$ 收敛速度。
+
+\subsection{(a) 一致性当且仅当选对概率趋于 1}
+
+若参数空间只有一个点，结论显然。以下设至少有两个不同参数，并记
+
+\[
+d=\min_{i\ne j}|\theta_i-\theta_j|>0.
+\]
+
+固定真值 $\theta\in\Theta$。因为 $T_n\in\Theta$，只要 $T_n\ne\theta$，就有 $|T_n-\theta|\ge d$，所以
+
+\[
+\{T_n\ne\theta\}=\{|T_n-\theta|>d/2\}.
+\]
+
+若 $T_n\xrightarrow{P_\theta}\theta$，则
+
+\[
+P_\theta(T_n\ne\theta)
+=P_\theta(|T_n-\theta|>d/2)\to0.
+\]
+
+反过来，若 $P_\theta(T_n=\theta)\to1$，则对任意 $\varepsilon>0$，
+
+\[
+P_\theta(|T_n-\theta|>\varepsilon)
+\le P_\theta(T_n\ne\theta)\to0.
+\]
+
+因而
+
+\[
+\boxed{T_n\xrightarrow{P_\theta}\theta
+\iff P_\theta(T_n=\theta)\to1.}
+\]
+
+\subsection{(b) 任意正数列放大后的误差仍依概率趋于零}
+
+取任意确定性正数列 $a_n$，无需限制增长速度。对每个 $\varepsilon>0$，
+
+\[
+\{|a_n(T_n-\theta)|>\varepsilon\}\subseteq\{T_n\ne\theta\}.
+\]
+
+因此由 (a)，
+
+\[
+P_\theta(|a_n(T_n-\theta)|>\varepsilon)
+\le P_\theta(T_n\ne\theta)\to0.
+\]
+
+所以
+
+\[
+\boxed{a_n(T_n-\theta)\xrightarrow{P_\theta}0}.
+\]
+
+特别地，$a_n(T_n-\theta)=O_{P_\theta}(1)$，即通常定义下的 $a_n$-一致性。
+
+ 错误时，放大后的误差可能极大；但只要估计恰好正确，放大多少倍都仍是零。错误事件的概率趋于零已经足够控制依概率收敛。这里并没有推出放大误差的方差或期望也趋于零。
+
+\section{第 4 题 样本均值与样本中程的风险比较}
+
+\textbf{题意。} $n>2$，$X_i$ 独立同分布，二阶矩有限。记
+
+\[
+\bar X=\frac1n\sum_{i=1}^nX_i,\qquad
+T=\frac{X_{(1)}+X_{(n)}}2.
+\]
+
+在平方误差下比较二者估计位置参数 $\theta$ 的风险。
+
+\subsection{(a) 正态模型中样本均值严格优于中程}
+
+设 $X_i\overset{\mathrm{i.i.d.}}{\sim}N(\theta,\sigma^2)$，$\sigma>0$。
+
+\textbf{第一步：写出均值与残差分解。} 令
+
+\[
+R_i=X_i-\bar X,\qquad
+D=\frac{\min_iR_i+\max_iR_i}{2}.
+\]
+
+将每个观测都减去同一数 $\bar X$ 不改变排序，故
+
+\[
+T=\bar X+D.
+\]
+
+由于 $|D|\le\max_i|R_i|$，有 $D^2\le\sum_iR_i^2$，故 $E D^2<\infty$。
+
+\textbf{第二步：证明 D 与样本均值独立且均值为零。} 对每个 $i$，
+
+\[
+\operatorname{Cov}(\bar X,R_i)
+=\operatorname{Cov}(\bar X,X_i)-\operatorname{Var}(\bar X)
+=\frac{\sigma^2}{n}-\frac{\sigma^2}{n}=0.
+\]
+
+$(\bar X,R_1,\ldots,R_n)$ 联合正态，因此 $\bar X$ 与整个残差向量独立，从而与 $D$ 独立。
+
+残差向量关于零对称，即 $(R_i)_i$ 与 $(-R_i)_i$ 同分布，而
+
+\[
+D(-R_1,\ldots,-R_n)=-D(R_1,\ldots,R_n).
+\]
+
+因此 $ED=0$，于是 $ET=\theta$。利用独立性，
+
+\[
+R_\theta(T)
+=\operatorname{Var}(T)
+=\frac{\sigma^2}{n}+\operatorname{Var}(D)
+\ge\frac{\sigma^2}{n}
+=R_\theta(\bar X).
+\]
+
+\textbf{第三步：证明严格不等号。} 函数
+
+\[
+d(x)=\frac{\min_i x_i+\max_i x_i}{2}
+-\frac1n\sum_i x_i
+\]
+
+连续，并且在 $x=(0,\ldots,0,1)$ 处，
+
+\[
+d(x)=\frac12-\frac1n>0
+\]
+
+（这里使用了 $n>2$）。所以在该点的某个开邻域内，$d(x)>0$。正态样本的联合密度处处为正，该邻域具有正概率，故 $P(D\ne0)>0$。结合 $ED=0$，得到 $\operatorname{Var}(D)>0$。
+
+因此对所有 $\theta\in\mathbb R,\sigma>0$，
+
+\[
+\boxed{R_\theta(\bar X)<R_\theta(T)}.
+\]
+
+上述分解也说明 $E(T\mid\bar X)=\bar X$，因此可以把结论理解为 Rao--Blackwell 改进；严格性仍需第三步，不能仅凭“条件期望不增方差”省略。
+
+\subsection{(b) 单位长度均匀模型中中程严格优于样本均值}
+
+设 $X_i\sim U(\theta-\tfrac12,\theta+\tfrac12)$。令
+
+\[
+Y_i=X_i-\theta+\frac12\sim U(0,1),\qquad
+A=Y_{(1)},\quad B=Y_{(n)}.
+\]
+
+于是
+
+\[
+T-\theta=\frac{A+B-1}{2}.
+\]
+
+先计算所需次序统计量矩。最小值与最大值的密度分别为
+
+\[
+f_A(a)=n(1-a)^{n-1},\quad
+f_B(b)=nb^{n-1},\qquad 0<a,b<1.
+\]
+
+利用积分 $\int_0^1u^r(1-u)^sdu=r!s!/(r+s+1)!$，得到
+
+\[
+EA=\frac1{n+1},\qquad EA^2=\frac2{(n+1)(n+2)},
+\]
+
+\[
+EB=\frac n{n+1},\qquad EB^2=\frac n{n+2}.
+\]
+
+从而
+
+\[
+\operatorname{Var}(A)=\operatorname{Var}(B)
+=\frac{n}{(n+1)^2(n+2)}.
+\]
+
+为计算协方差，使用二者联合密度
+
+\[
+f_{A,B}(a,b)=n(n-1)(b-a)^{n-2},
+\qquad 0<a<b<1.
+\]
+
+该密度来自：选一个观测落在最小值附近、一个落在最大值附近，其余 $n-2$ 个都落在长度为 $b-a$ 的区间内。于是
+
+\[
+\begin{aligned}
+E(AB)
+&=n(n-1)\int_0^1\int_0^b ab(b-a)^{n-2}\,da\,db\\
+&=n(n-1)\int_0^1 b^{n+1}\,db
+\int_0^1u(1-u)^{n-2}\,du\\
+&=n(n-1)\frac1{n+2}\frac1{n(n-1)}
+=\frac1{n+2}.
+\end{aligned}
+\]
+
+第二行用了 $a=bu$。因此
+
+\[
+\operatorname{Cov}(A,B)
+=\frac1{n+2}-\frac n{(n+1)^2}
+=\frac1{(n+1)^2(n+2)}.
+\]
+
+因为 $EA+EB=1$，$T$ 无偏，而且
+
+\[
+\begin{aligned}
+R_\theta(T)
+&=\frac14\left[\operatorname{Var}(A)+\operatorname{Var}(B)
++2\operatorname{Cov}(A,B)\right]\\
+&=\boxed{\frac1{2(n+1)(n+2)}}.
+\end{aligned}
+\]
+
+另一方面，$\bar X$ 无偏，且
+
+\[
+R_\theta(\bar X)=\frac{\operatorname{Var}(X_1)}n
+=\frac1{12n}.
+\]
+
+二者之差为
+
+\[
+R_\theta(\bar X)-R_\theta(T)
+=\frac{(n+1)(n+2)-6n}{12n(n+1)(n+2)}
+=\frac{(n-1)(n-2)}{12n(n+1)(n+2)}>0.
+\]
+
+所以
+
+\[
+\boxed{R_\theta(T)<R_\theta(\bar X),\qquad n>2.}
+\]
+
+\subsection{(c) 构造互不支配的模型族}
+
+取
+
+\[
+\boxed{\mathcal P=
+\{N(\theta,1):\theta\in\mathbb R\}
+\ \cup\
+\{U(\theta-\tfrac12,\theta+\tfrac12):\theta\in\mathbb R\}.}
+\]
+
+估计目标统一定义为分布的均值 $\theta$。其中分布类型也未知，可以看成一个额外的干扰参数。
+
+在正态子族内，(a) 给出 $\bar X$ 的风险严格更小；在均匀子族内，(b) 给出 $T$ 的风险严格更小。因此在整个 $\mathcal P$ 上，两种规则都不能处处支配另一种，即
+
+\[
+\boxed{\bar X\text{ 与 }T\text{ 互不支配。}}
+\]
+
+这并不意味着二者在所有规则中都可容许；这里只证明它们彼此不能支配对方。
+
+\section{第 5 题 统计量不能增加 Fisher 信息}
+
+\textbf{题意。} 样本 $X$ 的密度为 $f_\theta$，统计量 $T=T(X)$ 的密度为 $g_\theta$，$\theta\in\mathbb R^k$。两种密度关于参数可微，且在参数有界区域内，其一阶导数分别有相对于支配测度可积的包络。证明：
+
+\begin{enumerate}
+\item $I_X(\theta)-I_T(\theta)$ 半正定；
+\item 若 $T$ 充分，则两者相等。
+
+\end{enumerate}
+以下在参数空间内点讨论，并按通常定义假设涉及的 Fisher 信息矩阵各项有限，以使矩阵差有意义。若某个方向的信息为无穷，应把结论理解为该方向上的扩展非负不等式，而不写“无穷减无穷”。
+
+ 先证明“统计量的得分＝样本得分在统计量条件下的平均”，再把信息之差写成残差的二阶矩。
+
+\subsection{准备 得分恒等式}
+
+将得分都写成列向量：
+
+\[
+S_X(X)=\nabla_\theta\log f_\theta(X),\qquad
+S_T(T)=\nabla_\theta\log g_\theta(T).
+\]
+
+密度为零处可把得分定义为零。在参数内点，非负可微函数 $\theta\mapsto f_\theta(x)$ 若在当前点为零，其梯度也为零；对 $g_\theta$ 同理。因此
+
+\[
+S_X(x)f_\theta(x)=\nabla_\theta f_\theta(x),\qquad
+S_T(t)g_\theta(t)=\nabla_\theta g_\theta(t)
+\]
+
+在积分意义下成立。题目的可积包络允许交换积分与求导，故
+
+\[
+E_\theta S_X
+=\int\nabla_\theta f_\theta\,d\nu
+=\nabla_\theta1=0,
+\qquad E_\theta S_T=0.
+\]
+
+取任意有界可测标量函数 $b$。由 $T$ 的分布是 $X$ 经统计量映射得到的分布，
+
+\[
+\int b(T(x))f_\theta(x)\,d\nu(x)
+=\int b(t)g_\theta(t)\,d\lambda(t).
+\]
+
+两侧关于 $\theta$ 求导，有
+
+\[
+\int b(T(x))\nabla_\theta f_\theta(x)\,d\nu(x)
+=\int b(t)\nabla_\theta g_\theta(t)\,d\lambda(t).
+\]
+
+于是
+
+\[
+E_\theta[b(T)S_X]=E_\theta[b(T)S_T(T)].
+\]
+
+$S_T(T)$ 是 $T$ 的可测函数，上式又对所有有界可测 $b$ 成立，因此由条件期望的刻画，
+
+\[
+\boxed{E_\theta(S_X\mid T)=S_T(T).}
+\tag{5.1}
+\]
+
+\subsection{(a) 信息差为非负定矩阵}
+
+令 $D=S_X-S_T(T)$。由 (5.1)，
+
+\[
+E_\theta(D\mid T)=0.
+\]
+
+因此
+
+\[
+E_\theta[D S_T(T)^\top]
+=E_\theta[E_\theta(D\mid T)S_T(T)^\top]=0,
+\]
+
+转置方向的交叉项也为零。展开得
+
+\[
+\begin{aligned}
+I_X(\theta)
+&=E_\theta(S_XS_X^\top)\\
+&=E_\theta[(S_T+D)(S_T+D)^\top]\\
+&=I_T(\theta)+E_\theta(DD^\top).
+\end{aligned}
+\]
+
+所以
+
+\[
+\boxed{I_X(\theta)-I_T(\theta)
+=E_\theta[(S_X-S_T)(S_X-S_T)^\top]\succeq0.}
+\]
+
+具体而言，对任意 $a\in\mathbb R^k$，
+
+\[
+a^\top[I_X-I_T]a
+=E_\theta[(a^\top D)^2]\ge0,
+\]
+
+这正是半正定的定义。
+
+\subsection{(b) 充分统计量保留全部 Fisher 信息}
+
+\textbf{需要证明的关键点是 $S_X=S_T(T)$ 几乎处处。} 只知道 (5.1) 还不够，因为一般条件平均会消去一部分随机波动。
+
+由充分性，对每个有界可测函数 $a(x)$，可以选择一个不依赖参数的函数 $K_a(t)$，使
+
+\[
+E_\theta[a(X)\mid T]=K_a(T)
+\]
+
+对所有 $\theta$ 成立，且 $|K_a|\le\sup|a|$。于是
+
+\[
+E_\theta a(X)=E_\theta K_a(T).
+\]
+
+对参数求导，题目的包络条件给出
+
+\[
+E_\theta[a(X)S_X(X)]
+=E_\theta[K_a(T)S_T(T)].
+\]
+
+再利用条件期望，
+
+\[
+E_\theta[K_a(T)S_T(T)]
+=E_\theta[E_\theta(a(X)\mid T)S_T(T)]
+=E_\theta[a(X)S_T(T)].
+\]
+
+因此对所有有界可测 $a$，
+
+\[
+E_\theta[a(X)(S_X-S_T(T))]=0.
+\]
+
+对差向量的第 $j$ 个分量 $D_j$，分别取 $a(X)=\mathbf1_{\{D_j>0\}}$ 和 $a(X)=\mathbf1_{\{D_j<0\}}$，得到其正部、负部的期望均为零，故 $D_j=0$ 几乎处处。逐分量可得
+
+\[
+S_X=S_T(T)\quad P_\theta\text{-a.s.}
+\]
+
+代入 (a) 的信息差公式，
+
+\[
+\boxed{I_X(\theta)=I_T(\theta).}
+\]
+
+\textbf{证明中的分工。} 可积包络负责交换求导与积分；充分性负责使 $K_a$ 对所有参数是同一个函数。若 $K_a$ 也随参数变化，求导时就会多出一项，上述证明不能照搬。
+
+\section{第 6 题 用似然比差分推导无偏估计的方差下界}
+
+\textbf{题意。} $X_1,\ldots,X_n$ 独立同分布，密度 $f_\theta(x)>0$，$\theta\in\Theta\subset\mathbb R$。证明原题给出的差分信息下界，并在整数均值的正态模型中计算其最大值。
+
+ Cramér--Rao 不等式用“参数的微小导数”与估计误差建立协方差。本题改用两个不同参数之间的似然比，不要求参数空间包含开区间。
+
+\subsection{(a) 一般下界}
+
+\textbf{证明。} 固定 $\theta$，取任意 $\Delta\ne0$ 且 $\theta+\Delta\in\Theta$。定义样本似然比
+
+\[
+L_\Delta
+=\prod_{i=1}^n
+\frac{f_{\theta+\Delta}(X_i)}{f_\theta(X_i)}.
+\]
+
+密度处处为正，故比值有定义。它是从 $P_\theta^{\otimes n}$ 到 $P_{\theta+\Delta}^{\otimes n}$ 的 Radon--Nikodym 导数，因此
+
+\[
+E_\theta L_\Delta=1,\qquad
+E_\theta[T L_\Delta]=E_{\theta+\Delta}T.
+\]
+
+由 $T$ 对所有参数无偏，
+
+\[
+E_\theta T=\theta,\qquad
+E_{\theta+\Delta}T=\theta+\Delta.
+\]
+
+所以
+
+\[
+\begin{aligned}
+E_\theta[(T-\theta)(L_\Delta-1)]
+&=E_\theta(TL_\Delta)-E_\theta T
+-\theta E_\theta L_\Delta+\theta\\
+&=(\theta+\Delta)-\theta-\theta+\theta\\
+&=\Delta.
+\end{aligned}
+\]
+
+若相关二阶矩有限，由 Cauchy--Schwarz，
+
+\[
+\Delta^2
+\le E_\theta(T-\theta)^2\,E_\theta(L_\Delta-1)^2
+=\operatorname{Var}_\theta(T)[E_\theta L_\Delta^2-1].
+\]
+
+独立性给出
+
+\[
+\begin{aligned}
+E_\theta L_\Delta^2
+&=\prod_{i=1}^n
+E_\theta\left[
+\frac{f_{\theta+\Delta}(X_i)^2}{f_\theta(X_i)^2}
+\right]\\
+&=\left[
+\int_{\mathbb R}
+\frac{f_{\theta+\Delta}(x)^2}{f_\theta(x)}\,dx
+\right]^n.
+\end{aligned}
+\]
+
+于是
+
+\[
+\operatorname{Var}_\theta(T)
+\ge
+\frac{\Delta^2}{
+\left[\displaystyle\int_{\mathbb R}
+\frac{f_{\theta+\Delta}(x)^2}{f_\theta(x)}\,dx\right]^n-1}.
+\]
+
+该不等式对每个允许的 $\Delta$ 都成立，取上确界得
+
+\[
+\boxed{
+\operatorname{Var}_\theta(T)\ge
+\sup_{\substack{\Delta\ne0\\\theta+\Delta\in\Theta}}
+\frac{\Delta^2}{
+\left[\displaystyle\int_{\mathbb R}
+\frac{f_{\theta+\Delta}(x)^2}{f_\theta(x)}\,dx\right]^n-1}.}
+\]
+
+若 $\operatorname{Var}_\theta(T)=\infty$，结论显然；若某个 $\Delta$ 的似然比二阶矩为无穷，则该项下界按 0 理解。若分母为零，则 $L_\Delta=1$ 几乎处处，两个样本分布相同，不可能同时有期望 $\theta$ 和 $\theta+\Delta$；所以在确有无偏估计的前提下，不会出现这一冲突。
+
+\subsection{(b) 整数均值的正态模型}
+
+设 $f_\theta$ 是 $N(\theta,\sigma^2)$ 的密度，$\sigma^2>0$ 已知，$\Theta=\mathbb Z$。一份观测的密度比为
+
+\[
+\frac{f_{\theta+\Delta}(x)}{f_\theta(x)}
+=\exp\left\{\frac{\Delta(x-\theta)}{\sigma^2}
+-\frac{\Delta^2}{2\sigma^2}\right\}.
+\]
+
+利用 $X-\theta\sim N(0,\sigma^2)$ 的矩母函数，
+
+\[
+\begin{aligned}
+\int\frac{f_{\theta+\Delta}(x)^2}{f_\theta(x)}\,dx
+&=E_\theta\exp\left\{
+\frac{2\Delta(X-\theta)}{\sigma^2}
+-\frac{\Delta^2}{\sigma^2}\right\}\\
+&=\exp\left\{
+\frac12\sigma^2\left(\frac{2\Delta}{\sigma^2}\right)^2
+-\frac{\Delta^2}{\sigma^2}\right\}\\
+&=e^{\Delta^2/\sigma^2}.
+\end{aligned}
+\]
+
+因此
+
+\[
+\operatorname{Var}_\theta(T)
+\ge\sup_{\Delta\in\mathbb Z\setminus\{0\}}
+\frac{\Delta^2}{e^{n\Delta^2/\sigma^2}-1}.
+\]
+
+下面确定上确界。令 $c=n/\sigma^2>0$，考虑
+
+\[
+\psi(u)=\frac{u}{e^{cu}-1},\qquad u>0.
+\]
+
+其导数为
+
+\[
+\psi'(u)=
+\frac{e^{cu}(1-cu)-1}{(e^{cu}-1)^2}.
+\]
+
+令 $v=cu>0$，$r(v)=e^v(1-v)-1$，则 $r(0)=0$ 且
+
+\[
+r'(v)=-ve^v<0,
+\]
+
+故 $r(v)<0$，进而 $\psi'(u)<0$。所以目标函数随 $\Delta^2$ 严格减小。在非零整数中，最小的 $\Delta^2$ 是 1，恰由 $\Delta=\pm1$ 取得。因此
+
+\[
+\boxed{\operatorname{Var}_\theta(T)
+\ge\frac1{e^{n/\sigma^2}-1},}
+\]
+
+且上确界在 $\Delta=\pm1$ 处取得。
+
+这里“上确界取得”是指选择差分 $\Delta$ 的最优化，不能据此断言存在无偏估计量达到这个方差下界。
+
+\section{第 7 题 一个有限离散模型中的 UMVUE 存在性}
+
+\textbf{题意。} 单个观测 $X$ 的分布为
+
+\[
+P_p(X=-1)=2p(1-p),\qquad
+P_p(X=k)=p^k(1-p)^{3-k},\ k=0,1,2,3,
+\]
+
+其中 $0<p<1$。分别判断 $p$ 与 $p(1-p)$ 是否存在 UMVUE。
+
+记 $q=1-p$。先核对概率和：
+
+\[
+2pq+q^3+pq^2+p^2q+p^3
+=2pq+(p^3+q^3)+pq(p+q)=1.
+\]
+
+ 在有限样本空间中，列出所有“期望恒为零的统计量”，再使用 UMVUE 的正交判别。
+
+\subsection{准备一 UMVUE 的正交判别及证明}
+
+设 $\delta$ 是目标函数的无偏估计。则
+
+\[
+\boxed{\delta\text{ 是 UMVUE}
+\iff E_p[\delta Z]=0
+\text{ 对所有零均值无偏统计量 }Z\text{ 及所有 }p.}
+\]
+
+这里“零均值无偏统计量”是指同一个 $Z(X)$ 满足 $E_pZ=0$ 对全部 $p$ 成立。
+
+\textbf{必要性。} $\delta+cZ$ 对任意实数 $c$ 仍然无偏。如果 $\delta$ 最优，则固定 $p$ 后，二次函数
+
+\[
+\operatorname{Var}_p(\delta+cZ)
+=\operatorname{Var}_p(\delta)
++2c\operatorname{Cov}_p(\delta,Z)
++c^2\operatorname{Var}_p(Z)
+\]
+
+必须在 $c=0$ 取得最小值。其一次项必须为零，即 $\operatorname{Cov}_p(\delta,Z)=0$。因 $E_pZ=0$，这等价于 $E_p(\delta Z)=0$。
+
+\textbf{充分性。} 任意其他无偏估计 $\tilde\delta$ 都可写为 $\delta+Z$，其中 $E_pZ=0$。由正交性，
+
+\[
+\operatorname{Var}_p(\tilde\delta)
+=\operatorname{Var}_p(\delta)+\operatorname{Var}_p(Z)
+\ge\operatorname{Var}_p(\delta).
+\]
+
+故 $\delta$ 是 UMVUE。
+
+\subsection{准备二 求所有均值恒为零的统计量}
+
+设 $Z$ 在 $-1,0,1,2,3$ 处的值分别为 $z_{-1},z_0,z_1,z_2,z_3$。则
+
+\[
+E_pZ=2z_{-1}p(1-p)+z_0(1-p)^3
++z_1p(1-p)^2+z_2p^2(1-p)+z_3p^3.
+\]
+
+它在整个 $(0,1)$ 上为零，当且仅当各次幂系数为零：
+
+\[
+\begin{cases}
+z_0=0,\\
+2z_{-1}-3z_0+z_1=0,\\
+-2z_{-1}+3z_0-2z_1+z_2=0,\\
+-z_0+z_1-z_2+z_3=0.
+\end{cases}
+\]
+
+依次得到
+
+\[
+z_0=0,\qquad z_1=-2z_{-1},\qquad
+z_2=-2z_{-1},\qquad z_3=0.
+\]
+
+所以所有零均值统计量均为下列 $Z_0$ 的常数倍：
+
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+$x$ & $-1$ & $0$ & $1$ & $2$ & $3$ \\
+\midrule
+$Z_0(x)$ & $1$ & $0$ & $-2$ & $-2$ & $0$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{准备三 把正交条件化为三个函数值相等}
+
+记 $\delta_x=\delta(x)$。则
+
+\[
+\begin{aligned}
+E_p(\delta Z_0)
+&=2pq\delta_{-1}-2pq^2\delta_1-2p^2q\delta_2\\
+&=2pq[\delta_{-1}-(1-p)\delta_1-p\delta_2].
+\end{aligned}
+\]
+
+由于 $pq>0$，该式对所有 $p$ 为零，当且仅当
+
+\[
+\boxed{\delta_{-1}=\delta_1=\delta_2.}
+\tag{7.1}
+\]
+
+因此，一个无偏估计是 UMVUE，当且仅当它满足 (7.1)。
+
+\subsection{(a) p 不存在 UMVUE}
+
+若 $\delta$ 对 $p$ 无偏，即 $E_p\delta=p$，比较上述期望多项式与 $p$ 的系数，可得全部无偏估计为
+
+\begin{center}
+\begin{tabular}{cccccc}
+\toprule
+$x$ & $-1$ & $0$ & $1$ & $2$ & $3$ \\
+\midrule
+$\delta_a(x)$ & $a$ & $0$ & $1-2a$ & $2-2a$ & $1$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+其中 $a\in\mathbb R$ 是不依赖未知参数的常数。
+
+验证过程为：常数项给出 $\delta_0=0$；一次项给出 $\delta_1=1-2a$；二次项给出 $\delta_2=2-2a$；三次项给出 $\delta_3=1$。
+
+但对所有 $a$，
+
+\[
+\delta_a(2)-\delta_a(1)=1,
+\]
+
+不可能满足 (7.1)。因此
+
+\[
+\boxed{p\text{ 有无偏估计，但不存在 UMVUE。}}
+\]
+
+例如取 $a=0$ 就给出一个无偏估计。不存在 UMVUE 不是因为无偏估计类为空，而是不存在一个无偏规则能在所有 $p$ 下同时达到该类的最小方差。
+
+还可直接看出矛盾来源：固定 $p$ 时，$\delta_a=\delta_0+aZ_0$ 的方差最小点为
+
+\[
+a^*(p)=-\frac{E_p(\delta_0 Z_0)}{E_pZ_0^2}
+=\frac{2pq(1+p)}{6pq}
+=\frac{1+p}{3}.
+\]
+
+它随未知 $p$ 变化，不能用一个固定的 $a$ 同时实现。
+
+\subsection{(b) p(1-p) 存在 UMVUE}
+
+按照 (7.1)，寻找在 $-1,1,2$ 处同取常数 $c$ 的无偏估计。令在 $0,3$ 处均为零，则其期望为
+
+\[
+c(2pq+pq^2+p^2q)=3cpq.
+\]
+
+取 $c=1/3$ 即得
+
+\[
+\boxed{\delta^*(X)=\frac13\mathbf1_{\{X\in\{-1,1,2\}\}}.}
+\]
+
+它满足
+
+\[
+E_p\delta^*=\frac13(3pq)=pq,
+\]
+
+且在 $-1,1,2$ 处函数值相等，故由正交判别，确为 UMVUE。
+
+其方差为
+
+\[
+\boxed{\operatorname{Var}_p(\delta^*)
+=\frac19(3pq)(1-3pq)
+=\frac{pq}{3}-p^2q^2.}
+\]
+
+ 不完备并不意味着“所有目标都没有 UMVUE”。这里同一个不完备模型中，$p$ 没有 UMVUE，而 $p(1-p)$ 有。
+
+\section{第 8 题 正态均值指数函数的 UMVUE 与 CR 下界}
+
+\textbf{题意。} $X_i\overset{\mathrm{i.i.d.}}{\sim}N(\mu,\sigma^2)$，$\mu\in\mathbb R$ 未知，$\sigma^2>0$ 已知，$t\ne0$ 固定。求 $e^{t\mu}$ 的 UMVUE，比较其方差与 CR 下界，并求二者比值的极限。
+
+\subsection{(a) 构造并证明 UMVUE}
+
+由于
+
+\[
+\bar X\sim N\left(\mu,\frac{\sigma^2}{n}\right),
+\]
+
+正态矩母函数给出
+
+\[
+E_\mu e^{t\bar X}
+=\exp\left(t\mu+\frac{t^2\sigma^2}{2n}\right).
+\]
+
+因此
+
+\[
+\widehat g
+=\exp\left(t\bar X-\frac{t^2\sigma^2}{2n}\right)
+\]
+
+满足 $E_\mu\widehat g=e^{t\mu}$，是无偏估计。
+
+再证明其最优性。联合密度可写为
+
+\[
+f_\mu(x)
+=(2\pi\sigma^2)^{-n/2}
+\exp\left(-\frac{\sum_i x_i^2}{2\sigma^2}\right)
+\exp\left\{\frac{\mu}{\sigma^2}\sum_i x_i
+-\frac{n\mu^2}{2\sigma^2}\right\}.
+\]
+
+由因子分解定理，$\sum_iX_i$ 充分。它构成自然参数 $\eta=\mu/\sigma^2\in\mathbb R$ 的一参数指数族，自然参数空间含非空开区间，因此由指数族完备性定理，$\sum_iX_i$ 完备。$\bar X$ 是它的一一变换，亦完备且充分。
+
+$\widehat g$ 是完备充分统计量 $\bar X$ 的无偏函数，且正态指数矩有限，故由 Lehmann--Scheffé 定理，
+
+\[
+\boxed{\operatorname{UMVUE}(e^{t\mu})
+=\exp\left(t\bar X-\frac{t^2\sigma^2}{2n}\right).}
+\]
+
+\subsection{(b) 精确方差严格大于 CR 下界}
+
+记 $a=t^2\sigma^2/n>0$。先计算二阶矩：
+
+\[
+\begin{aligned}
+E_\mu\widehat g^{\,2}
+&=e^{-t^2\sigma^2/n}E_\mu e^{2t\bar X}\\
+&=e^{-t^2\sigma^2/n}
+\exp\left(2t\mu+\frac{(2t)^2\sigma^2}{2n}\right)\\
+&=\exp(2t\mu+a).
+\end{aligned}
+\]
+
+所以
+
+\[
+\boxed{\operatorname{Var}_\mu(\widehat g)
+=e^{2t\mu}(e^a-1).}
+\]
+
+另一方面，一份观测的得分与信息为
+
+\[
+S_\mu(X)=\frac{X-\mu}{\sigma^2},
+\qquad I_1(\mu)=\frac1{\sigma^2}.
+\]
+
+样本信息为 $I_n(\mu)=n/\sigma^2$。对 $g(\mu)=e^{t\mu}$，有 $g'(\mu)=te^{t\mu}$，故无偏估计的 CR 下界为
+
+\[
+\mathrm{CRLB}
+=\frac{[g'(\mu)]^2}{I_n(\mu)}
+=\frac{t^2\sigma^2}{n}e^{2t\mu}
+=ae^{2t\mu}.
+\]
+
+当 $a>0$ 时，由
+
+\[
+e^a-1=\int_0^a e^u\,du>\int_0^a1\,du=a,
+\]
+
+可得
+
+\[
+\boxed{\operatorname{Var}_\mu(\widehat g)>\mathrm{CRLB}.}
+\]
+
+\subsection{(c) 方差与下界之比趋于 1}
+
+由前面的公式，
+
+\[
+\frac{\operatorname{Var}_\mu(\widehat g)}{\mathrm{CRLB}}
+=\frac{e^a-1}{a}.
+\]
+
+固定 $t,\sigma^2$，当 $n\to\infty$ 时 $a\to0$，且
+
+\[
+\frac{e^a-1}{a}
+=\int_0^1 e^{av}\,dv\to1.
+\]
+
+因此
+
+\[
+\boxed{
+\frac{\operatorname{Var}_\mu(\widehat g)}{\mathrm{CRLB}}\longrightarrow1.}
+\]
+
+ UMVUE 的意思是在所有无偏估计中方差最小，不意味着必须达到 CR 下界。本题中有限样本下界不可达，但 UMVUE 的方差与下界在一阶渐近意义下相同。
+
+\section{第 9 题 U 统计量的条件投影及协方差}
+
+\textbf{题意与记号。} $X_1,\ldots,X_n$ 独立同分布，$h$ 为对称的 $m$ 元核，$m\le n$。假定
+\[
+ E h(X_1,\ldots,X_m)^2<\infty.
+\]
+定义
+\[
+\begin{gathered}
+ U_n=\binom nm^{-1}\sum_{1\le i_1<\cdots<i_m\le n}h(X_{i_1},\ldots,X_{i_m}),\\
+ \vartheta=E h(X_1,\ldots,X_m).
+\end{gathered}
+\]
+
+\[
+h_k(x_1,\ldots,x_k)
+=E[h(x_1,\ldots,x_k,X_{k+1},\ldots,X_m)],
+\qquad k=1,\ldots,m,
+\]
+
+其中 $h_m=h$。记
+
+\[
+\widetilde h_k=h_k-\vartheta,\qquad
+\widetilde h=h-\vartheta,\qquad
+\zeta_k=\operatorname{Var}(h_k(X_1,\ldots,X_k)).
+\]
+
+ $h_k$ 保留前 $k$ 个观测，把剩下的 $m-k$ 个观测平均掉。作为随机变量，
+
+\[
+h_k(X_1,\ldots,X_k)
+=E[h(X_1,\ldots,X_m)\mid X_1,\ldots,X_k].
+\tag{9.1}
+\]
+
+二阶可积性保证 $h$ 一阶可积，故可以使用 Fubini 定理与条件期望；由条件 Jensen 不等式，
+
+\[
+E[h_k(X_1,\ldots,X_k)^2]\le E[h(X_1,\ldots,X_m)^2]<\infty.
+\]
+
+对任意具体 $x_1,\ldots,x_k$ 的积分公式在积分存在处使用；条件期望恒等式均按几乎处处理解。仅有题目的二阶矩条件，不需要也不能额外假定每个样本空间点上的截面积分都有限。
+
+\subsection{(a) 逐次积分恒等式}
+
+\textbf{证明。} 对 $1\le k\le m-1$，利用独立同分布性和 Fubini 定理，
+
+\[
+\begin{aligned}
+&E[h_{k+1}(x_1,\ldots,x_k,X_{k+1})]\\
+&=\int h_{k+1}(x_1,\ldots,x_k,u_{k+1})\,dP(u_{k+1})\\
+&=\int\cdots\int
+h(x_1,\ldots,x_k,u_{k+1},\ldots,u_m)
+\prod_{j=k+1}^m dP(u_j)\\
+&=h_k(x_1,\ldots,x_k).
+\end{aligned}
+\]
+
+所以
+
+\[
+\boxed{h_k(x_1,\ldots,x_k)
+=E[h_{k+1}(x_1,\ldots,x_k,X_{k+1})].}
+\]
+
+随机变量形式就是塔式法则：
+
+\[
+E[h_{k+1}(X_1,\ldots,X_{k+1})\mid X_1,\ldots,X_k]
+=h_k(X_1,\ldots,X_k).
+\]
+
+\subsection{(b) 中心化 U 统计量等于中心化核的平均}
+
+每一个 $m$ 元子样本都与 $(X_1,\ldots,X_m)$ 同分布，所以每项核的期望均为 $\vartheta$。求和中共有 $\binom nm$ 项，因此
+
+\[
+EU_n=\binom nm^{-1}\binom nm\,\vartheta=\vartheta.
+\]
+
+于是
+
+\[
+\begin{aligned}
+U_n-EU_n
+&=\binom nm^{-1}\sum_{i_1<\cdots<i_m}h(X_{i_1},\ldots,X_{i_m})
+-\vartheta\\
+&=\binom nm^{-1}\sum_{i_1<\cdots<i_m}
+[h(X_{i_1},\ldots,X_{i_m})-\vartheta]\\
+&=\boxed{\binom nm^{-1}\sum_{i_1<\cdots<i_m}
+\widetilde h(X_{i_1},\ldots,X_{i_m})}.
+\end{aligned}
+\]
+
+\subsection{(c) 重叠下标数决定两个核的协方差}
+
+\textbf{证明。} 先考虑 $1\le k<m$。因为核对称且样本独立同分布，可以把两组核中的共同观测记为向量 $Z$，各自剩余观测记为 $A,B$。其中 $Z$ 有 $k$ 项，$A,B$ 各有 $m-k$ 项，三组相互独立。
+
+两项中心化核可写成
+
+\[
+\widetilde h(Z,A),\qquad \widetilde h(Z,B).
+\]
+
+给定 $Z$ 后，$A$ 与 $B$ 仍相互独立，因此两个核条件独立。由条件期望与 (9.1)，
+
+\[
+E[\widetilde h(Z,A)\mid Z]
+=h_k(Z)-\vartheta,
+\]
+
+对另一个核同样成立。故
+
+\[
+\begin{aligned}
+E[\widetilde h(Z,A)\widetilde h(Z,B)]
+&=E\{E[\widetilde h(Z,A)\widetilde h(Z,B)\mid Z]\}\\
+&=E\{E[\widetilde h(Z,A)\mid Z]\,
+E[\widetilde h(Z,B)\mid Z]\}\\
+&=E[(h_k(Z)-\vartheta)^2]\\
+&=\operatorname{Var}(h_k(Z))\\
+&=\zeta_k.
+\end{aligned}
+\]
+
+倒数第二步用了 $E h_k(Z)=\vartheta$，这也是塔式法则的直接结果。
+
+若 $k=m$，两组下标完全相同，核对称使两项核相同，此时期望直接等于
+
+\[
+E\widetilde h^2=\operatorname{Var}(h)=\zeta_m.
+\]
+
+因此对所有题设的 $k$，
+
+\[
+\boxed{
+E[\widetilde h(X_{i_1},\ldots,X_{i_m})
+\widetilde h(X_{j_1},\ldots,X_{j_m})]=\zeta_k.}
+\]
+
+补充：若没有共同下标，即 $k=0$，两项核独立且已中心化，协方差为零。
+
+\subsection{(d) 投影方差随保留的变量个数单调不减}
+
+记
+
+\[
+H_k=h_k(X_1,\ldots,X_k),\qquad
+\mathcal F_k=\sigma(X_1,\ldots,X_k).
+\]
+
+由 (a)，$E(H_{k+1}\mid\mathcal F_k)=H_k$。利用全方差公式，
+
+\[
+\begin{aligned}
+\zeta_{k+1}
+&=\operatorname{Var}(H_{k+1})\\
+&=\operatorname{Var}(E[H_{k+1}\mid\mathcal F_k])
++E[\operatorname{Var}(H_{k+1}\mid\mathcal F_k)]\\
+&=\zeta_k+E[\operatorname{Var}(H_{k+1}\mid\mathcal F_k)]\\
+&\ge\zeta_k.
+\end{aligned}
+\]
+
+所以
+
+\[
+\boxed{0\le\zeta_1\le\zeta_2\le\cdots\le\zeta_m.}
+\]
+
+ 保留的观测越多，平均掉的随机性越少，条件平均本身可以有更大的波动。这里不是说“信息越多，估计误差越大”，而是在比较同一个核的不同条件投影的方差。
+
+\section{第 10 题 三个观测之和为负的 U 统计量}
+
+\textbf{题意。} $n\ge3$，$X_i$ 为独立同分布实值随机变量，核为
+
+\[
+h(x_1,x_2,x_3)=\mathbf1_{\{x_1+x_2+x_3<0\}}.
+\]
+
+沿用第 9 题记号，写出 $U_n$、$h_1,h_2,h_3$ 和 $\zeta_1,\zeta_2,\zeta_3$。
+
+\subsection{第一步 约定分布函数并处理严格不等号}
+
+设
+
+\[
+F(u)=P(X_1\le u),\qquad
+F(u-)=P(X_1<u).
+\]
+
+记两个独立观测之和的分布函数为
+
+\[
+F_2(u)=P(X_1+X_2\le u),
+\qquad F_2(u-)=P(X_1+X_2<u).
+\]
+
+题目没有假设连续分布，所以阈值处可能有正概率，必须保留左极限。令
+
+\[
+\vartheta=P(X_1+X_2+X_3<0).
+\]
+
+\subsection{第二步 写出 U 统计量}
+
+核显然对称，且 $0\le h\le1$，故二阶矩条件自动满足。所求统计量为
+
+\[
+\boxed{
+U_n=\binom n3^{-1}
+\sum_{1\le i<j<\ell\le n}
+\mathbf1_{\{X_i+X_j+X_\ell<0\}}.}
+\]
+
+它是所有三元子样本中“总和为负”的比例，且 $EU_n=\vartheta$。
+
+\subsection{第三步 计算条件投影}
+
+固定第一个观测为 $x$，对其余两个取期望：
+
+\[
+\begin{aligned}
+h_1(x)
+&=P(x+X_2+X_3<0)\\
+&=P(X_2+X_3<-x)\\
+&=\boxed{F_2((-x)-)}\\
+&=\int_{\mathbb R}F((-x-y)-)\,dF(y).
+\end{aligned}
+\]
+
+这里 $F_2((-x)-)$ 表示在点 $-x$ 处的左极限。
+
+固定前两个观测为 $x_1,x_2$，则
+
+\[
+h_2(x_1,x_2)
+=P(X_3<-x_1-x_2)
+=\boxed{F((-x_1-x_2)-)}.
+\]
+
+三个观测都固定时，没有剩余随机变量需要平均，所以
+
+\[
+\boxed{h_3(x_1,x_2,x_3)
+=\mathbf1_{\{x_1+x_2+x_3<0\}}.}
+\]
+
+同时，
+
+\[
+\vartheta=\int F_2((-x)-)\,dF(x)
+=\iint F((-x-y)-)\,dF(x)\,dF(y).
+\]
+
+\subsection{第四步 计算三个投影方差}
+
+由于 $E h_k=\vartheta$，
+
+\[
+\zeta_k=E h_k^2-\vartheta^2.
+\]
+
+逐一代入得
+
+\[
+\boxed{
+\zeta_1=\int_{\mathbb R}
+[F_2((-x)-)]^2\,dF(x)-\vartheta^2,}
+\]
+
+\[
+\boxed{
+\zeta_2=\iint_{\mathbb R^2}
+[F((-x-y)-)]^2\,dF(x)\,dF(y)-\vartheta^2.}
+\]
+
+最后 $h_3$ 是概率为 $\vartheta$ 的 0--1 随机变量，故
+
+\[
+\boxed{\zeta_3=\vartheta(1-\vartheta).}
+\]
+
+原题没有指定共同分布 $F$，因此这些分布积分就是一般情形下的完整答案，不能给出统一数值。若另有连续分布假设，才可以将相应左极限写成通常的分布函数值。
+
+\section{第 11 题 均值与倒数均值乘积的 U 统计量}
+
+\textbf{题意。} $n\ge2$，$X_i$ 独立同分布，并满足
+
+\[
+E X_1^2<\infty,\qquad E X_1^{-2}<\infty.
+\]
+
+记
+
+\[
+\mu=E X_1,\qquad \bar\mu=E(X_1^{-1}).
+\]
+
+构造 $\mu\bar\mu$ 的无偏 U 统计量，求精确方差及渐近分布。
+
+为避免将题目的 $\bar\mu$ 与样本均值混淆，下文令
+
+\[
+\beta=\bar\mu=E(X_1^{-1}),\qquad
+\tau=\mu\beta,\qquad
+A=EX_1^2,\quad B=EX_1^{-2}.
+\]
+
+逆二阶矩有限意味着 $P(X_1=0)=0$；由 Cauchy--Schwarz，$E|X_1|$ 与 $E|X_1^{-1}|$ 均有限。因此下面涉及的期望都有定义。
+
+\subsection{(a) 构造对称二元核并验证无偏性}
+
+两个独立观测满足
+
+\[
+E\frac{X_1}{X_2}
+=E X_1\cdot E X_2^{-1}
+=\mu\beta.
+\]
+
+但 $x_1/x_2$ 不是对称核，所以取对称化
+
+\[
+\boxed{h(x,y)=\frac12\left(\frac{x}{y}+\frac{y}{x}\right)}.
+\]
+
+于是
+
+\[
+Eh(X_1,X_2)
+=\frac12(\mu\beta+\mu\beta)=\tau.
+\]
+
+对应的二阶 U 统计量为
+
+\[
+\begin{aligned}
+U_n
+&=\binom n2^{-1}\sum_{i<j}
+\frac12\left(\frac{X_i}{X_j}+\frac{X_j}{X_i}\right)\\
+&=\boxed{\frac1{n(n-1)}\sum_{i\ne j}\frac{X_i}{X_j}}.
+\end{aligned}
+\]
+
+每项的期望均为 $\tau$，共有 $n(n-1)$ 项，所以
+
+\[
+\boxed{EU_n=\tau=\mu\bar\mu.}
+\]
+
+为了后续渐近分析，再记
+
+\[
+\bar X_n=\frac1n\sum_iX_i,\qquad
+\bar Y_n=\frac1n\sum_iX_i^{-1}.
+\]
+
+由于
+
+\[
+\left(\sum_iX_i\right)\left(\sum_jX_j^{-1}\right)
+=\sum_{i\ne j}\frac{X_i}{X_j}+n,
+\]
+
+得到重要的等价表达式
+
+\[
+\boxed{U_n=\frac{n\bar X_n\bar Y_n-1}{n-1}.}
+\tag{11.1}
+\]
+
+注意 $\bar Y_n$ 是“倒数的平均”，一般不等于 $1/\bar X_n$。
+
+\subsection{(b) 计算一阶投影方差与核方差}
+
+固定第一个变量为 $x$，有
+
+\[
+h_1(x)=E[h(x,X_2)]
+=\frac12\left(xE X_2^{-1}+\frac{E X_2}{x}\right)
+=\boxed{\frac12\left(\beta x+\frac{\mu}{x}\right)}.
+\]
+
+其期望为 $\tau$。平方后，
+
+\[
+h_1(X_1)^2
+=\frac14\left(\beta^2X_1^2+\mu^2X_1^{-2}+2\mu\beta\right).
+\]
+
+因此
+
+\[
+E h_1(X_1)^2=\frac14(\beta^2A+\mu^2B+2\tau),
+\]
+
+\[
+\boxed{
+\zeta_1
+=\frac14(\beta^2A+\mu^2B+2\tau-4\tau^2).}
+\tag{11.2}
+\]
+
+再计算核的二阶矩。由 $X_1/X_2$ 与 $X_2/X_1$ 的乘积恒为 1，
+
+\[
+h(X_1,X_2)^2
+=\frac14\left(\frac{X_1^2}{X_2^2}
++\frac{X_2^2}{X_1^2}+2\right).
+\]
+
+独立性给出 $E(X_1^2/X_2^2)=AB$，所以
+
+\[
+E h(X_1,X_2)^2=\frac12(AB+1)<\infty.
+\]
+
+因此
+
+\[
+\boxed{\zeta_2=\frac12(AB+1)-\tau^2.}
+\tag{11.3}
+\]
+
+\subsection{(c) 通过核项重叠计数求精确方差}
+
+记 $H_{ij}=h(X_i,X_j)$，$i<j$，以及 $N=\binom n2$。则
+
+\[
+\operatorname{Var}(U_n)
+=\frac1{N^2}
+\sum_{i<j}\sum_{k<\ell}\operatorname{Cov}(H_{ij},H_{k\ell}).
+\]
+
+对固定的无序下标对 $\{i,j\}$，内层的 $\{k,\ell\}$ 分三类：
+
+\begin{enumerate}
+\item 完全相同：只有 1 对，协方差为 $\zeta_2$。
+\item 恰有 1 个共同下标：从 $i,j$ 中选共同的一个，再从其余 $n-2$ 个中选另一个，共 $2(n-2)$ 对。由第 9(c) 题，协方差为 $\zeta_1$。
+\item 没有共同下标：两项核独立，协方差为 0。
+
+\end{enumerate}
+外层共有 $N$ 对，故
+
+\[
+\begin{aligned}
+\operatorname{Var}(U_n)
+&=\frac{N[\zeta_2+2(n-2)\zeta_1]}{N^2}\\
+&=\boxed{
+\frac{4(n-2)}{n(n-1)}\zeta_1
++\frac2{n(n-1)}\zeta_2}.
+\end{aligned}
+\tag{11.4}
+\]
+
+这里双重求和本身就是有序的“核项对”求和，所以 $2(n-2)$ 不需再除以 2。
+
+代入 (11.2)、(11.3)，也可写为
+
+\[
+\boxed{
+\operatorname{Var}(U_n)=
+\frac{(n-2)(\beta^2A+\mu^2B+2\tau-4\tau^2)
++AB+1-2\tau^2}{n(n-1)}.}
+\tag{11.5}
+\]
+
+当 $n=2$ 时，(11.4) 给出 $\operatorname{Var}(U_2)=\zeta_2$，与 $U_2=h(X_1,X_2)$ 一致。
+
+\subsection{(d) 一般的一阶渐近分布}
+
+令
+
+\[
+V_i=\begin{pmatrix}X_i\\X_i^{-1}\end{pmatrix}.
+\]
+
+因为两项都有有限二阶矩，多元中心极限定理给出
+
+\[
+\sqrt n
+\begin{pmatrix}
+\bar X_n-\mu\\
+\bar Y_n-\beta
+\end{pmatrix}
+\xrightarrow{d}
+\begin{pmatrix}G_1\\G_2\end{pmatrix}
+\sim N_2(0,\Sigma),
+\]
+
+其中
+
+\[
+\Sigma=
+\begin{pmatrix}
+A-\mu^2 & 1-\tau\\
+1-\tau & B-\beta^2
+\end{pmatrix}.
+\tag{11.6}
+\]
+
+非对角项来自
+
+\[
+\operatorname{Cov}(X_1,X_1^{-1})
+=E(X_1X_1^{-1})-\mu\beta=1-\tau.
+\]
+
+写
+
+\[
+D_{X,n}=\bar X_n-\mu,\qquad
+D_{Y,n}=\bar Y_n-\beta.
+\]
+
+直接展开乘积：
+
+\[
+\bar X_n\bar Y_n-\tau
+=\beta D_{X,n}+\mu D_{Y,n}+D_{X,n}D_{Y,n}.
+\tag{11.7}
+\]
+
+由 CLT，$D_{X,n},D_{Y,n}=O_P(n^{-1/2})$，故
+
+\[
+\sqrt n D_{X,n}D_{Y,n}=O_P(n^{-1/2})=o_P(1).
+\]
+
+由 (11.1)，
+
+\[
+\begin{aligned}
+\sqrt n(U_n-\tau)
+&=\frac n{n-1}\sqrt n(\bar X_n\bar Y_n-\tau)
++\frac{\sqrt n}{n-1}(\tau-1)\\
+&=\frac n{n-1}
+\left[\beta\sqrt n D_{X,n}+\mu\sqrt n D_{Y,n}\right]+o_P(1).
+\end{aligned}
+\]
+
+应用连续映射与 Slutsky 定理，
+
+\[
+\sqrt n(U_n-\tau)\xrightarrow d\beta G_1+\mu G_2.
+\]
+
+极限为均值零的正态变量，其方差为
+
+\[
+\begin{aligned}
+V
+&=(\beta,\mu)\Sigma(\beta,\mu)^\top\\
+&=\beta^2(A-\mu^2)+\mu^2(B-\beta^2)+2\mu\beta(1-\tau)\\
+&=\beta^2A+\mu^2B+2\tau-4\tau^2\\
+&=4\zeta_1.
+\end{aligned}
+\]
+
+因此一般成立
+
+\[
+\boxed{
+\sqrt n(U_n-\mu\bar\mu)
+\xrightarrow d
+N\left(0,\,
+\bar\mu^2EX_1^2+\mu^2EX_1^{-2}
++2\mu\bar\mu-4\mu^2\bar\mu^2\right).}
+\tag{11.8}
+\]
+
+这里允许方差为零；$N(0,0)$ 表示集中在零点的退化分布。若 $V>0$，还可写成通常的标准化形式
+
+\[
+\boxed{\frac{\sqrt n(U_n-\tau)}{\sqrt V}\xrightarrow dN(0,1).}
+\]
+
+\subsection{(e) 一阶退化时的极限}
+
+题设未假定 $\zeta_1>0$，故需区分一阶退化情形。若 $\zeta_1=0$，(11.8) 仍正确，但只告诉我们 $\sqrt n(U_n-\tau)\to_P0$。下面给出此时 $n$ 尺度的极限。
+
+由 $4\zeta_1=0$，均值为零的随机变量
+
+\[
+W=\beta(X_1-\mu)+\mu(X_1^{-1}-\beta)
+\]
+
+方差为零，故
+
+\[
+W=0\quad\text{a.s.}
+\]
+
+于是对每个 $n$，
+
+\[
+\beta D_{X,n}+\mu D_{Y,n}=0\quad\text{a.s.}
+\]
+
+代入 (11.7)，得到精确等式
+
+\[
+\bar X_n\bar Y_n-\tau=D_{X,n}D_{Y,n}.
+\]
+
+再由 (11.1)，
+
+\[
+n(U_n-\tau)
+=\frac n{n-1}
+\left[(\sqrt n D_{X,n})(\sqrt n D_{Y,n})+\tau-1\right].
+\]
+
+使用联合 CLT 与连续映射定理，得到
+
+\[
+\boxed{n(U_n-\tau)\xrightarrow dG_1G_2+\tau-1,\qquad \zeta_1=0,}
+\tag{11.9}
+\]
+
+其中 $(G_1,G_2)$ 的协方差仍由 (11.6) 给出。这个极限一般不是正态；若模型进一步退化，也可能恒为零。
+
+\textbf{具体例子。} 若 $P(X_1=1)=P(X_1=-1)=1/2$，则
+
+\[
+\mu=\beta=0,\quad A=B=1,\quad X_1^{-1}=X_1.
+\]
+
+所以 $\tau=0,\zeta_1=0$，并且 $G_1=G_2=Z$，$Z\sim N(0,1)$。此时
+
+\[
+U_n=\frac{n\bar X_n^2-1}{n-1},
+\qquad
+\boxed{nU_n\xrightarrow d Z^2-1=\chi_1^2-1.}
+\]
+
+这说明题设确实允许一阶退化，补充分支不是多余假设。

@@ -1,0 +1,885 @@
+\chapter{假设检验与置信集合}
+
+估计问题要求给出参数的数值，检验问题则要求根据样本在两个参数集合之间作出判断。本章先固定第一类错误的上界，再比较备择下的拒绝概率。似然比决定证据的排序；充分性与完备性负责处理干扰参数；置信集合由一族检验反演得到。
+
+\begin{notebox}[阅读范围]
+本章按完整课件整理。检验、$p$ 值、Neyman--Pearson 引理、单侧 UMP 及双侧 UMP 不存在的内容，对应原课件第 1--27 页；无偏检验与 UMPU 从第 28 页开始。这里的收录范围不表示已独立完成全部证明和习题。
+\end{notebox}
+
+\section{检验、功效与比较的范围}
+
+设样本 $X$ 的分布属于 $\{P_\theta:\theta\in\Theta\}$，检验
+\[
+ H_0:\theta\in\Theta_0,\qquad H_1:\theta\in\Theta_1,
+ \qquad \Theta_0\cap\Theta_1=\varnothing.
+\]
+简单假设只指定一个分布；复合假设包含多个分布。例如正态模型中，若方差未知，即使把均值固定为 $\mu_0$，原假设仍是复合假设。
+
+\begin{definitionbox}{检验、功效、大小与水平}
+检验是可测函数 $\varphi:\mathcal X\to[0,1]$，其值表示观察到 $x$ 后拒绝原假设的概率。功效函数和大小分别为
+\[
+ \beta_\varphi(\theta)=\E_\theta\varphi(X),\qquad
+ \operatorname{size}(\varphi)=\sup_{\theta\in\Theta_0}\beta_\varphi(\theta).
+\]
+若大小不超过 $\alpha$，称为水平 $\alpha$ 检验；若大小恰为 $\alpha$，称为精确大小 $\alpha$ 的检验。在 $\Theta_0$ 上，$\beta_\varphi$ 是第一类错误概率；在 $\Theta_1$ 上，$1-\beta_\varphi$ 是第二类错误概率。
+\end{definitionbox}
+
+$\varphi(x)\in\{0,1\}$ 时规则不随机化。一般情形取与样本独立的 $V\sim U(0,1)$，在 $V\le\varphi(x)$ 时拒绝。对固定 $x$，有
+\[
+ P_V\{V\le\varphi(x)\}=\varphi(x),
+\]
+故这个实施步骤确实产生规定的条件拒绝概率。$\varphi$ 是规则，$V$ 用于实施规则，两者不能与功效函数混淆。
+
+总拒绝的功效恒为 1，但大小也为 1；总不拒绝没有第一类错误，却不能检出任何备择。因此最优性只能在规定的比较类中讨论。在水平约束下增大备择功效，等价于减小第二类错误，并不表示两个错误概率可以同时无约束地最小化。
+
+\begin{definitionbox}{MP 与 UMP}
+对固定简单备择，功效最大的水平 $\alpha$ 检验称为最有力检验（MP）。若同一个水平 $\alpha$ 检验 $\varphi^*$ 满足
+\[
+ \E_\theta\varphi^*\ge\E_\theta\psi,
+ \qquad \theta\in\Theta_1,
+\]
+对每个水平 $\alpha$ 检验 $\psi$ 都成立，则称为一致最有力检验（UMP）。这里的“一致”指同一个规则对所有备择都最优，与一致收敛无关。
+\end{definitionbox}
+
+精确大小是原假设上的上确界等于 $\alpha$，不要求每个原假设参数处的拒绝率都是 $\alpha$。这种逐点相等的性质称为相似性，后文另行讨论。
+
+\begin{examplebox}{练习 5.1：水平与功效}
+设 $Z\sim N(\delta,1)$，按 $Z>z_{1-\alpha}$ 拒绝，其中 $z_q=\Phi^{-1}(q)$。写出功效，并判断它是 $H_0:\delta\le0$ 的什么水平。
+
+\textbf{答案线索。} $\beta(\delta)=1-\Phi(z_{1-\alpha}-\delta)$ 随 $\delta$ 递增，故 $\sup_{\delta\le0}\beta(\delta)=\beta(0)=\alpha$。参数越负，拒绝率越低，说明精确大小不等于各点拒绝率相同。
+\end{examplebox}
+
+\section{p 值与离散边界随机化}
+
+\subsection{观察值与重复抽样}
+
+先考虑简单原假设 $P_0$，且统计量 $T$ 越大越支持备择。对已经观察到的数据 $x$，常规右尾 $p$ 值为
+\[
+ p(x)=P_0\{T(X')\ge T(x)\},\qquad X'\sim P_0.
+\]
+此时 $x$ 和 $T(x)$ 已固定，概率针对假想的重新抽样 $X'$。这个数衡量原假设下出现至少同样偏向备择的结果有多罕见，不是原假设为真的概率。实验前的 $p(X)$ 则是一个随机变量。
+
+\begin{examplebox}{正态右侧检验}
+设 $X_1,\ldots,X_{25}$ 独立服从 $N(\mu,10^2)$，检验 $\mu=100$ 对 $\mu>100$。若观察到 $\bar x=104$，则
+\[
+ z=\frac{\bar x-100}{10/\sqrt{25}}=2,\qquad
+ p(x)=P(Z'\ge2)=1-\Phi(2)\approx0.0228.
+\]
+在水平 $0.05$ 下拒绝，在水平 $0.01$ 下不拒绝。连续型统计量恰好等于观察值的概率为零，故用整块尾部概率衡量极端程度。
+\end{examplebox}
+
+\subsection{与嵌套拒绝域的联系}
+
+若拒绝域 $R_\alpha$ 随 $\alpha$ 单调扩张，定义
+\[
+ p_R(x)=\inf\{\alpha\in(0,1]:x\in R_\alpha\},\qquad R_1=\mathcal X.
+\]
+假设对 $0<u<1$ 有集合意义的右连续性
+\[
+ R_u=\bigcap_{v>u}R_v.
+\]
+则
+\[
+ \{x:p_R(x)\le u\}=R_u.
+\]
+证明如下：若 $x\in R_u$，下确界自然不超过 $u$。反之，若下确界不超过 $u$，则对每个 $v>u$ 都能找到某个 $\alpha<v$ 使 $x\in R_\alpha$；由嵌套性 $x\in R_v$，再用右连续性得到 $x\in R_u$。因此若 $P_0(R_u)\le u$，便有 $P_0\{p_R(X)\le u\}\le u$。
+
+正态右尾取 $R_\alpha=\{z:z\ge\Phi^{-1}(1-\alpha)\}$，直接计算
+\[
+ z\in R_\alpha
+ \iff \alpha\ge1-\Phi(z),
+\]
+所以 $p_R(x)=1-\Phi(z)=p(x)$。任意嵌套族的下确界不一定等于上述右尾概率；两者相等还依赖拒绝域按同一统计量的尾部排序构造。离散模型尤其要说明采用的边界与随机化约定。
+
+\subsection{均匀性、超均匀性与复合原假设}
+
+若 $T$ 在简单原假设下的分布函数 $F_0$ 连续，则概率积分变换给出
+\[
+ F_0(T)\sim U(0,1),\qquad p(X)=1-F_0(T)\sim U(0,1).
+\]
+故 $P_0\{p(X)\le u\}=u$。连续性已经足够，不必额外要求 $F_0$ 严格递增。
+
+一般称 $p$ 值有效，若
+\[
+ P_\theta\{p(X)\le u\}\le u,
+ \qquad 0\le u\le1,\quad\theta\in\Theta_0.
+\]
+这种性质称为超均匀性，使规则 $p\le\alpha$ 控制水平。复合原假设必须对其中每个参数都成立，不能任取一个原假设参数计算尾概率。
+
+一种通用构造是：若每个简单原假设下都有有效的 $p_\theta$，且上确界可测，则
+\[
+ p_{\rm sup}(x)=\sup_{\theta\in\Theta_0}p_\theta(x)
+\]
+在复合原假设下有效。因为真值为 $\theta$ 时，$p_{\rm sup}\ge p_\theta$，故
+\[
+ P_\theta(p_{\rm sup}\le u)\le P_\theta(p_\theta\le u)\le u.
+\]
+存在最不利边界分布时，这个上确界常可简化为边界处的尾概率。
+
+\subsection{离散概率质量怎样补足}
+
+对离散 $T$，记
+\[
+ a_t=P_0(T>t),\qquad m_t=P_0(T=t).
+\]
+若选 $c$ 使 $m_c>0$ 且 $a_c\le\alpha\le a_c+m_c$，则取
+\[
+ \gamma=\frac{\alpha-a_c}{m_c},\qquad
+ \varphi(x)=\ind_{\{T(x)>c\}}+\gamma\ind_{\{T(x)=c\}}.
+\]
+于是 $\E_0\varphi=a_c+\gamma m_c=\alpha$。分子是尚缺的拒绝概率，分母是边界整块概率；二者的比值正是边界上应拒绝的比例。
+
+\begin{examplebox}{二项分布：$15\%$ 的边界拒绝与 $10\%$ 的总拒绝}
+设 $T\sim\operatorname{Bin}(4,1/2)$，要求大小 $\alpha=0.10$。只拒绝 $T=4$ 的大小为 $1/16$；再把 $T=3$ 全部加入便成为 $5/16$，超过预算。故
+\[
+ c=3,\qquad
+ \gamma=\frac{1/10-1/16}{4/16}=\frac3{20}=0.15.
+\]
+$T=4$ 时全拒绝，$T=3$ 时取独立 $V\sim U(0,1)$，按 $V\le0.15$ 拒绝，其他值不拒绝。总拒绝概率为
+\[
+ \frac1{16}+\frac4{16}\times0.15=0.10.
+\]
+$0.15$ 是给定边界事件后的拒绝概率；$0.10$ 是对全部可能数据平均后的拒绝概率。
+\end{examplebox}
+
+定义随机化 $p$ 值
+\[
+ p_{\rm rand}(x,v)=a_{T(x)}+v m_{T(x)},\qquad
+ V\sim U(0,1),\quad V\perp X.
+\]
+观察到 $T=t$ 后，它在区间 $[a_t,a_t+m_t]$ 内均匀分布。这个区间的长度恰为该取值的概率 $m_t$。对任意
+$u\in[a_c,a_c+m_c]$，由独立性，
+\begin{align*}
+ P_0\{p_{\rm rand}(X,V)\le u\}
+ &=P_0(T>c)+P_0(T=c)
+       P\left(V\le\frac{u-a_c}{m_c}\right)\\
+ &=a_c+m_c\frac{u-a_c}{m_c}=u.
+\end{align*}
+各原子区间的内部互不相交，长度总和为 $\sum_t m_t=1$。给定 $T=t$ 时的条件密度为 $1/m_t$，再乘上选中该区间的概率 $m_t$，得到区间内无条件密度为 1；其余部分的 Lebesgue 测度为零。因此在简单离散原假设下
+\[
+ p_{\rm rand}(X,V)\sim U(0,1).
+\]
+按 $p_{\rm rand}\le\alpha$ 拒绝，恰好等价于前述边界随机化规则。常规尾概率 $p(X)=a_T+m_T$ 满足 $p(X)\ge p_{\rm rand}(X,V)$，从而
+\[
+ P_0\{p(X)\le u\}\le u.
+\]
+这同时说明离散常规 $p$ 值为何通常保守。
+
+\begin{examplebox}{练习 5.2：区分三种概率}
+在上述二项例子中，观察到 $T=3$。求常规 $p$ 值、随机化 $p$ 值，并写出其在水平 $0.10$ 下拒绝的条件。再证明常规 $p$ 值对应的非随机检验大小为 $1/16$。
+
+\textbf{答案线索。} $p=5/16$，$p_{\rm rand}=1/16+V/4$；后者不超过 $0.10$ 当且仅当 $V\le0.15$。常规规则只在 $T=4$ 时拒绝，所以大小为 $1/16<0.10$。
+\end{examplebox}
+
+\section{Neyman--Pearson 引理}
+
+\subsection{定理及临界值的存在}
+
+设 $P_0,P_1$ 对同一 $\sigma$-有限测度 $\nu$ 有密度 $f_0,f_1$。目标是
+\[
+ \max_{0\le\varphi\le1}\E_1\varphi,
+ \qquad \E_0\varphi\le\alpha.
+\]
+用密度差比直接相除更方便：当 $f_0=0<f_1$ 时，该点只支持备择，应拒绝。
+
+\begin{definitionbox}{Neyman--Pearson 引理}
+对 $0<\alpha<1$，存在有限 $c\ge0$ 及 $\gamma\in[0,1]$，使
+\[
+ \varphi^*=\ind_{\{f_1>cf_0\}}
+              +\gamma\ind_{\{f_1=cf_0\}},
+ \qquad \E_0\varphi^*=\alpha.
+\]
+它是检验 $P_0$ 对 $P_1$ 的 MP 水平 $\alpha$ 检验。任何同样最优的水平检验，在 $\{f_1\ne cf_0\}$ 上都与它相等，$\nu$-几乎处处。若 $c>0$，所有最优检验都必须具有精确大小 $\alpha$；$c=0$ 时最优功效为 1，不一定需要用满大小。
+\end{definitionbox}
+
+\textbf{临界值存在的证明。}
+在 $P_0$ 下，$f_0(X)>0$ 且两个密度可取有限版本，故似然比 $L=f_1(X)/f_0(X)$ 几乎处处有限且非负。令
+\[
+ q(t)=P_0(L>t),\qquad
+ c=\inf\{t:q(t)\le\alpha\}.
+\]
+$q$ 单调不增，$t<0$ 时为 1，$t\to\infty$ 时趋于 0；它右连续，且左极限为 $q(t-)=P_0(L\ge t)$。所以 $c\in[0,\infty)$，并有
+\[
+ q(c)\le\alpha\le q(c-).
+\]
+若差为正，令 $\gamma=[\alpha-q(c)]/[q(c-)-q(c)]$；若差为零，则两端均为 $\alpha$，取 $\gamma=0$。这使
+\[
+ \E_0\varphi^*=q(c)+\gamma P_0(L=c)=\alpha.
+\]
+在 $P_0$ 零概率但 $f_1>0$ 的区域按密度差规则全拒绝，不影响大小。
+
+\subsection{最优性与等号条件的证明}
+
+任取 $0\le\psi\le1$ 且 $\E_0\psi\le\alpha$。逐点有
+\[
+ D=(\varphi^*-\psi)(f_1-cf_0)\ge0.
+\]
+因为密度差为正处 $\varphi^*=1$，为负处 $\varphi^*=0$，等于零处乘积为零。因此
+\begin{align*}
+ \E_1\varphi^*-\E_1\psi
+ &=\int(\varphi^*-\psi)(f_1-cf_0)\,d\nu
+        +c\int(\varphi^*-\psi)f_0\,d\nu\\
+ &=\int D\,d\nu+c(\alpha-\E_0\psi)\ge0.
+\end{align*}
+若 $\psi$ 也最优，两个非负项都必须为零。$\int D=0$ 给出 $D=0$ 几乎处处，于是密度差严格为正处必须 $\psi=1$，严格为负处必须 $\psi=0$。等号边界的安排不受这一乘积限制，所以最优规则不一定唯一。若 $c>0$，第二项为零还强迫 $\E_0\psi=\alpha$。
+
+若 $c=0$，$\varphi^*=1$ 于 $\{f_1>0\}$，故其功效已为 1。更一般地，若规则 $\psi$ 的大小 $a<\alpha$ 且功效 $b<1$，令
+\[
+ \varepsilon=\frac{\alpha-a}{1-a},\qquad
+ \widetilde\psi=\psi+\varepsilon(1-\psi).
+\]
+则新规则大小恰为 $\alpha$，功效为 $b+\varepsilon(1-b)>b$。所以功效尚未到 1 的最优规则必须用满大小；这个结论不要求唯一性。
+
+\subsection{似然比平台与不同的最优规则}
+
+\begin{examplebox}{均匀分布端点：两个不同的 MP 检验}
+设 $X_i$ 独立服从 $U(0,\theta)$，$M=X_{(n)}$，检验 $\theta_0$ 对 $\theta_1>\theta_0$。在原假设支持上，似然比恒为
+$k=(\theta_0/\theta_1)^n$；在 $\theta_0\le M<\theta_1$ 的新增支持上为 $+\infty$。任意水平检验都满足
+\begin{align*}
+ \E_{\theta_1}\varphi
+ &=k\E_{\theta_0}\varphi
+   +\E_{\theta_1}[\varphi\ind_{\{M\ge\theta_0\}}]\\
+ &\le k\alpha+1-k
+ =1-(1-\alpha)(\theta_0/\theta_1)^n.
+\end{align*}
+令 $c_\alpha=\theta_0(1-\alpha)^{1/n}$，则
+\[
+ \varphi_A=\ind_{\{M>c_\alpha\}},\qquad
+ \varphi_B=\ind_{\{M>\theta_0\}}+
+              \alpha\ind_{\{M\le\theta_0\}}
+\]
+在 $\theta_0$ 下大小都为 $\alpha$，在 $\theta_1$ 下功效都达到上述上界。它们在原假设支持内采取不同安排，却没有改变任何相对证据的排序，因为该处似然比完全相同。
+\end{examplebox}
+
+\begin{examplebox}{练习 5.3：最优性与预算例外}
+设 $P_0=U(0,1)$，$P_1=U(0,\delta)$，其中 $0<\delta<\alpha$。证明 $\varphi=\ind_{\{X<\delta\}}$ 最优，但大小严格小于 $\alpha$。再指出 NP 引理的哪个条件允许这一现象。
+
+\textbf{答案线索。} 大小为 $\delta$，功效为 1，已达到上限；可取密度差阈值 $c=0$，所以不能使用 $c>0$ 时的精确大小结论。
+\end{examplebox}
+
+\section{单调似然比与单侧 UMP}
+
+\subsection{单调似然比与随机单调性}
+
+\begin{definitionbox}{单调似然比（MLR）}
+对任意 $\theta_1<\theta_2$，若 $f_{\theta_2}/f_{\theta_1}$ 在相关支持上可写成 $T$ 的非递减函数，则称模型在 $T$ 中有 MLR；分母为零、分子为正时按 $+\infty$ 处理。其交叉乘积形式要求：若 $T(x)\le T(y)$，则
+\[
+ f_{\theta_2}(y)f_{\theta_1}(x)
+ \ge f_{\theta_2}(x)f_{\theta_1}(y).
+\]
+各参数对的密度可选择适当版本，使上述比较在相关支持上成立。当 $T(x)=T(y)$ 时须同时作两个方向的比较，因而交叉乘积相等，保证同一个 $T$ 值对应同一个扩展似然比；只要求严格小于时的不等式不足以表达这一点。它表示较大的 $T$ 相对更支持较大的参数。共同支持是常用的充分背景条件，并非 MLR 的必要条件。
+\end{definitionbox}
+
+\textbf{MLR 推出随机单调性的证明。}
+在 $A=\{T\le t\}$、$B=\{T>t\}$ 上积分交叉乘积不等式，Tonelli 定理给出
+\[
+ P_{\theta_1}(A)P_{\theta_2}(B)
+ \ge P_{\theta_2}(A)P_{\theta_1}(B).
+\]
+令 $p_i=P_{\theta_i}(T>t)$，化为 $(1-p_1)p_2\ge(1-p_2)p_1$，故 $p_2\ge p_1$。同理 $P_\theta(T\ge t)$ 也随参数非递减。因此对固定 $c,\gamma$，
+\[
+ \E_\theta[\ind_{\{T>c\}}+\gamma\ind_{\{T=c\}}]
+ =(1-\gamma)P_\theta(T>c)+\gamma P_\theta(T\ge c)
+\]
+随参数非递减。这是分布的尾概率比较，不是不同参数下样本值的逐点比较。
+
+对共同支持上的指数族
+\[
+ f_\theta(x)=\exp\{\eta(\theta)T(x)-A(\theta)\}h(x),
+\]
+若 $\eta$ 非递减，则两参数的似然比为
+\[
+ \exp\{[\eta(\theta_2)-\eta(\theta_1)]T
+                  -A(\theta_2)+A(\theta_1)\},
+\]
+所以在 $T$ 中有 MLR。$\eta$ 递减时应改用 $-T$。Cauchy 位置族在 $T=X$ 中不是 MLR：其两参数似然比在正、负无穷处都趋于 1，却在两个位置参数处分别小于和大于 1，不可能单调。
+
+\subsection{Karlin--Rubin 定理及证明}
+
+\begin{definitionbox}{单侧 UMP 定理}
+若模型在 $T$ 中有 MLR，取
+\[
+ \varphi^*=\ind_{\{T>c\}}+\gamma\ind_{\{T=c\}},
+ \qquad \E_{\theta_0}\varphi^*=\alpha\in(0,1).
+\]
+则它是 $H_0:\theta\le\theta_0$ 对 $H_1:\theta>\theta_0$ 的 UMP 水平 $\alpha$ 检验；对点原假设 $\theta=\theta_0$ 也成立。其功效随参数非递减。
+\end{definitionbox}
+
+\textbf{证明。}
+随机单调性给出
+\[
+ \sup_{\theta\le\theta_0}\E_\theta\varphi^*
+ =\E_{\theta_0}\varphi^*=\alpha,
+\]
+所以复合原假设水平确实受控。固定任意 $\theta>\theta_0$，MLR 保证上尾规则按 $f_\theta/f_{\theta_0}$ 的大小拒绝：在比值平台上的部分选择属于 NP 等号边界的允许安排。因此它是 $P_{\theta_0}$ 对 $P_\theta$ 的 MP 检验。每个复合原假设水平检验 $\psi$ 都满足 $\E_{\theta_0}\psi\le\alpha$，由 NP 引理
+\[
+ \E_\theta\varphi^*\ge\E_\theta\psi.
+\]
+临界值只由边界分布和 $\alpha$ 决定，不依赖所选的具体备择，故对每个 $\theta>\theta_0$ 都成立，得到 UMP。
+
+同一规则若在另一参数 $\theta'$ 处的功效为 $a\in(0,1)$，重新以 $\theta'$ 为边界，就成为水平 $a$ 的右侧 UMP。对 $\theta<\theta_0$，补检验 $1-\varphi^*$ 是从边界检验较小参数的 NP 最优规则，所以在所有满足 $\E_{\theta_0}\psi=\alpha$ 的规则中，
+\[
+ \E_\theta\varphi^*\le\E_\theta\psi.
+\]
+即该上尾规则在较小参数处还具有最小拒绝概率。
+
+若各参数分布具有共同正支持，$0<\alpha<1$ 保证所有参数处功效均严格介于 0 与 1。若两个参数的似然比不是常数，功效还严格增加。否则令 $a=\beta(\theta_1)=\beta(\theta_2)$，常数检验 $a$ 在该简单检验问题中也最优；NP 等号条件却要求它在严格大于阈值处等于 1、严格小于阈值处等于 0。因 $0<a<1$，只能是似然比几乎处处恒定，矛盾。
+
+\subsection{例子与方向}
+
+\begin{examplebox}{Poisson、二项与指数分布}
+若 $X_i\sim\operatorname{Poisson}(\theta)$ 独立，则 $S=\sum X_i\sim\operatorname{Poisson}(n\theta)$，自然参数 $\log\theta$ 递增。检验 $\theta\le\theta_0$ 对 $\theta>\theta_0$ 时选
+\[
+ P_{\theta_0}(S>c)\le\alpha\le P_{\theta_0}(S\ge c),\qquad
+ \gamma=\frac{\alpha-P_{\theta_0}(S>c)}{P_{\theta_0}(S=c)}.
+\]
+按大 $S$ 拒绝即为 UMP。二项族的似然比同样随成功数递增，前节 $\operatorname{Bin}(4,1/2)$ 的边界规则因而对所有 $p>1/2$ 同时最优。
+
+若 $X_i\sim\operatorname{Exp}(\lambda)$，以率参数 $\lambda$ 表示，则密度中的自然参数是 $-\lambda$。较大的率对应较短的等待时间，检验较大 $\lambda$ 应拒绝较小的 $\sum X_i$，方向不能照搬。
+\end{examplebox}
+
+均匀端点族在 $M$ 中有 MLR。前节的 $\varphi_A,\varphi_B$ 对所有 $\theta>\theta_0$ 都达到 NP 功效上界，又都满足复合原假设水平，因此都是 UMP。两者完整功效为
+\begin{align*}
+ \beta_A(\theta)&=
+ \begin{cases}0,&\theta\le c_\alpha,\\1-(c_\alpha/\theta)^n,&\theta>c_\alpha,
+ \end{cases}\\[3pt]
+ \beta_B(\theta)&=
+ \begin{cases}\alpha,&\theta\le\theta_0,\\
+ 1-(1-\alpha)(\theta_0/\theta)^n,&\theta>\theta_0.
+ \end{cases}
+\end{align*}
+备择一侧功效相同，不要求原假设一侧也相同；支持随参数改变时，某些参数处功效可为零。
+
+\begin{examplebox}{练习 5.4：把物理参数换成自然参数}
+对率参数指数样本，检验 $\lambda\le\lambda_0$ 对 $\lambda>\lambda_0$。利用 $2\lambda_0\sum X_i\sim\chi^2_{2n}$ 写出 UMP 规则，并说明最坏原假设参数。
+
+\textbf{答案线索。} 以 $-\sum X_i$ 为 MLR 统计量，拒绝 $2\lambda_0\sum X_i<\chi^2_{2n,\alpha}$。拒绝率随 $\lambda$ 增大，原假设最大值在 $\lambda_0$ 处取得；连续分布不需要随机化。
+\end{examplebox}
+
+\section{双侧困难与无偏约束}
+
+\subsection{正态双侧问题不存在 UMP}
+
+设 $Z\sim N(\delta,1)$，检验 $\delta=0$ 对 $\delta\ne0$。似然比
+\[
+ f_\delta(z)/f_0(z)=e^{\delta z-\delta^2/2}
+\]
+在 $\delta>0$ 时严格递增，在 $\delta<0$ 时严格递减。因连续分布的边界概率为零，NP 引理的唯一性给出：对任意固定正备择，唯一 MP 规则是
+$\varphi_+=\ind_{\{Z>z_{1-\alpha}\}}$；对任意固定负备择，唯一 MP 规则是
+$\varphi_-=\ind_{\{Z<z_\alpha\}}$。
+
+若双侧 UMP 存在，它必须在 $P_0$ 下同时等于这两个规则。但在
+\[
+ \{Z>\max(z_\alpha,z_{1-\alpha})\}
+\]
+上，前者拒绝、后者不拒绝，该集合的原假设概率为 $\min(\alpha,1-\alpha)>0$，矛盾。此证明对所有 $0<\alpha<1$ 成立。把左右两尾各改为 $\alpha/2$ 只能控制总大小，不能恢复对每个固定单侧备择的 NP 最优性。
+
+\subsection{无偏性给出的两个矩方程}
+
+\begin{definitionbox}{无偏检验与 UMPU}
+水平 $\alpha$ 检验若对每个备择满足 $\beta_\varphi(\theta)\ge\alpha$，称为无偏检验。若它在所有无偏水平 $\alpha$ 检验中对每个备择都最有力，称为 UMPU。常数规则 $\varphi\equiv\alpha$ 是比较基线。检验无偏性不是估计量期望等于参数。
+\end{definitionbox}
+
+设 $\theta_0$ 为参数区间内点，功效在该点连续可微，并允许对固定检验在积分号下求导。无偏性与水平条件先给出
+\[
+ \beta(\theta_0)=\alpha.
+\]
+因为邻近备择的功效至少为 $\alpha$，连续性给出边界处至少为 $\alpha$，水平又给出不超过 $\alpha$。又因该点是功效的局部最小点，$\beta'(\theta_0)=0$。
+
+令原假设得分 $S_0=\dot f_{\theta_0}/f_{\theta_0}$，由密度归一化求导及功效求导，
+\[
+ \E_0S_0=0,\qquad
+ \E_0\varphi=\alpha,\qquad \E_0(\varphi S_0)=0.
+\]
+共同正支持、导数绝对可积及相应的积分求导条件需实际核验；含参数支持边界的模型不能直接套用。
+
+在正则自然指数族 $f_\eta=e^{\eta T-A(\eta)}h$ 中，
+$S_0=T-m$，其中 $m=\E_0T=A'(\eta_0)$，故必要条件化为
+\[
+ \boxed{\E_0\varphi=\alpha,\qquad \E_0(T\varphi)=\alpha m.}
+\]
+第一个方程固定总拒绝概率；第二个要求拒绝区域内的正负中心化一阶矩平衡。它们只是无偏性的必要局部条件，候选规则的全局无偏性仍要证明。
+
+对连续双尾规则，第二个方程可写为
+\[
+ \int_{t<c_1}(m-t)\,dP_0^T(t)
+ =\int_{t>c_2}(t-m)\,dP_0^T(t).
+\]
+它平衡的是距均值的加权概率，不是两尾面积。对称分布常得到等尾，偏态分布通常不是每尾 $\alpha/2$。
+
+\begin{examplebox}{练习 5.5：必要条件为什么不充分}
+设 $Z\sim N(\delta,1)$。选择 $c>0$ 使 $P_0(|Z|\le c)=\alpha$，令 $\varphi=\ind_{\{|Z|\le c\}}$。验证它满足大小和原假设处的导数条件，却不是双侧无偏检验。
+
+\textbf{答案线索。} 对称性给出 $\E_0(Z\varphi)=0$，大小为 $\alpha$；但 $|\delta|\to\infty$ 时 $P_\delta(|Z|\le c)\to0<\alpha$。在原点导数为零并不能控制全部备择。
+\end{examplebox}
+
+\section{广义 Neyman--Pearson 引理}
+
+\subsection{多个矩约束下的符号规则}
+
+设 $g,g_1,\ldots,g_k$ 对 $\sigma$-有限测度 $\nu$ 绝对可积，允许取正负值。记
+\[
+ \Phi=\{\varphi:0\le\varphi\le1,\ \varphi\text{ 可测}\},\qquad
+ \mathcal C_b=\left\{\varphi\in\Phi:
+       \int\varphi g_j\,d\nu=b_j,\ j=1,\ldots,k\right\}.
+\]
+目标是在非空的 $\mathcal C_b$ 中最大化 $\int\varphi g\,d\nu$。
+
+\begin{definitionbox}{广义 NP 引理}
+最大值可以取到。若某个可行 $\varphi^*$ 和有限实数乘子 $a_j$ 满足：令
+\[
+ \Delta=g-\sum_{j=1}^k a_jg_j,
+\]
+则 $\varphi^*=1$ 于 $\{\Delta>0\}$、$\varphi^*=0$ 于 $\{\Delta<0\}$，它就最优。等号边界可随机化。
+
+进一步令
+\[
+ M=\left\{\left(\int\varphi g_j\,d\nu\right)_{j=1}^k:
+                    \varphi\in\Phi\right\}.
+\]
+若 $b$ 为 $M$ 的内点，则存在有限实数乘子，使所有最优解都具有上述符号形式，几乎处处成立。
+\end{definitionbox}
+
+\textbf{充分性的证明。}
+对任意 $\psi\in\mathcal C_b$，逐点有 $(\varphi^*-\psi)\Delta\ge0$，而矩约束相同，故
+\begin{align*}
+ \int(\varphi^*-\psi)g\,d\nu
+ &=\int(\varphi^*-\psi)\Delta\,d\nu
+   +\sum_j a_j\int(\varphi^*-\psi)g_j\,d\nu\\
+ &=\int(\varphi^*-\psi)\Delta\,d\nu\ge0.
+\end{align*}
+相同功效时，非负乘积几乎处处为零，故 $\Delta\ne0$ 处具有同样的唯一性。
+
+若约束改成 $\int\varphi g_j\,d\nu\le b_j$，充分条件相应为 $a_j\ge0$、符号规则、可行性和互补松弛
+\[
+ a_j\left(b_j-\int\varphi^*g_j\,d\nu\right)=0.
+\]
+此时上式中乘子项等于 $\sum_j a_j(b_j-\int\psi g_j\,d\nu)\ge0$。等式约束允许任意实数乘子，不等式上界约束才要求非负。
+
+\subsection{存在性与逆结论的证明}
+
+这部分使用两个标准分析结果：Hilbert 空间有界序列存在弱收敛子序列；有限维闭凸集的边界点存在支撑超平面。它们分别保证最优解取到，以及有限乘子的存在。
+
+记录每个检验的矩向量和目标值：
+\[
+ u_\varphi=\left(\int\varphi g_j\,d\nu\right)_j,
+ \quad v_\varphi=\int\varphi g\,d\nu,
+ \quad K=\{(u_\varphi,v_\varphi):\varphi\in\Phi\}.
+\]
+$K$ 显然凸。为证紧，利用 $\nu$ 的 $\sigma$-有限性选取严格正的可积 $q$，设
+\[
+ w=q+|g|+\sum_j|g_j|,\qquad
+ C=\int w\,d\nu,\qquad d\mu=(w/C)\,d\nu.
+\]
+$\mu$ 是与 $\nu$ 等价的概率测度。每个检验的 $L^2(\mu)$ 范数不超过 1，所以任意检验序列有弱收敛子序列 $\varphi_{n_\ell}\rightharpoonup\varphi$。对任意可测集 $A$，以 $\ind_A$ 为测试函数，有
+\[
+ 0\le\int_A\varphi\,d\mu\le\mu(A).
+\]
+分别取 $A=\{\varphi<0\}$ 和 $A=\{\varphi>1\}$，得 $0\le\varphi\le1$ 几乎处处。又因 $Cg_j/w$、$Cg/w$ 有界，均属于 $L^2(\mu)$，弱收敛给出
+\[
+ \int\varphi_{n_\ell}g_j\,d\nu\longrightarrow\int\varphi g_j\,d\nu,
+ \qquad
+ \int\varphi_{n_\ell}g\,d\nu\longrightarrow\int\varphi g\,d\nu.
+\]
+所以每列可达向量都有仍可达的收敛子序列，$K$ 在有限维空间中紧。选可行检验的目标值趋于上确界，紧性给出某个可行检验达到最大值 $v^*$。
+
+再定义向下延伸的闭凸集
+\[
+ H=\{(u,v-t):(u,v)\in K,\ t\ge0\}.
+\]
+闭性由 $K$ 的紧性直接验证。最优点 $(b,v^*)$ 在其上边界，故存在非零 $(p,s)$，使
+\[
+ p^\top(u-b)+s(v-v^*)\le0,\qquad (u,v)\in H.
+\]
+因 $H$ 可向下无限延伸，必有 $s\ge0$。若 $s=0$，则 $p\ne0$；$b\in\operatorname{int}M$ 允许取 $u=b+\varepsilon p\in M$，将对应点代入便得 $\varepsilon\|p\|^2\le0$，矛盾。因此 $s>0$。令 $a=-p/s$，便有
+\[
+ v_\varphi-a^\top u_\varphi\le v^*-a^\top b,
+ \qquad\varphi\in\Phi.
+\]
+最优解达到等号，因此它在全部 $\Phi$ 中最大化
+$\int\varphi\Delta\,d\nu$。这个无约束积分逐点最大化时，正系数处必须取 1，负系数处必须取 0，得到逆结论。内点条件正是排除 $s=0$ 的竖直支撑面。
+
+\begin{examplebox}{练习 5.6：从两个约束得到一条直线}
+在 $\E_0\varphi=\alpha$、$\E_0(T\varphi)=\alpha m$ 下最大化 $\E_\eta\varphi$。写出广义 NP 的 $g,g_1,g_2$ 与密度差，并解释乘子为何不需要非负。
+
+\textbf{答案线索。} 取 $g=f_\eta$、$g_1=f_0$、$g_2=Tf_0$，于是 $\Delta=f_\eta-(a+bT)f_0$。原约束为等式，故 $a,b$ 为任意有限实数。
+\end{examplebox}
+
+\section{一参数指数族的双侧 UMPU}
+
+\subsection{定理、可行性与双尾结构}
+
+考虑共同正支持上的自然指数族
+\[
+ f_\eta(x)=\exp\{\eta T(x)-A(\eta)\}h(x),\qquad \eta\in I,
+\]
+其中 $I$ 为开区间，$\eta_0\in I$，$T$ 非恒定，$0<\alpha<1$。开自然参数区间保证在 $\eta_0$ 两侧有指数矩，从而可交换局部求导与积分，并有 $m=\E_0T=A'(\eta_0)$。
+
+\begin{definitionbox}{一参数指数族双侧 UMPU}
+检验 $\eta=\eta_0$ 对 $\eta\ne\eta_0$，存在满足
+\[
+ \E_0\varphi^*=\alpha,\qquad
+ \E_0(T\varphi^*)=\alpha m
+\]
+的双尾规则：
+\[
+ \varphi^*(x)=
+ \begin{cases}
+ 1,&T<c_1\text{ 或 }T>c_2,\\
+ \gamma_i,&T=c_i,\quad i=1,2,\\
+ 0,&c_1<T<c_2.
+ \end{cases}
+\]
+每个这样标定的双尾规则都是 UMPU。若临界点重合，使用一个边界随机化值；若 $T$ 恒定，模型不随 $\eta$ 改变，常数规则 $\alpha$ 即可。
+\end{definitionbox}
+
+\textbf{第一步：验证广义 NP 的内点条件。}
+设 $\mathcal C_b$ 为上述两矩约束类，常数规则 $\alpha$ 可行。考虑
+\[
+ \varphi_{s,t}=\alpha+s+t\ind_{\{T>m\}},\qquad
+ |s|+|t|<\min(\alpha,1-\alpha).
+\]
+它是合法检验，矩向量的改变量为
+\[
+ \begin{pmatrix}
+ 1&P_0(T>m)\\m&\E_0[T\ind_{\{T>m\}}]
+ \end{pmatrix}
+ \begin{pmatrix}s\\t\end{pmatrix}.
+\]
+矩阵行列式为 $\E_0[(T-m)\ind_{\{T>m\}}]>0$，因为非恒定可积变量不可能仅在均值的一侧取值。因此小扰动覆盖 $b=(\alpha,\alpha m)^\top$ 附近的二维邻域，内点条件成立。
+
+\textbf{第二步：由严格凸性得到双尾。}
+固定 $\eta\ne\eta_0$，广义 NP 保证有最优解，且按
+\[
+ d_\eta(t)=r_\eta(t)-(a+bt),\qquad
+ r_\eta(t)=e^{(\eta-\eta_0)t-A(\eta)+A(\eta_0)}
+\]
+的正负拒绝。因
+\[
+ d_\eta''(t)=(\eta-\eta_0)^2r_\eta(t)>0,
+\]
+负值区间是一个区间，规则在其外拒绝，内部接受，至多在两个零点随机化。
+
+单尾情形不能满足两个矩约束。因为对任何常数 $c$ 都有
+\[
+ \E_0[(T-c)(\varphi-\alpha)]=0.
+\]
+若 $\varphi$ 为上尾规则，则乘积在 $T<c$ 时为 $\alpha(c-T)>0$，在 $T>c$ 时为 $(1-\alpha)(T-c)>0$，在 $T=c$ 时为零。非恒定性使其期望严格为正，矛盾；下尾规则则严格为负。恒为 0 或 1 也不符合大小约束。因此可取双尾形式，包含在有限支持边界上随机化和两个临界点重合的情形。
+
+\subsection{同一个规则对全部备择都最优}
+
+\textbf{第三步：固定临界点，用割线逐一比较。}
+固定已得到的两矩可行双尾规则，设 $c_1<c_2$。对任意新的备择 $\eta\ne\eta_0$，连接指数曲线上的
+$(c_1,r_\eta(c_1))$、$(c_2,r_\eta(c_2))$，得到直线 $\ell_\eta(t)=a_\eta+b_\eta t$。严格凸性给出
+\[
+ r_\eta(t)-\ell_\eta(t)
+ \begin{cases}
+ >0,&t<c_1\text{ 或 }t>c_2,\\
+ <0,&c_1<t<c_2,\\
+ =0,&t=c_1,c_2.
+ \end{cases}
+\]
+区间内曲线低于割线；区间外的严格不等式由割线斜率的单调性得到。例如 $t<c_1$ 时，
+\[
+ \frac{r_\eta(c_1)-r_\eta(t)}{c_1-t}
+ <\frac{r_\eta(c_2)-r_\eta(c_1)}{c_2-c_1}=b_\eta,
+\]
+移项即得曲线高于延长线。于是固定的 $\varphi^*$ 对每个备择都满足广义 NP 的充分符号规则，所以
+\[
+ \E_\eta\varphi^*\ge\E_\eta\psi,
+ \qquad\psi\in\mathcal C_b,\quad\eta\ne\eta_0.
+\]
+改变备择时，改变的是割线的斜率和截距，临界点与检验本身均不变。
+
+\textbf{第四步：证明全局无偏并限制比较类。}
+取 $\psi\equiv\alpha$ 得 $\E_\eta\varphi^*\ge\alpha$，证明候选确实无偏。每个无偏水平检验又都满足前文两个必要矩方程，因此属于 $\mathcal C_b$，上述功效比较覆盖所有无偏竞争者，UMPU 得证。
+
+若 $c_1=c_2=c$，将割线改为 $r_\eta$ 在 $c$ 处的切线。严格凸性保证除 $c$ 外差均为正，规则因而在 $T\ne c$ 全拒绝，在 $T=c$ 随机化。记 $p=P_0(T=c)$，矩方程给出
+\[
+ (1-\gamma)p=1-\alpha,
+ \qquad m-(1-\gamma)cp=\alpha m.
+\]
+所以 $c=m$ 且 $\gamma=1-(1-\alpha)/p$，要求 $p\ge1-\alpha$。连续分布没有这样的重合情形。
+
+\begin{examplebox}{已知方差的双侧正态检验}
+对独立正态样本 $N(\mu,\sigma^2)$，$\sigma$ 已知，检验 $\mu=\mu_0$。令 $Z=\sqrt n(\bar X-\mu_0)/\sigma$，则
+\[
+ \varphi^*=\ind_{\{|Z|>z_{1-\alpha/2}\}}
+\]
+在原假设下大小为 $\alpha$。又因中心化正态分布对称，
+\[
+ \E_{\mu_0}[(\bar X-\mu_0)\varphi^*]=0,
+\]
+所以两个矩方程都成立，双侧 $z$ 检验为 UMPU。这与双侧不存在 UMP 不矛盾：两者的竞争类不同。
+\end{examplebox}
+
+\begin{examplebox}{练习 5.7：两尾为什么不一定等概率}
+设 $T$ 在原假设下服从偏态连续分布，均值为 $m$。分别写出双侧 UMPU 临界值的面积方程与一阶矩方程。解释仅令两尾各为 $\alpha/2$ 为何通常不足。
+
+\textbf{答案线索。} 要求 $P_0(T<c_1)+P_0(T>c_2)=\alpha$ 及
+$\E_0[(T-m)\ind_{\{T<c_1\text{ 或 }T>c_2\}}]=0$。尾概率未包含距均值的权重，等面积一般不能推出矩平衡。
+\end{examplebox}
+
+\section{干扰参数与条件 UMPU}
+
+\subsection{相似性、Neyman 结构与完备性}
+
+考虑参数 $(\eta,\lambda)$，$\eta$ 为研究对象，$\lambda$ 为干扰参数。固定 $\eta=\eta_0$ 的边界族记为
+$\mathcal P_b=\{P_{\eta_0,\lambda}:\lambda\in\Lambda\}$。
+
+\begin{definitionbox}{相似检验与 Neyman 结构}
+若对每个 $\lambda$ 都有 $\E_{\eta_0,\lambda}\varphi=\alpha$，称检验在边界族上相似。设 $U$ 对边界族充分，若
+\[
+ \E_{\eta_0,\lambda}(\varphi\mid U)=\alpha
+ \quad P_{\eta_0,\lambda}\text{-几乎处处，对每个 }\lambda,
+\]
+则称具有 Neyman 结构。塔式法则立即给出后者蕴含相似性。
+\end{definitionbox}
+
+若 $U$ 对边界族充分，则以下两项等价：$U$ 有界完备；每个大小 $\alpha\in(0,1)$ 的相似检验都具有 Neyman 结构。
+
+\textbf{证明。}
+充分性允许选取对所有 $\lambda$ 共用的条件期望函数。对相似检验令
+\[
+ h(U)=\E_{\eta_0,\lambda}(\varphi\mid U)-\alpha.
+\]
+它有界，且对每个 $\lambda$ 期望为零，有界完备性推出 $h=0$，即 Neyman 结构。反之，若有界完备性失败，存在有界 $q(U)$，对所有 $\lambda$ 期望为零，但并非在每个分布下几乎处处为零。若 $|q|\le M$，取
+\[
+ 0<\varepsilon<\min(\alpha,1-\alpha)/M.
+\]
+则 $\varphi=\alpha+\varepsilon q(U)$ 是相似检验，但它本身为 $U$ 的函数，故条件期望就是自身，不具有 Neyman 结构，矛盾。
+
+\subsection{条件似然比与两个条件矩}
+
+设模型为共同正支持上的正则指数族
+\[
+ f_{\eta,\lambda}(x)
+ =\exp\{\eta T(x)+\lambda^\top U(x)-A(\eta,\lambda)\}h(x),
+\]
+其中 $(\eta,\lambda)\in I\times\Lambda$，$I$ 为含 $\eta_0$ 的开区间，$\Lambda$ 为开集；假设存在通常样本空间上的正则条件分布。开自然参数邻域保证所需的局部积分求导。边界族中 $U$ 充分。给定 $U=u$ 后，$\lambda$ 的因子在归一化中消去，条件似然比为
+\[
+ \frac{dQ_{\eta,u}}{dQ_{\eta_0,u}}
+ =\frac{\exp\{(\eta-\eta_0)T\}}
+ {\E_{\eta_0}[\exp\{(\eta-\eta_0)T\}\mid U=u]}.
+\]
+右侧不含干扰参数，条件问题成为一参数指数倾斜。分母必须保留，它使条件密度积分为 1。
+
+任取全模型中的无偏水平检验 $\psi$。固定 $\lambda$，由原假设处功效的连续性与可微性，
+\[
+ \E_{\eta_0,\lambda}\psi=\alpha,\qquad
+ \E_{\eta_0,\lambda}[T(\psi-\alpha)]=0.
+\]
+充分性允许选择共同函数
+\[
+ h(U)=\E_0(\psi-\alpha\mid U),\qquad
+ g(U)=\E_0[T(\psi-\alpha)\mid U].
+\]
+二者对所有 $\lambda$ 的期望为零。$h$ 有界，有界完备性足以消去；$g$ 未必有界，仅有
+\[
+ \E_0|g(U)|\le\E_0|T|<\infty.
+\]
+所以要把第二个约束也传入条件层，需要完整的完备性。若 $U$ 对边界族完备充分，便有
+\[
+ \boxed{\E_0(\psi\mid U)=\alpha,\qquad
+ \E_0(T\psi\mid U)=\alpha\E_0(T\mid U).}
+\]
+这里只为第一个条件使用有界完备性，不能据此省略第二个条件的可积性和完备性要求。
+
+\begin{definitionbox}{条件 UMPU 定理}
+在上述正则共同正支持模型中，取 $0<\alpha<1$，设 $U$ 对边界族完备充分。若可测的临界值及端点随机化给出逐层双尾规则 $\varphi^*$，并满足
+\[
+ \E_0(\varphi^*\mid U)=\alpha,\qquad
+ \E_0(T\varphi^*\mid U)=\alpha\E_0(T\mid U),
+\]
+则 $\varphi^*$ 是 $\eta=\eta_0$ 对 $\eta\ne\eta_0$、干扰参数不受限制时的 UMPU 检验。条件层上 $T$ 恒定时用常数规则 $\alpha$。
+\end{definitionbox}
+
+\textbf{证明。}
+任意无偏竞争者 $\psi$ 都满足上述两个条件矩。条件似然比不含干扰参数，故在几乎每个 $U=u$ 层内，可以用一参数结果的割线证明得到
+\[
+ \E_{\eta,\lambda}(\varphi^*-\psi\mid U=u)\ge0.
+\]
+共同正支持使原假设与备择的分布相互绝对连续，因而它们的 $U$ 分布也具有相同零测集，原假设下忽略的条件层不会在备择下突然有正概率。按\emph{备择下} $U$ 的分布平均，
+\[
+ \E_{\eta,\lambda}(\varphi^*-\psi)
+ =\E_{\eta,\lambda}
+       [\E_{\eta,\lambda}(\varphi^*-\psi\mid U)]\ge0.
+\]
+候选的条件大小给出每个干扰参数处的大小为 $\alpha$；再取也满足条件矩的常数规则 $\psi\equiv\alpha$，得到候选在每个备择下功效至少为 $\alpha$。它自身无偏，且优于全部无偏竞争者，结论成立。临界值的可测性是拼成合法检验的必要条件，不能只逐个条件层抽象选取而不加说明。
+
+\subsection{未知方差的正态均值检验}
+
+设 $X_i\sim N(\mu,\sigma^2)$ 独立，$n\ge2$，检验 $\mu=\mu_0$。令
+\[
+ Y=\bar X-\mu_0,\qquad U=\sum_i(X_i-\mu_0)^2.
+\]
+平方展开后，联合密度可写成
+\[
+ f_{\mu,\sigma^2}(x)=
+ (2\pi\sigma^2)^{-n/2}e^{-n(\mu-\mu_0)^2/(2\sigma^2)}
+ \exp\left\{\frac{n(\mu-\mu_0)}{\sigma^2}Y
+                         -\frac{U}{2\sigma^2}\right\}.
+\]
+目标自然参数 $\eta=n(\mu-\mu_0)/\sigma^2\in\R$，干扰自然参数 $\lambda=-1/(2\sigma^2)<0$；原假设等价于 $\eta=0$。在边界族中 $U/\sigma^2\sim\chi_n^2$，因子分解与开自然参数区间给出 $U$ 对未知方差完备充分。
+
+原假设下同时把各 $X_i-\mu_0$ 变号，$U$ 不变而 $Y$ 变为 $-Y$，故给定 $U$ 时 $Y$ 关于零对称。因此按 $|Y|>c(U)$ 拒绝，只要条件大小为 $\alpha$，就自动满足第二个条件矩。
+
+令 $V_0=Y/\sqrt U$。边界族下写 $X_i-\mu_0=\sigma Z_i$，则
+\[
+ V_0=\frac{\bar Z}{\sqrt{\sum_i Z_i^2}},
+\]
+分布不依赖 $\sigma^2$，所以它对\emph{边界族}辅助。Basu 定理给出 $V_0\perp U$，可取常数 $d$ 使 $P_0(|V_0|>d)=\alpha$，则
+\[
+ P_0(|V_0|>d\mid U)=\alpha,
+ \qquad c(u)=d\sqrt u.
+\]
+
+设 $S^2=(n-1)^{-1}\sum_i(X_i-\bar X)^2$。由 $U=(n-1)S^2+nY^2$，有
+\[
+ t=\frac{\sqrt nY}{S}
+ =\frac{\sqrt{n(n-1)}V_0}{\sqrt{1-nV_0^2}}.
+\]
+$|V_0|<1/\sqrt n$ 几乎处处成立，右侧是严格递增的奇函数，其导数为
+$\sqrt{n(n-1)}(1-nV_0^2)^{-3/2}$。故 $|V_0|>d$ 等价于 $|t|>k$。正态均值方向与正交残差独立，给出原假设下 $t\sim t_{n-1}$，从而
+\[
+ \boxed{\varphi^*=
+ \ind_{\{|\sqrt n(\bar X-\mu_0)/S|>t_{n-1,1-\alpha/2}\}}}
+\]
+是对所有 $\sigma^2>0$ 都成立的双侧 UMPU 检验。Basu 在这里用于固定 $\mu_0$ 的边界族，不是整个双参数模型。
+
+\subsection{两个 Poisson 强度的条件检验}
+
+设 $X_j\sim\operatorname{Poisson}(\rho_j)$ 独立，$\rho_1,\rho_2>0$，检验 $\rho_1=\rho_2$。令
+\[
+ T=X_1,\quad U=X_1+X_2,\quad
+ \eta=\log(\rho_1/\rho_2),\quad\lambda=\log\rho_2.
+\]
+联合概率函数为
+\[
+ p(x_1,x_2)=\frac{\exp\{\eta T+\lambda U-e^\lambda(1+e^\eta)\}}
+ {x_1!x_2!}.
+\]
+给定 $U=u$，直接相除得到
+\[
+ X_1\mid U=u\sim\operatorname{Bin}\left(u,
+               \frac{\rho_1}{\rho_1+\rho_2}\right).
+\]
+原假设下成功概率为 $1/2$，干扰强度消失，且 $U\sim\operatorname{Poisson}(2\rho)$ 对边界族完备充分。在每层选择关于 $u/2$ 对称的二项双尾规则，并作对称边界随机化达到条件大小 $\alpha$，就有
+\[
+ \E_0[(X_1-u/2)\varphi\mid U=u]=0.
+\]
+两个条件矩均成立，故得到强度不等的 UMPU 检验。$u=0$ 时条件统计量恒定；$u=1$ 时两个矩方程迫使两个可能取值处的拒绝概率均为 $\alpha$，这两层都用常数随机化。
+
+\begin{examplebox}{练习 5.8：小计数层的精确检验}
+取 $u=2$、$\alpha=0.05$，在 $X_1=0,2$ 时以同一概率 $\gamma$ 拒绝，$X_1=1$ 时不拒绝。求 $\gamma$，验证两个条件矩。
+
+\textbf{答案线索。} 原假设条件概率为 $(1/4,1/2,1/4)$，故 $\gamma/2=0.05$，得到 $\gamma=0.10$；$\E_0(X_1\varphi\mid U=2)=2\gamma/4=0.05=\alpha\,\E_0(X_1\mid U=2)$。
+\end{examplebox}
+
+\section{检验反演与最优置信集合}
+
+\subsection{覆盖率与错误候选的纳入概率}
+
+对每个候选 $\theta_0$，给出检验该点原假设的非随机水平 $\alpha$ 规则 $\varphi_{\theta_0}$，定义
+\[
+ C(X)=\{\theta_0:\varphi_{\theta_0}(X)=0\}.
+\]
+即固定同一份数据，保留所有未被拒绝的参数候选。结果一般是集合，不必是一个区间。假设有关集合事件可测，则真值为 $\theta$ 时
+\[
+ P_\theta\{\theta\in C(X)\}
+ =1-\E_\theta\varphi_\theta(X)\ge1-\alpha.
+\]
+若每个点原假设下的拒绝概率恰为 $\alpha$，覆盖率就精确为 $1-\alpha$。对另一个候选 $\theta_0\ne\theta$，
+\[
+ P_\theta\{\theta_0\in C(X)\}
+ =1-\E_\theta\varphi_{\theta_0}(X).
+\]
+$\theta$ 决定数据的真分布，$\theta_0$ 决定被检验的候选，两个下标各有作用。
+
+随机化检验先取统一的独立 $V\sim U(0,1)$，定义
+$C(X,V)=\{\theta_0:V>\varphi_{\theta_0}(X)\}$。相同公式仍成立，但概率同时对数据和辅助随机数计算。
+
+\subsection{UMP 与 UMA 的对偶}
+
+一致最准确（UMA）在本章指：满足覆盖保证的前提下，对规定方向上的每个错误候选，其纳入概率最小。
+
+\textbf{对偶证明。}
+设 $D(X)$ 为另一满足覆盖率至少 $1-\alpha$ 的置信集合。对固定候选 $\theta_0$ 定义
+\[
+ \psi_{\theta_0}(X)=\ind_{\{\theta_0\notin D(X)\}}.
+\]
+覆盖保证给出 $\E_{\theta_0}\psi_{\theta_0}\le\alpha$，所以它是一个合法水平检验。若 $\varphi_{\theta_0}$ 在所考虑的备择方向为 UMP，则
+\[
+ \E_\theta\varphi_{\theta_0}\ge\E_\theta\psi_{\theta_0}.
+\]
+两边从 1 中减去，便有
+\[
+ P_\theta(\theta_0\in C)\le P_\theta(\theta_0\in D).
+\]
+最有力的拒绝转成了对错误候选最小的纳入概率。若比较对象本身随机化，用其条件拒绝概率代替上述指示函数，论证相同。
+
+\begin{examplebox}{正态均值的单侧下置信界}
+已知方差时，检验 $\mu=\mu_0$ 对 $\mu>\mu_0$ 的 UMP 规则在
+$\sqrt n(\bar X-\mu_0)/\sigma>z_{1-\alpha}$ 时拒绝。接受候选的条件等价于
+\[
+ \mu_0\ge\bar X-z_{1-\alpha}\frac\sigma{\sqrt n},
+\]
+所以反演为
+\[
+ C(X)=\left[\bar X-z_{1-\alpha}\frac\sigma{\sqrt n},\ \infty\right).
+\]
+其 UMA 结论针对 $\mu_0<\mu$ 的错误候选，即对应检验的备择方向。不能据此声称它对真值两侧的所有错误候选都最准确。
+\end{examplebox}
+
+\subsection{UMPU 与无偏置信集合}
+
+本章称置信集合无偏，若它对每个真参数有覆盖率至少 $1-\alpha$，并且对每个错误候选 $\theta_0\ne\theta$ 都有
+\[
+ P_{\theta,\lambda}(\theta_0\in C)\le1-\alpha.
+\]
+反演双侧无偏检验立即得到这个性质，因为错误候选对应备择下的拒绝概率至少为 $\alpha$。反之，对任意这样的竞争集合 $D$，规则
+$\psi_{\theta_0}=\ind_{\{\theta_0\notin D\}}$ 既有水平保证，也在每个备择下功效至少为 $\alpha$，所以属于无偏检验类。
+
+因此反演 UMPU 检验，得到在无偏置信集合类中对每个错误候选纳入概率都最小的集合，称为一致最准确无偏（UMAU）置信集合。这里的最优指标是逐个错误候选的纳入概率，不是笼统的“长度最短”。
+
+\begin{examplebox}{双侧 $t$ 区间}
+正态未知方差时，接受候选 $\mu_0$ 的条件是
+\[
+ \left|\frac{\sqrt n(\bar X-\mu_0)}S\right|
+ \le t_{n-1,1-\alpha/2}.
+\]
+故反演得到
+\[
+ C(X)=\left[\bar X-t_{n-1,1-\alpha/2}\frac S{\sqrt n},\quad
+                 \bar X+t_{n-1,1-\alpha/2}\frac S{\sqrt n}\right].
+\]
+对所有 $\mu\in\R$、$\sigma^2>0$，其覆盖率都恰为 $1-\alpha$；由条件 UMPU 与反演对偶，它在无偏置信集合类中具有 UMAU 性质。已知方差时将 $t$ 分位数与 $S$ 分别换成 $z$ 分位数与 $\sigma$，结论相同。
+
+覆盖率描述固定真参数下的重复抽样行为。观测数据后的区间端点已固定，频率覆盖结论本身不赋予参数一个后验分布。
+\end{examplebox}
+
+\begin{examplebox}{练习 5.9：反演的方向与最优性的含义}
+从已知方差正态均值检验 $H_0:\mu=\mu_0$ 对 $H_1:\mu<\mu_0$ 出发，求单侧置信集合，并说明其 UMA 性质针对哪一侧错误候选。再说明双侧 $t$ 区间的 UMAU 性质为何不能直接译成“所有置信区间中长度最短”。
+
+\textbf{答案线索。} 接受条件为 $\sqrt n(\bar X-\mu_0)/\sigma\ge z_\alpha$，所以
+$C=(-\infty,\bar X+z_{1-\alpha}\sigma/\sqrt n]$；比较针对 $\mu_0>\mu$。UMAU 限于无偏集合类，比较的是错误候选的纳入概率，并非直接比较每次样本的长度或期望长度。
+\end{examplebox}
+
+\section{本章结果的使用条件}
+
+\begin{center}
+\small
+\begin{tabularx}{\textwidth}{@{}p{0.23\textwidth}XX@{}}
+\toprule
+问题 & 主要工具 & 必须核验的条件\\
+\midrule
+简单对简单 & NP 引理 & 大小、似然比边界与随机化\\
+单侧复合假设 & MLR 与单侧 UMP & 自然参数方向、边界水平、规则不随备择改变\\
+一参数双侧问题 & 广义 NP 与 UMPU & 正则求导、两个矩方程、全局无偏\\
+存在干扰参数 & 条件 UMPU & 边界族完备充分、条件两矩、可测性与零测集转移\\
+构造置信集合 & 检验反演 & 覆盖率、候选与真值的下标、比较方向和集合类\\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+一项功效比较只有同时说明假设、水平和竞争类，结论才完整。NP 在全部水平检验中处理固定备择；MLR 使同一排序适用于所有单侧备择；双侧问题借无偏性限定竞争者，再以矩约束和凸性完成统一比较。条件化与反演保留的正是这些约束，因此最优性名称不能脱离适用范围单独使用。

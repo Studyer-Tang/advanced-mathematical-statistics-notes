@@ -95,3 +95,8 @@
 \newcommand{\argmax}{\operatorname*{arg\,max}}
 \newcommand{\argmin}{\operatorname*{arg\,min}}
 
+
+% Keep running heads short enough for the original 185 x 260 mm page.
+\renewcommand{\chaptermark}[1]{\markboth{\ifnum\value{chapter}>0 第\thechapter 章\fi}{}}
+\setlength{\emergencystretch}{1em}
+\raggedbottom

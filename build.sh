@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 cd "$(dirname "$0")"
-mkdir -p output/pdf
+mkdir -p tmp
+build_dir=$(mktemp -d tmp/build.XXXXXXXX)
+trap 'rm -rf -- "$build_dir"' EXIT
 
 build_chapter() {
   local source="$1"
-  local target="$2"
-  local build_dir="tmp/build/$source"
-  mkdir -p "$build_dir"
   if command -v latexmk >/dev/null 2>&1; then
     latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir="$build_dir" "$source.tex"
   elif command -v xelatex >/dev/null 2>&1; then
@@ -19,8 +18,15 @@ build_chapter() {
     echo "Install XeLaTeX with ctex, or Tectonic, before building." >&2
     exit 1
   fi
-  cp "$build_dir/$source.pdf" "output/pdf/$target"
+  if [[ ! -s "$build_dir/$source.pdf" ]]; then
+    echo "Compiler did not generate $source.pdf." >&2
+    exit 1
+  fi
 }
 
-build_chapter main chapter-01-cn.pdf
-build_chapter chapter02 chapter-02-cn.pdf
+# A compilation failure must not publish only one chapter of a new edition.
+build_chapter main
+build_chapter chapter02
+mkdir -p output/pdf
+cp "$build_dir/main.pdf" output/pdf/chapter-01-cn.pdf
+cp "$build_dir/chapter02.pdf" output/pdf/chapter-02-cn.pdf

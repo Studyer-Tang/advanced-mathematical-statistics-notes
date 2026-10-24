@@ -42,7 +42,7 @@ GitHub: [Studyer-Tang](https://github.com/Studyer-Tang)
 ./build.ps1
 ```
 
-生成两章独立 PDF，位于 output/pdf/。
+生成两章独立 PDF，位于 `output/pdf/`。两个脚本都会先在独立临时目录中完成全部章节的编译，再更新发布版 PDF；编译失败或未生成 PDF 时保留之前的两章，退出时清理临时文件。最终复制到发布目录时仍需有足够磁盘空间和写入权限。
 
 macOS / Linux 可运行 ./build.sh。该脚本优先使用 latexmk / XeLaTeX，未安装时可使用 Tectonic。也可分别用 XeLaTeX 编译 main.tex（第一章）与 chapter02.tex（第二章），各运行两遍生成目录。两个入口共用 preamble.tex 版式，正文分章维护。
 
@@ -64,4 +64,4 @@ macOS / Linux 可运行 ./build.sh。该脚本优先使用 latexmk / XeLaTeX，�
 
 ## 更新方式
 
-每学完一个知识块，就在对应章节源文件中补充翻译、理解、例题和疑问，同时更新 `PROGRESS.md`。推送后，GitHub Actions 会自动验证 PDF 能否正常编译，并提供构建产物。
+每学完一个知识块，就在对应章节源文件中补充翻译、理解、例题和疑问，同时更新 `PROGRESS.md`。推送后，GitHub Actions 会自动验证 PDF 能否正常编译，并提供构建产物。构建脚本另有 Windows、macOS、Linux 回归检查，覆盖第二章编译失败、编译器未产生 PDF 和成功发布两章的情况；本地可运行 `python -m unittest discover -s tests -v`，不依赖 TeX 安装。
